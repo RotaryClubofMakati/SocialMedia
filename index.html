@@ -459,6 +459,9 @@ function humanSize_(bytes){
 const $=id=>document.getElementById(id);
 const ADMIN_USER='Aaron';
 const ADMIN_PASS='Aaron';
+// Additional admin accounts. Each entry is {user, pass}; add more here
+// the same way to hand out more admin logins without removing Aaron's.
+const EXTRA_ADMINS=[{user:'jiyan',pass:'jiyan'}];
 // Approver account: can review content that is "For Approval", attach the
 // final photo/video, and mark it Approved or send it back for Revision.
 // Change these two values to whatever credentials the club wants to hand
@@ -515,7 +518,7 @@ async function copyShareLink(){
 function tryLogin(){
   const u=$('loginUser').value.trim();
   const p=$('loginPass').value;
-  if(u===ADMIN_USER&&p===ADMIN_PASS){
+  if((u===ADMIN_USER&&p===ADMIN_PASS)||EXTRA_ADMINS.some(a=>u===a.user&&p===a.pass)){
     currentRole='admin';
     sessionStorage.setItem(AUTH_KEY,'1');
     sessionStorage.setItem(ROLE_KEY,'admin');
@@ -890,7 +893,7 @@ function findDuplicateYoutubeLinks(){
   const msg=dupes.map(([id,names])=>'Video '+id+' is used by '+names.length+' projects:\n  • '+names.join('\n  • ')).join('\n\n');
   alert('Found the same YouTube video linked on more than one project — this is why they look/play identically:\n\n'+msg+'\n\nOpen each one and replace the link with that project\'s own video.');
 }
-let dateSortDir='asc'; // 'asc' = oldest event date first, 'desc' = newest first
+let dateSortDir='desc'; // 'asc' = oldest event date first, 'desc' = newest first (default: newest/new events on top)
 function toggleDateSort(){
  dateSortDir=dateSortDir==='asc'?'desc':'asc';
  const arrow=$('eventDateSortArrow');

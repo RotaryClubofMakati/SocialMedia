@@ -257,6 +257,13 @@ textarea{min-height:90px}
 .apBox{max-height:95vh;padding:28px}
 .apBox h2{font-size:22px}
 #apDescription{font-size:15px;line-height:1.6;color:#344054;white-space:pre-wrap;word-break:break-word;border:1px solid var(--border);border-radius:9px;padding:14px;background:#F9FBFD}
+/* Same treatment as the description, one notch heavier — this is the
+   exact title that will be typed into YouTube/Facebook, so the approver
+   needs to read (and be able to copy) it verbatim. */
+#apTitleBox{font-size:16px;font-weight:700;line-height:1.5;color:var(--navy);white-space:pre-wrap;word-break:break-word;border:1px solid var(--border);border-radius:9px;padding:12px 14px;background:#F9FBFD}
+#apTitleBox.empty{font-weight:500;font-style:italic;color:var(--muted)}
+.apCopyBtn{margin-left:8px;background:#E7EDF5;color:var(--navy);border:0;border-radius:7px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer}
+.apCopyBtn:hover{background:#D5E0EE}
 .apBox .albumTile{width:172px}
 .apBox .albumTile img,.apBox .albumTile video{width:160px;height:118px}
 .apBox .albumTile .tileStatus{font-size:11px}
@@ -474,6 +481,11 @@ textarea{min-height:90px}
 <div id="apGrid" class="albumGrid"></div>
 </div>
 
+<div class="field full" style="margin-top:14px">
+<label>Title — the exact title used for the post (e.g. the YouTube title)
+  <button type="button" class="apCopyBtn" onclick="copyApTitle()" title="Copy this title">⧉ Copy</button></label>
+<div id="apTitleBox"></div>
+</div>
 <div class="field full" style="margin-top:14px">
 <label>Description / Caption — read the whole thing before deciding</label>
 <div id="apDescription"></div>
@@ -1392,6 +1404,9 @@ function openApproveModal(id){
   $('apProject').textContent=x.project||'';
   $('apContent').textContent=x.content||'';
   $('apMeta').textContent=[x.platform,x.ctype,x.uploadDate?('Upload date: '+fmt(x.uploadDate)):'',x.reviewedBy?('Last reviewed by '+x.reviewedBy+(x.reviewedAt?(' on '+fmt(x.reviewedAt.slice(0,10))):'')):''].filter(Boolean).join(' • ');
+  const apTitle=x.content||'';
+  $('apTitleBox').textContent=apTitle||'(No title entered yet)';
+  $('apTitleBox').classList.toggle('empty',!apTitle);
   $('apDescription').textContent=x.description||'(No description)';
   $('apLinks').innerHTML=renderLinksHtml(x.links);
   $('apLinksWrap').style.display=(x.links&&x.links.length)?'block':'none';
@@ -1403,6 +1418,16 @@ function openApproveModal(id){
   renderApGrid();
   updateApDecisionState();
   $('approveModal').classList.add('open');
+}
+/** Copies the title verbatim so it can be pasted straight into YouTube etc. */
+async function copyApTitle(){
+  const box=$('apTitleBox');
+  if(!box||box.classList.contains('empty')){alert('There is no title on this content yet.');return;}
+  const text=box.textContent;
+  try{await navigator.clipboard.writeText(text);
+    const b=document.querySelector('.apCopyBtn');
+    if(b){const old=b.textContent;b.textContent='✓ Copied';setTimeout(()=>{b.textContent=old},1400);}
+  }catch(err){prompt('Copy this title:',text);}
 }
 function updateApDecisionState(){
   const btn=$('apReviseBtn'),hint=$('apDecideHint');

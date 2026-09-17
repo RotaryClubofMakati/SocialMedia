@@ -1412,8 +1412,14 @@ function openApproveModal(id){
   $('apLinksWrap').style.display=(x.links&&x.links.length)?'block':'none';
   $('apReviewerName').value=localStorage.getItem(REVIEWER_NAME_KEY)||'';
   $('apNotes').value='';
+  // Every reviewer starts with a completely fresh, unmarked grid — never
+  // pre-filled with a previous reviewer's (or the admin's) ✓/✕ marks. Those
+  // marks live in that earlier reviewer's own `review.photos` entry in the
+  // history, not on the shared x.photos the item currently displays, so
+  // reusing x.photos here would leak one person's marks onto the next
+  // person who opens the same share link.
   apPhotosState=(x.photos&&x.photos.length)
-    ?x.photos.map(p=>({cid:'a'+(++albumCidSeq),url:p.url,status:p.status||'pending',isVideo:isVideoUrl(p.url)}))
+    ?x.photos.map(p=>({cid:'a'+(++albumCidSeq),url:p.url,status:'pending',isVideo:isVideoUrl(p.url)}))
     :(x.thumbnail?[{cid:'a'+(++albumCidSeq),url:x.thumbnail,status:'pending',isVideo:isVideoUrl(x.thumbnail)}]:[]);
   renderApGrid();
   updateApDecisionState();

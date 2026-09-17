@@ -504,7 +504,7 @@ textarea{min-height:90px}
      the review immediately, so they must come after the notes box rather
      than before it. -->
 <div class="apDecideBar">
-<p class="hint" id="apDecideHint" style="margin:0 0 10px">Finished reading? Choose one — this sends your review to the content team straight away.</p>
+<p class="hint" id="apDecideHint" style="margin:0 0 10px">Finished reading? Choose one — this records your review right away. An Admin will apply it from the Reviews/Approvals tab.</p>
 <div style="display:flex;gap:12px;flex-wrap:wrap">
 <button class="primary" id="apApproveBtn" style="flex:1;min-width:220px;background:#16a34a;font-size:16px;padding:16px" onclick="submitApprove('Approved')">✓ OK to upload</button>
 <button class="danger" id="apReviseBtn" style="flex:1;min-width:220px;font-size:16px;padding:16px" onclick="submitApprove('Revise')">✕ Not OK — needs revision</button>
@@ -1436,8 +1436,8 @@ function updateApDecisionState(){
   btn.disabled=!hasNote;
   btn.title=hasNote?'':'Write a note above first — the content team needs to know what to fix.';
   if(hint)hint.textContent=hasNote
-    ?'Finished reading? Choose one — this sends your review to the content team straight away.'
-    :'Finished reading? Choose one — this sends your review straight away. To send it back for revision, write a note above first.';
+    ?'Finished reading? Choose one — this records your review right away. An Admin will apply it from the Reviews/Approvals tab.'
+    :'Finished reading? Choose one — this records your review right away (an Admin applies it after). To send it back for revision, write a note above first.';
 }
 function closeApproveModal(){apModalToken++;$('approveModal').classList.remove('open');apEditId=null}
 function renderApGrid(){
@@ -1478,15 +1478,24 @@ function submitApprove(newStatus){
   // replacing it, so the Reviews tab can show them side by side.
   const review={id:at+'|'+reviewerName,by:reviewerName,at:at,decision:newStatus,notes:notes,photos:photos};
   const history=getReviewsFor(x).concat([review]);
-  let copy={...x,status:newStatus,photos:photos,reviewedBy:reviewerName,reviewedAt:at,reviews:history};
-  if(notes)copy.notes=notes;
+  // This only records the reviewer's verdict in the review history — it
+  // deliberately does NOT touch the item's live status, photo marks,
+  // reviewedBy/reviewedAt, or notes. An Admin has to go to the
+  // Reviews/Approvals tab and explicitly click "Use this review" (see
+  // applyReview()) before the item actually moves from "For Approval" to
+  // Approved/Revise. That's what lets several reviewers weigh in on the
+  // same item without any one submission silently overriding its status.
+  let copy={...x,reviews:history};
   appendReviewLocal(x.id,review);
   localStorage.setItem(REVIEWER_NAME_KEY,reviewerName);
   let btns=[$('apApproveBtn'),$('apReviseBtn'),document.querySelector('#approveModal .modalActions .secondary')];
   btns.forEach(b=>{if(b)b.disabled=true});
   saveToAppsScript(copy,function(ok,err){
     btns.forEach(b=>{if(b)b.disabled=false});
-    if(ok){closeApproveModal();render();}
+    if(ok){
+      closeApproveModal();render();
+      alert('Thanks, '+reviewerName+' — your review has been recorded.\n\nAn Admin will apply it from the Reviews/Approvals tab; the status won\'t change until then.');
+    }
     else alert('Could not save review: '+(err&&err.message?err.message:err||'Unknown error'));
   });
 }

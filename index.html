@@ -105,13 +105,13 @@ tbody tr:hover td{background:#F5F9FF}
 body.role-approver .adminOnly{display:none!important}
 .roleBadge{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);color:#fff}
 
-/* Share-link approver: a no-login reviewer view scoped to one project.
-   Reached via ?project=<name> in the URL. Everything the normal Approver
-   account can't see (adminOnly) is already hidden by body.role-approver
-   above; .shareHide additionally trims the live/offline toggle, the
-   external Apps Script link, logout, the stat cards, and the full
-   toolbar/filters, since a link recipient only needs the one project's
-   review list. */
+/* Share-link approver: a no-login reviewer view scoped to one content
+   item (?id=<contentId>) or to all content (?all=1). Everything the
+   normal Approver account can't see (adminOnly) is already hidden by
+   body.role-approver above; .shareHide additionally trims the
+   live/offline toggle, the external Apps Script link, logout, the stat
+   cards, and the full toolbar/filters, since a link recipient only needs
+   the review list. */
 body.role-share .shareHide{display:none!important}
 #shareHeader{display:none}
 
@@ -147,6 +147,62 @@ video.preview{width:200px;height:120px;border-radius:9px;background:#111;display
 .albumReviewBar button:disabled{opacity:.45;cursor:not-allowed}
 .albumReviewBar .arbDownload{background:#16a34a;color:#fff}
 .albumReviewBar .arbRemove{background:var(--cardinal);color:#fff}
+
+/* ---- Tab bar (Content | Reviews) ------------------------------------
+   The Reviews tab is where two or more approvers' verdicts on the SAME
+   content item sit next to each other, so an admin can read both and
+   pick which one to apply. ------------------------------------------ */
+.tabBar{display:flex;gap:6px;margin:18px 0 4px;border-bottom:2px solid var(--border);flex-wrap:wrap}
+.tabBtn{background:transparent;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;padding:10px 16px;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;border-radius:8px 8px 0 0;display:inline-flex;align-items:center;gap:7px}
+.tabBtn:hover{background:#F5F8FC;color:var(--navy)}
+.tabBtn.active{color:var(--navy);border-bottom-color:var(--cardinal)}
+.tabBtn .tabCount{background:var(--cardinal);color:#fff;border-radius:999px;font-size:10px;font-weight:800;padding:2px 7px;min-width:18px;text-align:center}
+.tabBtn.active .tabCount{background:var(--cardinal)}
+.tabPane{display:none}
+.tabPane.active{display:block}
+
+.revGroup{border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:18px;background:#fff}
+.revGroup.conflict{border-color:#D97706;box-shadow:0 0 0 3px rgba(217,119,6,.10)}
+.revGroupHead{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.revGroupHead img.revCover{width:78px;height:58px;object-fit:cover;border-radius:9px;background:#eef2f6;flex:0 0 auto}
+.revGroupTitle{font-weight:800;font-size:15px;color:var(--navy);line-height:1.3}
+.revGroupSub{font-size:12px;color:var(--muted);margin-top:3px}
+.revFlag{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:4px 10px;margin-top:6px}
+.revFlag.disagree{background:#FEF3C7;color:#92400E}
+.revFlag.agree{background:#DCFCE7;color:#166534}
+.revCols{display:flex;gap:14px;flex-wrap:wrap}
+.revCard{flex:1 1 300px;min-width:280px;border:1px solid var(--border);border-radius:12px;padding:13px;background:#F9FBFD;display:flex;flex-direction:column}
+.revCard.approved{border-left:5px solid #16a34a}
+.revCard.revise{border-left:5px solid var(--cardinal)}
+.revCard.chosen{background:#EFF6FF;border-color:#1f5d8f;box-shadow:0 0 0 2px rgba(31,93,143,.18)}
+.revWho{font-weight:800;font-size:14px;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.revWhen{font-size:11px;color:var(--muted);margin-top:2px}
+.revVerdict{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:3px 10px}
+.revVerdict.approved{background:#DCFCE7;color:#166534}
+.revVerdict.revise{background:var(--card-bg);color:var(--card-tx)}
+.revTally{font-size:11px;font-weight:700;color:var(--muted);margin-top:9px}
+.revTally .ok{color:#166534}
+.revTally .no{color:#8C1D23}
+.revNotes{font-size:12px;color:#344054;white-space:pre-wrap;background:#fff;border:1px solid var(--border);border-radius:9px;padding:8px;margin-top:9px;max-height:110px;overflow:auto}
+.revNotes.empty{color:var(--muted);font-style:italic}
+.revThumbs{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.revThumb{position:relative;width:52px;height:40px;border-radius:7px;overflow:hidden;background:#eef2f6;border:2px solid transparent}
+.revThumb img,.revThumb video{width:100%;height:100%;object-fit:cover;display:block}
+.revThumb.approved{border-color:#16a34a}
+.revThumb.revise{border-color:var(--cardinal)}
+.revThumb .mark{position:absolute;right:1px;bottom:0;font-size:11px;font-weight:900;text-shadow:0 0 3px #fff,0 0 3px #fff}
+.revThumb.approved .mark{color:#16a34a}
+.revThumb.revise .mark{color:var(--cardinal)}
+.revThumb.pending .mark{color:#98A2B3}
+.revActions{margin-top:auto;padding-top:11px;display:flex;gap:7px;flex-wrap:wrap}
+.revActions button{padding:8px 12px;font-size:12px;font-weight:700;border-radius:9px;border:0;cursor:pointer}
+.revUse{background:var(--navy,#17458F);color:#fff;flex:1}
+.revUse:disabled{opacity:.5;cursor:not-allowed}
+.revOpen{background:#E7EDF5;color:var(--navy)}
+.revDel{background:#FEF2F2;color:#8C1D23;border:1px solid #F3C4C4!important}
+.revDel:hover{background:var(--cardinal);color:#fff}
+.revChosenTag{font-size:10px;font-weight:800;background:#1f5d8f;color:#fff;border-radius:999px;padding:2px 8px}
+.revEmpty{text-align:center;padding:40px 20px;color:var(--muted)}
 
 .albumTile .tileMedia{position:relative;cursor:zoom-in}
 .albumTile .tileMedia .zoomBadge{position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;pointer-events:none}
@@ -188,6 +244,26 @@ textarea{min-height:90px}
 .linkRow{display:grid;grid-template-columns:130px 1fr;gap:7px;margin-bottom:7px}
 .preview{width:120px;height:90px;object-fit:cover;border-radius:9px;background:#eef2f6;display:none;margin-top:7px}
 .modalActions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+
+/* The Approver's main action — deliberately oversized so it's easy to hit
+   on a phone and impossible to miss in a long list. */
+.reviewBtn{font-size:16px!important;font-weight:800!important;padding:14px 26px!important;border-radius:11px!important;white-space:nowrap}
+
+/* ---- Review modal -------------------------------------------------
+   Bigger than a normal modal so the approver can actually see the
+   photos and read the caption. The description is NOT scrollable —
+   it grows to its full height and the modal itself scrolls, so no
+   part of the caption can be missed inside a small inner box. */
+.apBox{max-height:95vh;padding:28px}
+.apBox h2{font-size:22px}
+#apDescription{font-size:15px;line-height:1.6;color:#344054;white-space:pre-wrap;word-break:break-word;border:1px solid var(--border);border-radius:9px;padding:14px;background:#F9FBFD}
+.apBox .albumTile{width:172px}
+.apBox .albumTile img,.apBox .albumTile video{width:160px;height:118px}
+.apBox .albumTile .tileStatus{font-size:11px}
+.apBox .albumTile .tileChecks button{padding:7px 0;font-size:14px}
+.apDecideBar{margin-top:22px;padding:16px;border-radius:12px;background:#F5F8FC;border:1px solid var(--border)}
+.apDecideBar button:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:700px){.apBox{padding:18px}.apBox .albumTile{width:138px}.apBox .albumTile img,.apBox .albumTile video{width:126px;height:94px}}
 .hint{font-size:11px;color:var(--muted);margin-top:4px}
 
 @media(max-width:1100px){.cards{grid-template-columns:repeat(4,1fr)}}
@@ -219,14 +295,16 @@ textarea{min-height:90px}
   // tab doesn't see the login screen flash on every page load.
   //
   // Approver share links: the Admin can generate a link scoped to one
-  // project (?project=<name>). Anyone who opens it skips the login screen
-  // entirely and lands directly in a read-only-except-review view of that
-  // project's content — the normal Admin and Approver logins below are
-  // untouched.
-  var shareProjectParam=new URLSearchParams(location.search).get('project');
-  var shareMode=!!(shareProjectParam&&shareProjectParam.trim());
-  var shareProjectFilter=shareMode?shareProjectParam.trim().toLowerCase():'';
-  var shareProjectDisplay=shareMode?shareProjectParam.trim():'';
+  // content item (?id=<contentId>) or to all content (?all=1). Anyone who
+  // opens it skips the login screen entirely and lands directly in a
+  // read-only-except-review view — the normal Admin and Approver logins
+  // below are untouched.
+  var shareUrlParams=new URLSearchParams(location.search);
+  var shareIdParam=shareUrlParams.get('id');
+  var shareAllParam=shareUrlParams.get('all');
+  var shareAllMode=shareAllParam==='1';
+  var shareContentId=(shareIdParam&&shareIdParam.trim())?shareIdParam.trim():'';
+  var shareMode=!!shareContentId||shareAllMode;
   if(shareMode){
     document.getElementById('loginScreen').classList.remove('open');
   }else{
@@ -269,6 +347,12 @@ textarea{min-height:90px}
     <div class="hint">Check each photo/video below, then approve it or send it back for revision — same review as the full system. No login is needed for this link.</div>
   </div>
 </div>
+<div class="tabBar shareHide" id="tabBar">
+  <button type="button" class="tabBtn active" id="tabBtnContent" onclick="switchTab('content')">📋 Content</button>
+  <button type="button" class="tabBtn adminOnly" id="tabBtnReviews" onclick="switchTab('reviews')">🧾 Reviews / Approvals <span class="tabCount" id="tabReviewCount" style="display:none">0</span></button>
+</div>
+
+<div class="tabPane active" id="paneContent">
 <div class="cards shareHide">
 <div class="card" id="cardTotal" onclick="filterByStatus('')" title="Show all content"><div class="label">Total content</div><div class="num" id="nTotal">0</div></div>
 <div class="card stPending" id="cardPending" onclick="filterByStatus('Pending')" title="Show only Pending"><div class="label">Pending</div><div class="num" id="nPending">0</div></div>
@@ -289,12 +373,31 @@ textarea{min-height:90px}
 <select id="sf" onchange="render()"><option value="">All statuses</option><option>Pending</option><option>Editing</option><option>For Approval</option><option>Approved</option><option>For Upload</option><option>Uploaded</option><option>Revise</option></select>
 <button class="secondary" onclick="exportCSV()">Export CSV</button>
 <button class="secondary adminOnly" onclick="findDuplicateYoutubeLinks()">🔍 Check duplicate YouTube links</button>
-<button class="secondary adminOnly" onclick="openShareLinkModal()">🔗 Approval Link</button>
+<button class="secondary adminOnly" onclick="copyAllShareLink()" title="Get a link that shows every content item">🌐 All Content Link</button>
 </div>
 <div class="wrap"><table><thead><tr>
 <th>Thumbnail</th><th>Project</th><th id="eventDateHeader" onclick="toggleDateSort()" style="cursor:pointer;user-select:none" title="Click to sort by Event Date">Event Date <span id="eventDateSortArrow"></span></th><th>Upload Date</th><th>Platform</th><th>Content / Title</th><th>Description</th><th>Status</th><th>Uploaded Links</th><th>Actions</th>
 </tr></thead><tbody id="tbody"></tbody></table></div>
-</div>
+</div><!-- /#paneContent -->
+
+<div class="tabPane" id="paneReviews">
+  <div class="toolbar">
+    <input id="revSearch" placeholder="Search project, content, or reviewer name..." oninput="renderReviews()">
+    <select id="revFilter" onchange="renderReviews()">
+      <option value="multi">Only items reviewed by 2+ people</option>
+      <option value="all">All reviewed items</option>
+      <option value="conflict">Only where reviewers disagree</option>
+    </select>
+    <button class="secondary" onclick="exportReviewsCSV()">Export reviews CSV</button>
+  </div>
+  <p class="hint" style="margin:2px 0 14px">
+    Every review is kept, so when two or more approvers look at the same content you can read both side by side and
+    pick whose verdict to apply. <b>Use this review</b> sets the item's status, its per-photo ✓/✕ marks and the notes
+    to exactly what that reviewer decided.
+  </p>
+  <div id="revList"></div>
+</div><!-- /#paneReviews -->
+</div><!-- /.container -->
 
 <div class="modal" id="modal"><div class="box">
 <h2 id="mtitle">Add Content</h2>
@@ -356,53 +459,48 @@ textarea{min-height:90px}
 <div class="modalActions"><button class="secondary" onclick="closeDescModal()">Close</button></div>
 </div></div>
 
-<div class="modal" id="approveModal"><div class="box" style="width:min(640px,100%)">
+<div class="modal" id="approveModal"><div class="box apBox" style="width:min(1040px,100%)">
 <h2>Review Content</h2>
-<p style="margin:0 0 4px"><b id="apProject"></b> — <span id="apContent"></span></p>
+<p style="margin:0 0 4px;font-size:16px"><b id="apProject"></b> — <span id="apContent"></span></p>
 <p class="hint" style="margin:0 0 14px" id="apMeta"></p>
 
 <div class="field full">
+<label>Your Name (required — this is recorded as who reviewed this content)</label>
+<input id="apReviewerName" placeholder="e.g. Juan Dela Cruz">
+</div>
+
+<div class="field full" style="margin-top:14px">
 <label>Photos / Videos — check ✓ or reject ✕ each one</label>
 <div id="apGrid" class="albumGrid"></div>
 </div>
 
-<div class="field full" style="margin-top:14px;display:flex;gap:10px">
-<button class="primary" id="apApproveBtn" style="flex:1;background:#16a34a;font-size:14px" onclick="submitApprove('Approved')">✓ OK to upload</button>
-<button class="danger" id="apReviseBtn" style="flex:1;font-size:14px" onclick="submitApprove('Revise')">✕ Not OK — needs revision</button>
-</div>
-
 <div class="field full" style="margin-top:14px">
-<label>Description / Caption</label>
-<div id="apDescription" style="font-size:13px;color:var(--muted);white-space:pre-wrap;max-height:100px;overflow:auto;border:1px solid var(--border);border-radius:9px;padding:8px"></div>
+<label>Description / Caption — read the whole thing before deciding</label>
+<div id="apDescription"></div>
 </div>
 <div class="field full" style="margin-top:14px" id="apLinksWrap">
 <label>Social Media Links</label>
 <div id="apLinks" class="links" style="min-height:20px"></div>
 </div>
 <div class="field full" style="margin-top:14px">
-<label>Notes for the content team (say what to fix, e.g. the description)</label>
-<textarea id="apNotes" placeholder="Example: please change the caption, it's too formal / wrong event date"></textarea>
+<label>Notes for the content team (say what to fix, e.g. the description)
+  <span class="hint" style="font-weight:500">— required if you send it back for revision</span></label>
+<textarea id="apNotes" placeholder="Example: please change the caption, it's too formal / wrong event date" oninput="updateApDecisionState()"></textarea>
+</div>
+
+<!-- The decision buttons sit last on purpose: pressing either one submits
+     the review immediately, so they must come after the notes box rather
+     than before it. -->
+<div class="apDecideBar">
+<p class="hint" id="apDecideHint" style="margin:0 0 10px">Finished reading? Choose one — this sends your review to the content team straight away.</p>
+<div style="display:flex;gap:12px;flex-wrap:wrap">
+<button class="primary" id="apApproveBtn" style="flex:1;min-width:220px;background:#16a34a;font-size:16px;padding:16px" onclick="submitApprove('Approved')">✓ OK to upload</button>
+<button class="danger" id="apReviseBtn" style="flex:1;min-width:220px;font-size:16px;padding:16px" onclick="submitApprove('Revise')">✕ Not OK — needs revision</button>
+</div>
 </div>
 
 <div class="modalActions">
 <button class="secondary" onclick="closeApproveModal()">Cancel</button>
-</div>
-</div></div>
-
-<div class="modal" id="shareLinkModal"><div class="box" style="width:min(560px,100%)">
-<h2>Approver Link</h2>
-<p class="hint" style="margin:0 0 14px">Generate a link scoped to one project. Anyone who opens it can review, check off photos/videos, and approve or request revisions for that project — no login required. Your Admin and Approver account logins are unchanged and still work as before.</p>
-<div class="field full">
-<label>Project (must match exactly)</label>
-<input id="shareLinkProject" placeholder="Example: Hope Mission" oninput="updateShareLinkPreview()">
-</div>
-<div class="field full" style="margin-top:10px">
-<label>Shareable Link</label>
-<input id="shareLinkOutput" readonly placeholder="Enter a project above to generate the link" onclick="this.select()">
-</div>
-<div class="modalActions">
-<button class="secondary" onclick="closeShareLinkModal()">Close</button>
-<button class="primary" onclick="copyShareLink()">Copy Link</button>
 </div>
 </div></div>
 
@@ -470,6 +568,80 @@ const APPROVER_USER='Approver';
 const APPROVER_PASS='Approver';
 const AUTH_KEY='rcMakatiAdminAuth';
 const ROLE_KEY='rcMakatiRole';
+const REVIEWER_NAME_KEY='rcMakatiReviewerName';
+
+/* ---------------------------------------------------------------------
+   REVIEW HISTORY
+   ---------------------------------------------------------------------
+   The reviewer's name is required before a review can be submitted, so
+   every verdict can be attributed to a person. Previously a second
+   approver's verdict simply overwrote the first one's (reviewedBy /
+   reviewedAt / the per-photo ✓✕ marks were all single-valued), which
+   meant there was nothing left to compare.
+
+   Now each submitted review is appended to a `reviews` array on the
+   content item:
+
+     {id, by, at, decision:'Approved'|'Revise', notes, photos:[{url,status}]}
+
+   `reviewedBy` / `reviewedAt` / `status` / `photos` still hold the most
+   recently applied verdict, so the Content tab, the row badge and the
+   download/cleanup bar keep working exactly as before.
+
+   The array is also mirrored into localStorage. That mirror is a safety
+   net for two cases: (a) an older Google Sheet that has no `reviews`
+   column yet and silently drops the field on save, and (b) working
+   offline. Server data wins when both exist; entries are de-duplicated
+   by their review id.
+-------------------------------------------------------------------- */
+const REVIEW_LOG_KEY='rcMakatiReviewLog_v1';
+function loadReviewLog(){
+  try{return JSON.parse(localStorage.getItem(REVIEW_LOG_KEY)||'{}')||{};}
+  catch(e){return {};}
+}
+function appendReviewLocal(contentId,review){
+  const log=loadReviewLog();
+  const list=Array.isArray(log[contentId])?log[contentId]:[];
+  list.push(review);
+  log[contentId]=list.slice(-20); // keep the last 20 reviews per item
+  try{localStorage.setItem(REVIEW_LOG_KEY,JSON.stringify(log));}catch(e){}
+}
+/** Merged, de-duplicated, oldest-first review list for one content item. */
+function getReviewsFor(x){
+  if(!x)return [];
+  const out=[],seen={};
+  const push=r=>{
+    if(!r||!r.by)return;
+    const key=r.id||(r.by+'|'+(r.at||''));
+    if(seen[key])return;
+    seen[key]=1;out.push(r);
+  };
+  (Array.isArray(x.reviews)?x.reviews:[]).forEach(push);
+  (loadReviewLog()[x.id]||[]).forEach(push);
+  // Legacy items reviewed before this feature existed still carry a single
+  // reviewedBy/reviewedAt pair — surface it so nothing is lost.
+  if(!out.length&&x.reviewedBy){
+    push({id:'legacy|'+x.id,by:x.reviewedBy,at:x.reviewedAt||'',
+      decision:(x.status==='Revise'?'Revise':'Approved'),notes:x.notes||'',
+      photos:(x.photos||[]).map(p=>({url:p.url,status:p.status||'pending'})),legacy:true});
+  }
+  return out.sort((a,b)=>String(a.at||'').localeCompare(String(b.at||'')));
+}
+function reviewTally(r){
+  const ph=Array.isArray(r.photos)?r.photos:[];
+  return {ok:ph.filter(p=>p.status==='approved').length,
+          no:ph.filter(p=>p.status==='revise').length,
+          total:ph.length};
+}
+/** True when the reviewers on this item didn't all reach the same verdict. */
+function reviewsDisagree(list){
+  if(list.length<2)return false;
+  if(new Set(list.map(r=>r.decision)).size>1)return true;
+  // Same overall verdict, but different photos marked "do not upload".
+  const sig=r=>(Array.isArray(r.photos)?r.photos:[])
+    .map(p=>String(p.url)+':'+(p.status||'pending')).sort().join('|');
+  return new Set(list.map(sig)).size>1;
+}
 let currentRole=shareMode?'shareApprover':(sessionStorage.getItem(ROLE_KEY)||'admin');
 // True for both the normal Approver login and a no-login project share
 // link — both get the same review-only UI (adminOnly hidden, Review
@@ -478,41 +650,45 @@ let currentRole=shareMode?'shareApprover':(sessionStorage.getItem(ROLE_KEY)||'ad
 function isApproverLike(){return currentRole==='approver'||currentRole==='shareApprover';}
 function applyRoleUI(){
   document.body.classList.toggle('role-approver',isApproverLike());
+  // Approvers and share-link recipients only see their own review screen,
+  // never the side-by-side comparison of everyone's verdicts.
+  if(isApproverLike()&&activeTab==='reviews')switchTab('content');
   document.body.classList.toggle('role-share',currentRole==='shareApprover');
   const rb=$('roleBadge');
   if(rb)rb.textContent=currentRole==='shareApprover'?'Approver (Link)':(currentRole==='approver'?'Approver':'Admin');
   const sh=$('shareHeader');
   if(sh)sh.style.display=currentRole==='shareApprover'?'flex':'none';
   const spn=$('shareProjectName');
-  if(spn)spn.textContent=shareProjectDisplay||'';
+  if(spn){
+    if(shareAllMode)spn.textContent='All Content';
+    else if(shareContentId){
+      const item=data.find(o=>String(o.id)===shareContentId);
+      spn.textContent=item?(item.content||item.project||'this item'):'this item';
+    }
+  }
 }
-function openShareLinkModal(project){
-  const pre=(project!==undefined?project:($('projectFilter')?.value||'')).trim();
-  $('shareLinkProject').value=pre;
-  updateShareLinkPreview();
-  $('shareLinkModal').classList.add('open');
+function buildContentShareLink(id){
+  return location.origin+location.pathname+'?id='+encodeURIComponent(id);
 }
-function closeShareLinkModal(){$('shareLinkModal').classList.remove('open')}
-function buildShareLink(project){
-  return location.origin+location.pathname+'?project='+encodeURIComponent(project.trim());
+function buildAllShareLink(){
+  return location.origin+location.pathname+'?all=1';
 }
-function updateShareLinkPreview(){
-  const project=$('shareLinkProject').value.trim();
-  $('shareLinkOutput').value=project?buildShareLink(project):'';
-}
-async function copyShareLink(){
-  const project=$('shareLinkProject').value.trim();
-  if(!project){alert('Enter the project name first.');return;}
-  const hasMatch=data.some(x=>String(x.project||'').trim().toLowerCase()===project.toLowerCase());
-  if(!hasMatch&&!confirm('No content found yet for project "'+project+'". Generate the link anyway?'))return;
-  const link=buildShareLink(project);
-  $('shareLinkOutput').value=link;
+async function copyContentShareLink(id,contentName){
+  const link=buildContentShareLink(id);
   try{
     await navigator.clipboard.writeText(link);
-    alert('Link copied! Send it to the approver — opening it shows only "'+project+'" content, with no login needed.');
+    alert('Link copied! Opening it shows only "'+(contentName||'this item')+'" for review — no login needed.');
   }catch(err){
-    $('shareLinkOutput').select();
-    alert('Could not copy automatically. The link is selected — press Ctrl+C / Cmd+C to copy it.');
+    prompt('Could not copy automatically. Copy this link:',link);
+  }
+}
+async function copyAllShareLink(){
+  const link=buildAllShareLink();
+  try{
+    await navigator.clipboard.writeText(link);
+    alert('Link copied! Opening it shows every content item for review — no login needed.');
+  }catch(err){
+    prompt('Could not copy automatically. Copy this link:',link);
   }
 }
 function tryLogin(){
@@ -716,10 +892,6 @@ async function loadFromAppsScript(){
     saveLocal();
     setAppStatus('connected','Apps Script: Connected','Live data loaded from Google Sheets.');
     if(shareMode){
-      // Use the actually-cased project name from the data for display,
-      // once it's loaded, instead of whatever casing was in the URL.
-      const match=data.find(x=>String(x.project||'').trim().toLowerCase()===shareProjectFilter);
-      if(match)shareProjectDisplay=match.project;
       applyRoleUI();
     }
     render();
@@ -838,6 +1010,18 @@ function renderLinksHtml(links){
 }
 function fmt(s){if(!s)return '';let a=s.split('-');return a[1]+'/'+a[2]+'/'+a[0]}
 function cls(s){return s.replace(/[^A-Za-z]/g,'')}
+/**
+ * Which image represents a content item in the table and in the Reviews
+ * tab. The uploaded cover Thumbnail always wins — it's the one that was
+ * deliberately chosen. Only when no thumbnail has been set does it fall
+ * back to the first photo in the album, so an item still shows something
+ * recognisable instead of an empty box.
+ */
+function coverImageOf(x){
+  if(!x)return '';
+  if(x.thumbnail)return x.thumbnail;
+  return (x.photos&&x.photos.length)?x.photos[0].url:'';
+}
 function driveViewUrl(url){
   if(!url)return url;
   const m=url.match(/[?&]id=([^&]+)/);
@@ -900,6 +1084,194 @@ function toggleDateSort(){
  if(arrow)arrow.textContent=dateSortDir==='asc'?'▲':'▼';
  render();
 }
+/* ---- Tabs ---------------------------------------------------------- */
+var activeTab='content'; // var: applyRoleUI may run before this line is reached
+function switchTab(name){
+  // Approver / share-link users only ever get the Content list.
+  if(name==='reviews'&&isApproverLike())name='content';
+  activeTab=name;
+  $('paneContent').classList.toggle('active',name==='content');
+  $('paneReviews').classList.toggle('active',name==='reviews');
+  $('tabBtnContent').classList.toggle('active',name==='content');
+  $('tabBtnReviews').classList.toggle('active',name==='reviews');
+  if(name==='reviews')renderReviews();
+}
+
+/** Items that have at least one recorded review, newest activity first. */
+function reviewedItems(){
+  return data.map(x=>({item:x,list:getReviewsFor(x)}))
+    .filter(o=>o.list.length>0)
+    .sort((a,b)=>String(b.list[b.list.length-1].at||'')
+      .localeCompare(String(a.list[a.list.length-1].at||'')));
+}
+function updateReviewTabCount(){
+  const badge=$('tabReviewCount');
+  if(!badge)return;
+  const n=reviewedItems().filter(o=>o.list.length>1).length;
+  badge.textContent=n;
+  badge.style.display=n?'inline-block':'none';
+  badge.title=n+' item(s) reviewed by more than one person';
+}
+function fmtWhen(iso){
+  if(!iso)return 'date not recorded';
+  const d=new Date(iso);
+  if(isNaN(d))return String(iso).slice(0,10);
+  return d.toLocaleString(undefined,{year:'numeric',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+function renderReviews(){
+  updateReviewTabCount();
+  const host=$('revList');
+  if(!host)return;
+  const q=($('revSearch')?.value||'').toLowerCase();
+  const mode=$('revFilter')?.value||'multi';
+  let groups=reviewedItems();
+  if(mode==='multi')groups=groups.filter(o=>o.list.length>1);
+  if(mode==='conflict')groups=groups.filter(o=>reviewsDisagree(o.list));
+  if(q)groups=groups.filter(o=>[o.item.project,o.item.content,o.item.platform,
+    ...o.list.map(r=>r.by)].join(' ').toLowerCase().includes(q));
+
+  if(!groups.length){
+    host.innerHTML='<div class="revEmpty">'+(mode==='multi'
+      ?'No content has been reviewed by two or more people yet.<br>Once a second approver reviews the same item, both verdicts will appear here side by side.'
+      :mode==='conflict'?'No disagreements — every reviewer reached the same verdict.'
+      :'No reviews recorded yet. Reviews appear here as soon as an approver submits one.')+'</div>';
+    return;
+  }
+
+  host.innerHTML=groups.map(o=>{
+    const x=o.item,list=o.list,clash=reviewsDisagree(list);
+    const cover=coverImageOf(x);
+    const coverHtml=cover?`<img class="revCover" src="${esc(cover)}" referrerpolicy="no-referrer" alt="">`:'';
+    const flag=list.length>1
+      ?(clash?'<span class="revFlag disagree">⚠ Reviewers disagree — pick one below</span>'
+             :'<span class="revFlag agree">✓ Reviewers agree</span>')
+      :'<span class="revFlag agree">1 review on record</span>';
+    const cards=list.map((r,i)=>{
+      const t=reviewTally(r);
+      const dec=r.decision==='Revise'?'revise':'approved';
+      // The verdict currently live on the item — same person, same
+      // decision, same moment — is the one that's actually in effect.
+      const chosen=(x.reviewedBy===r.by&&(!r.at||!x.reviewedAt||r.at===x.reviewedAt)&&
+                    ((r.decision==='Revise')===(x.status==='Revise')));
+      const thumbs=(Array.isArray(r.photos)?r.photos:[]).slice(0,12).map(p=>{
+        const st=p.status==='approved'?'approved':p.status==='revise'?'revise':'pending';
+        const mark=st==='approved'?'✓':st==='revise'?'✕':'•';
+        return `<div class="revThumb ${st}" title="${esc(st==='approved'?'Approved':st==='revise'?'Do not upload':'Not marked')}"><img src="${esc(p.url)}" referrerpolicy="no-referrer" alt=""><span class="mark">${mark}</span></div>`;
+      }).join('');
+      return `<div class="revCard ${dec} ${chosen?'chosen':''}">
+        <div class="revWho">${esc(r.by)} ${chosen?'<span class="revChosenTag">IN EFFECT</span>':''}</div>
+        <div class="revWhen">${esc(fmtWhen(r.at))}${r.legacy?' • recorded before review history was kept':''}</div>
+        <div style="margin-top:8px"><span class="revVerdict ${dec}">${r.decision==='Revise'?'✕ Needs revision':'✓ OK to upload'}</span></div>
+        <div class="revTally">${t.total?`<span class="ok">${t.ok} approved</span> · <span class="no">${t.no} do not upload</span> · ${t.total-t.ok-t.no} unmarked`:'No photos/videos attached'}</div>
+        ${thumbs?`<div class="revThumbs">${thumbs}</div>`:''}
+        <div class="revNotes ${r.notes?'':'empty'}">${r.notes?esc(r.notes):'No notes left by this reviewer.'}</div>
+        <div class="revActions">
+          <button class="revUse" ${chosen?'disabled':''} onclick="applyReview('${escJs(x.id)}',${i})">${chosen?'Currently applied':'Use this review'}</button>
+          <button class="revOpen" onclick="openModal('${escJs(x.id)}')">Open item</button>
+          <button class="revDel" onclick="deleteReview('${escJs(x.id)}',${i})" title="Remove this review from the record">🗑 Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="revGroup ${clash?'conflict':''}">
+      <div class="revGroupHead">${coverHtml}
+        <div style="flex:1;min-width:200px">
+          <div class="revGroupTitle">${esc(x.content||'(untitled)')}</div>
+          <div class="revGroupSub">${esc(x.project||'No project')} • ${esc(x.platform||'')} • Current status: <b>${esc(x.status||'')}</b></div>
+          <div>${flag}</div>
+        </div>
+      </div>
+      <div class="revCols">${cards}</div>
+    </div>`;
+  }).join('');
+}
+
+/**
+ * Applies one reviewer's verdict to the content item: their decision
+ * becomes the item's status, their ✓/✕ marks become the photo statuses,
+ * and their notes go to the content team. The other reviews stay on
+ * record, so the choice can be changed later.
+ */
+function applyReview(contentId,index){
+  const x=data.find(a=>String(a.id)===String(contentId));
+  if(!x)return;
+  const list=getReviewsFor(x);
+  const r=list[index];
+  if(!r)return;
+  if(!confirm('Apply '+r.by+"'s review to \""+(x.content||'this item')+'"?\n\n'+
+    'Status becomes: '+r.decision+'\n'+
+    'The photo ✓/✕ marks and notes will be set to what '+r.by+' decided.\n\n'+
+    'The other reviews stay on record — you can switch back anytime.'))return;
+  const marks={};
+  (Array.isArray(r.photos)?r.photos:[]).forEach(p=>{marks[p.url]=p.status||'pending';});
+  const copy={...x,
+    status:r.decision,
+    photos:(x.photos||[]).map(p=>({url:p.url,status:marks[p.url]||'pending'})),
+    reviewedBy:r.by,
+    reviewedAt:r.at||new Date().toISOString(),
+    reviews:list};
+  if(r.notes)copy.notes=r.notes;
+  saveToAppsScript(copy,function(ok,err){
+    if(ok)renderReviews();
+    else alert('Could not apply that review: '+(err&&err.message?err.message:err||'Unknown error'));
+  });
+}
+
+/**
+ * Removes one review from the record (Admin only). Reviews live in two
+ * places — on the content item and in the local mirror — so both are
+ * cleaned up, otherwise the deleted entry would reappear on the next
+ * merge. If the deleted review happens to be the one currently applied,
+ * the item's status and photo marks are left exactly as they are; only
+ * the record of who decided it goes away, and it falls back to the most
+ * recent remaining reviewer.
+ */
+function deleteReview(contentId,index){
+  if(isApproverLike()){alert('Only an Admin can delete a review.');return;}
+  const x=data.find(a=>String(a.id)===String(contentId));
+  if(!x)return;
+  const list=getReviewsFor(x);
+  const r=list[index];
+  if(!r)return;
+  if(!confirm('Delete '+r.by+"'s review of \""+(x.content||'this item')+'"?\n\n'+
+    'Their verdict, notes and photo marks will be removed from the record. This cannot be undone.\n\n'+
+    "The item's current status is not changed."))return;
+  const keyOf=rev=>rev.id||(rev.by+'|'+(rev.at||''));
+  const gone=keyOf(r);
+  const remaining=list.filter(rev=>keyOf(rev)!==gone);
+  // Drop it from the local mirror too.
+  try{
+    const log=loadReviewLog();
+    if(Array.isArray(log[x.id])){
+      log[x.id]=log[x.id].filter(rev=>keyOf(rev)!==gone);
+      if(!log[x.id].length)delete log[x.id];
+      localStorage.setItem(REVIEW_LOG_KEY,JSON.stringify(log));
+    }
+  }catch(e){}
+  const last=remaining.length?remaining[remaining.length-1]:null;
+  const copy={...x,reviews:remaining,
+    reviewedBy:last?last.by:'',
+    reviewedAt:last?(last.at||''):''};
+  saveToAppsScript(copy,function(ok,err){
+    if(ok)renderReviews();
+    else alert('Could not delete that review: '+(err&&err.message?err.message:err||'Unknown error'));
+  });
+}
+
+function exportReviewsCSV(){
+  const rows=[['Project','Content','Platform','Current status','Reviewer','Reviewed at','Decision','Photos approved','Photos rejected','Notes']];
+  reviewedItems().forEach(o=>o.list.forEach(r=>{
+    const t=reviewTally(r);
+    rows.push([o.item.project||'',o.item.content||'',o.item.platform||'',o.item.status||'',
+      r.by||'',r.at||'',r.decision||'',t.ok,t.no,r.notes||'']);
+  }));
+  if(rows.length===1){alert('No reviews to export yet.');return;}
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='rcmakati-reviews.csv';
+  a.click();
+}
+
 function render(){
  let q=$('search').value.toLowerCase(),p=$('pf').value,s=$('sf').value,proj=($('projectFilter')?.value||'').toLowerCase();
  let c={Pending:0,Uploaded:0,Editing:0,'For Approval':0,Approved:0,'For Upload':0,Revise:0};
@@ -912,8 +1284,9 @@ function render(){
    return (!q||[x.project,x.content,x.description,x.eventDate,x.uploadDate,x.platform,x.ctype,x.status,x.notes].join(' ').toLowerCase().includes(q))
    &&(!proj||String(x.project||'').toLowerCase().includes(proj))
    &&(!p||x.platform===p)&&(!s||x.status===s)
-   &&(!shareMode||String(x.project||'').trim().toLowerCase()===shareProjectFilter);
+   &&(!shareMode||shareAllMode||String(x.id)===shareContentId);
  });
+ applyRoleUI();
  // Sort by Event Date (date of the project). Rows without an event date
  // are pushed to the bottom regardless of sort direction, since there's
  // no meaningful date to compare them by.
@@ -930,16 +1303,28 @@ function render(){
    // on its way there (Pending/Editing/For Approval/Approved/For
    // Upload/Revise) — replaces the old due-date-based highlighting.
    let row=x.status==='Uploaded'?'rowUploaded':'rowNotUploaded';
-   let coverUrl=(x.photos&&x.photos.length)?x.photos[0].url:x.thumbnail;
+   let coverUrl=coverImageOf(x);
    let thumb=coverUrl?`<img class="thumb" src="${esc(coverUrl)}" data-src="${esc(coverUrl)}" alt="Thumbnail" referrerpolicy="no-referrer" loading="lazy">`:`<div class="thumbEmpty">No image</div>`;
    let linkHtml=renderLinksHtml(x.links);
    let actionsHtml=isApproverLike()
-     ?`<button class="primary" onclick="openApproveModal('${x.id}')">Review</button>`
+     ?`<button class="primary reviewBtn" onclick="openApproveModal('${x.id}')">Review</button>`
      :`<button class="secondary" onclick="openModal('${x.id}')">Edit</button><button class="danger" onclick="del('${x.id}')">Delete</button>`;
    let thumbAttrs=isApproverLike()?` onclick="openApproveModal('${x.id}')" style="cursor:pointer"`:'';
-   let shareBtn=isApproverLike()?'':`<button type="button" class="shareRowBtn adminOnly" onclick="openShareLinkModal('${escJs(x.project||'')}')" title="Get an approver link for this project">🔗</button>`;
-   return `<tr class="${row}"><td${thumbAttrs}>${thumb}</td><td>${shareBtn}<b>${esc(x.project||'')}</b></td><td>${fmt(x.eventDate)}</td><td>${fmt(x.uploadDate)}</td><td>${esc(x.platform)}</td><td><b>${esc(x.content)}</b></td><td class="descCell" onclick="openDescModal('${x.id}')"><span class="clampText">${esc(x.description)}</span></td><td><span class="badge ${cls(x.status)}" onclick="quickStatus('${x.id}')" title="${isApproverLike()?'Click to review':'Click to change status'}">${esc(x.status)}</span></td><td><div class="links">${linkHtml}</div></td><td><div class="actions">${actionsHtml}</div></td></tr>`;
+   let contentShareBtn=isApproverLike()?'':`<button type="button" class="shareRowBtn adminOnly" onclick="event.stopPropagation();copyContentShareLink('${x.id}','${escJs(x.content||'')}')" title="Get a shareable link for just this content item">📎</button>`;
+   let contentAttrs=` onclick="${isApproverLike()?`openApproveModal('${x.id}')`:`openModal('${x.id}')`}" style="cursor:pointer" title="${isApproverLike()?'Click to review':'Click to edit'}"`;
+   let revList=getReviewsFor(x);
+   let extra=revList.length>1?(' • '+revList.length+' reviews on record: '+revList.map(r=>r.by).join(', ')):'';
+   let reviewedByTitle=x.reviewedBy?('Reviewed by '+x.reviewedBy+(x.reviewedAt?(' on '+fmt(x.reviewedAt.slice(0,10))):'')+extra):(isApproverLike()?'Click to review':'Click to change status');
+   let multiTag=(revList.length>1&&!isApproverLike())?`<span style="margin-left:4px;background:${reviewsDisagree(revList)?'#FEF3C7':'#E7EDF5'};color:${reviewsDisagree(revList)?'#92400E':'#17458F'};border-radius:999px;padding:1px 6px;font-weight:800;cursor:pointer" onclick="event.stopPropagation();switchTab('reviews')" title="Compare all ${revList.length} reviews">${reviewsDisagree(revList)?'⚠ ':''}${revList.length}×</span>`:'';
+   let reviewedByHtml=x.reviewedBy?`<div style="font-size:10px;color:var(--muted);margin-top:3px;white-space:nowrap" title="${esc(reviewedByTitle)}">by ${esc(x.reviewedBy)}${multiTag}</div>`:'';
+   return `<tr class="${row}"><td${thumbAttrs}>${thumb}</td><td${contentAttrs}><b>${esc(x.project||'')}</b></td><td>${fmt(x.eventDate)}</td><td>${fmt(x.uploadDate)}</td><td>${esc(x.platform)}</td><td${contentAttrs}>${contentShareBtn}<b>${esc(x.content)}</b></td><td class="descCell" onclick="openDescModal('${x.id}')"><span class="clampText">${esc(x.description)}</span></td><td><span class="badge ${cls(x.status)}" onclick="quickStatus('${x.id}')" title="${esc(reviewedByTitle)}">${esc(x.status)}</span>${reviewedByHtml}</td><td><div class="links">${linkHtml}</div></td><td><div class="actions">${actionsHtml}</div></td></tr>`;
  }).join(''):`<tr><td colspan="10" style="text-align:center;padding:35px;color:#667085">No content found. Click "+ Add Content" to start.</td></tr>`;
+ // Keep the Reviews tab badge (and the pane, if it's open) in step with
+ // whatever was just loaded or saved.
+ if(!isApproverLike()){
+   updateReviewTabCount();
+   if(activeTab==='reviews')renderReviews();
+ }
  // Fall back gracefully if a Drive thumbnail is blocked from hotlinking.
  $('tbody').querySelectorAll('img.thumb').forEach(img=>{
    img.onerror=function(){
@@ -1006,16 +1391,28 @@ function openApproveModal(id){
   apEditId=id;
   $('apProject').textContent=x.project||'';
   $('apContent').textContent=x.content||'';
-  $('apMeta').textContent=[x.platform,x.ctype,x.uploadDate?('Upload date: '+fmt(x.uploadDate)):''].filter(Boolean).join(' • ');
+  $('apMeta').textContent=[x.platform,x.ctype,x.uploadDate?('Upload date: '+fmt(x.uploadDate)):'',x.reviewedBy?('Last reviewed by '+x.reviewedBy+(x.reviewedAt?(' on '+fmt(x.reviewedAt.slice(0,10))):'')):''].filter(Boolean).join(' • ');
   $('apDescription').textContent=x.description||'(No description)';
   $('apLinks').innerHTML=renderLinksHtml(x.links);
   $('apLinksWrap').style.display=(x.links&&x.links.length)?'block':'none';
+  $('apReviewerName').value=localStorage.getItem(REVIEWER_NAME_KEY)||'';
   $('apNotes').value='';
   apPhotosState=(x.photos&&x.photos.length)
     ?x.photos.map(p=>({cid:'a'+(++albumCidSeq),url:p.url,status:p.status||'pending',isVideo:isVideoUrl(p.url)}))
     :(x.thumbnail?[{cid:'a'+(++albumCidSeq),url:x.thumbnail,status:'pending',isVideo:isVideoUrl(x.thumbnail)}]:[]);
   renderApGrid();
+  updateApDecisionState();
   $('approveModal').classList.add('open');
+}
+function updateApDecisionState(){
+  const btn=$('apReviseBtn'),hint=$('apDecideHint');
+  if(!btn)return;
+  const hasNote=!!($('apNotes').value||'').trim();
+  btn.disabled=!hasNote;
+  btn.title=hasNote?'':'Write a note above first — the content team needs to know what to fix.';
+  if(hint)hint.textContent=hasNote
+    ?'Finished reading? Choose one — this sends your review to the content team straight away.'
+    :'Finished reading? Choose one — this sends your review straight away. To send it back for revision, write a note above first.';
 }
 function closeApproveModal(){apModalToken++;$('approveModal').classList.remove('open');apEditId=null}
 function renderApGrid(){
@@ -1040,9 +1437,26 @@ function setApPhotoStatus(cid,status){
 }
 function submitApprove(newStatus){
   const x=data.find(a=>a.id===apEditId); if(!x)return;
+  const reviewerName=$('apReviewerName').value.trim();
+  if(!reviewerName){alert('Please enter your name — it is recorded as who reviewed this content.');$('apReviewerName').focus();return;}
   const notes=$('apNotes').value.trim();
-  let copy={...x,status:newStatus,photos:apPhotosState.map(p=>({url:p.url,status:p.status||'pending'}))};
+  // Sending something back with no explanation leaves the content team
+  // guessing, so a revision can't be submitted until a note is written.
+  if(newStatus==='Revise'&&!notes){
+    alert('Please write a note first.\n\nBefore sending this back for revision, tell the content team what needs to be fixed — otherwise they won\'t know what to change.');
+    $('apNotes').focus();
+    return;
+  }
+  const at=new Date().toISOString();
+  const photos=apPhotosState.map(p=>({url:p.url,status:p.status||'pending'}));
+  // Keep this reviewer's verdict alongside everyone else's instead of
+  // replacing it, so the Reviews tab can show them side by side.
+  const review={id:at+'|'+reviewerName,by:reviewerName,at:at,decision:newStatus,notes:notes,photos:photos};
+  const history=getReviewsFor(x).concat([review]);
+  let copy={...x,status:newStatus,photos:photos,reviewedBy:reviewerName,reviewedAt:at,reviews:history};
   if(notes)copy.notes=notes;
+  appendReviewLocal(x.id,review);
+  localStorage.setItem(REVIEWER_NAME_KEY,reviewerName);
   let btns=[$('apApproveBtn'),$('apReviseBtn'),document.querySelector('#approveModal .modalActions .secondary')];
   btns.forEach(b=>{if(b)b.disabled=true});
   saveToAppsScript(copy,function(ok,err){

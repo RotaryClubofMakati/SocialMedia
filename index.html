@@ -209,6 +209,21 @@ video.preview{width:200px;height:120px;border-radius:9px;background:#111;display
 .revFlag{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:4px 10px;margin-top:6px}
 .revFlag.disagree{background:#FEF3C7;color:#92400E}
 .revFlag.agree{background:#DCFCE7;color:#166534}
+
+/* Upload-destination row — tells the approver exactly where this content
+   goes: the club's fixed YouTube channel / Facebook Page link, plus the
+   actual post URL once the content team has pasted one. Shown in the
+   Approve modal (Approver login + Approver share-link) and on each card
+   in the Reviews tab. */
+.uploadDestWrap{margin:8px 0 2px;padding:10px 12px;background:#F3F7FC;border:1px dashed var(--border);border-radius:10px}
+.uploadDestLabel{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px}
+.uploadDestRow{display:flex;flex-wrap:wrap;gap:8px}
+/* Informational only — not a link. No cursor:pointer, no hover state,
+   so nothing here invites (or allows) a click through to YouTube/Facebook. */
+.uploadDestLink{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;background:#EEF3FA;color:var(--navy);border:1px solid transparent}
+.uploadDestLink.yt{background:#FBE1E2;color:#8C1D23}
+.uploadDestLink.fb{background:var(--sky-bg);color:var(--sky-tx)}
+.uploadDestLink.posted{background:var(--green-bg);color:var(--green-tx)}
 .revCols{display:flex;gap:14px;flex-wrap:wrap}
 .revCard{flex:1 1 300px;min-width:280px;border:1px solid var(--border);border-radius:12px;padding:13px;background:#F9FBFD;display:flex;flex-direction:column}
 .revCard.approved{border-left:5px solid #16a34a}
@@ -540,6 +555,7 @@ textarea{min-height:90px}
 <h2>Review Content</h2>
 <p style="margin:0 0 4px;font-size:16px"><b id="apProject"></b> — <span id="apContent"></span></p>
 <p class="hint" style="margin:0 0 14px" id="apMeta"></p>
+<div id="apUploadDest"></div>
 
 <div class="field full">
 <label>Your Name (required — this is recorded as who reviewed this content)</label>
@@ -608,6 +624,11 @@ textarea{min-height:90px}
 
 <script>
 const API_URL="https://script.google.com/macros/s/AKfycbzJNv03nc0G1OmcUvItDZzSr1IZDVN8ugxtpHEk77qg5aohrUTymMBr_ycwxjqG0758/exec";
+// The club's own YouTube channel / Facebook Page — where an approver should
+// upload to if the content team hasn't already posted it and pasted the
+// link. EDIT THESE two URLs to the club's real channel/page.
+const CLUB_YOUTUBE_URL='https://www.youtube.com/@RotaryClubOfMakati';
+const CLUB_FACEBOOK_URL='https://www.facebook.com/RotaryClubOfMakati';
 const KEY='rcMakatiContentTracker_v2';
 let data=JSON.parse(localStorage.getItem(KEY)||'null')||[];
 let editId=null;
@@ -1118,6 +1139,34 @@ function renderLinksHtml(links){
     return `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.platform)}</a>`;
   }).join('');
 }
+/**
+ * Tells an approver where this content is meant to go — purely as
+ * information, never as something to click through. The destination is
+ * read from the "Main Platform" category already chosen on Add Content
+ * (x.platform), so the reviewer just sees a plain label such as
+ * "📤 This content uploads on YouTube" (or "Already posted on YouTube" if
+ * a real post URL has since been pasted in). Nothing here is a link —
+ * there is no href, so the club's YouTube/Facebook pages can never be
+ * opened from this screen.
+ */
+function renderUploadDestHtml(x){
+  const platform=x&&x.platform||'';
+  const links=x&&x.links||[];
+  const ytPost=links.find(l=>ytId(l.url));
+  const fbPost=links.find(l=>isFacebookUrl(l.url));
+  const badge=(cls_,icon,label)=>`<span class="uploadDestLink ${cls_}">${icon} ${esc(label)}</span>`;
+  let html='';
+  if(platform==='YouTube'){
+    html=ytPost?badge('yt posted','▶','Already posted on YouTube'):badge('yt','▶','This content uploads on YouTube');
+  }else if(platform==='Facebook'){
+    html=fbPost?badge('fb posted','📘','Already posted on Facebook'):badge('fb','📘','This content uploads on Facebook');
+  }else if(platform){
+    html=badge('','📤','This content uploads on '+platform);
+  }else{
+    html=badge('','📤','No main platform set yet — check Add Content');
+  }
+  return `<div class="uploadDestWrap"><div class="uploadDestLabel">Where to upload</div><div class="uploadDestRow">${html}</div></div>`;
+}
 function fmtNum(n){
   n=Number(n||0);
   if(n>=1000000)return (n/1000000).toFixed(1).replace(/\.0$/,'')+'M';
@@ -1470,6 +1519,7 @@ function renderReviews(){
           <div>${flag}</div>
         </div>
       </div>
+      ${renderUploadDestHtml(x)}
       <div class="revCols">${cards}</div>
     </div>`;
   }).join('');
@@ -1709,6 +1759,7 @@ function openApproveModal(id){
   $('apProject').textContent=x.project||'';
   $('apContent').textContent=x.content||'';
   $('apMeta').textContent=[x.platform,x.ctype,x.category,x.uploadDate?('Upload date: '+fmt(x.uploadDate)):'',x.reviewedBy?('Last reviewed by '+x.reviewedBy+(x.reviewedAt?(' on '+fmt(x.reviewedAt.slice(0,10))):'')):''].filter(Boolean).join(' • ');
+  $('apUploadDest').innerHTML=renderUploadDestHtml(x);
   const apTitle=x.content||'';
   $('apTitleBox').textContent=apTitle||'(No title entered yet)';
   $('apTitleBox').classList.toggle('empty',!apTitle);

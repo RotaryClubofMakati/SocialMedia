@@ -749,14 +749,14 @@ function applyRoleUI(){
       spn.textContent=item?((item.content||item.project||'this item')+(item.category?' • '+item.category:'')):'this item';
     }
   }
-  // Category tabs help approvers filter a long "All Content" or "For
-  // Approval" review list, and are just as useful on the normal
-  // Admin/Approver logins — they were previously wiped out by .shareHide
-  // for every share link. The one case where they're pointless is a
-  // single-item share link (?id=...), since that view is already locked
-  // to one content item no matter what the category filter says.
+  // Category tabs help approvers filter a long "All Content" review list,
+  // and are just as useful on the normal Admin/Approver logins — they were
+  // previously wiped out by .shareHide for every share link. They're
+  // pointless on a single-item share link (?id=...) since that view is
+  // already locked to one content item, and on the "For Approval" link
+  // (?approvals=1) since that list is already short and scoped by status.
   const catTabsEl=$('categoryTabs');
-  if(catTabsEl)catTabsEl.style.display=(shareMode&&!shareAllMode&&!shareApprovalsMode)?'none':'';
+  if(catTabsEl)catTabsEl.style.display=(shareMode&&!shareAllMode)?'none':'';
 }
 function buildContentShareLink(id){
   return location.origin+location.pathname+'?id='+encodeURIComponent(id);

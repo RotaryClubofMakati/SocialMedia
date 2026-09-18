@@ -67,6 +67,14 @@ header .tag{margin:4px 0 0;opacity:.85;font-size:13px}
 .card .label{font-size:12px;color:var(--muted);font-weight:600}
 .card .num{font-size:26px;font-weight:800;font-family:'Manrope',Arial,sans-serif;margin-top:2px}
 
+.categoryTabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.catTab{display:inline-flex;align-items:center;gap:7px;background:var(--card);color:var(--navy);border:1px solid var(--border);border-radius:999px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
+.catTab:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(15,59,115,.14)}
+.catTab.activeCat{background:var(--royal);color:#fff;border-color:var(--royal)}
+.catTab .catTabCount{background:rgba(15,59,115,.08);border-radius:999px;padding:1px 8px;font-size:11px;font-weight:800}
+.catTab.activeCat .catTabCount{background:rgba(255,255,255,.25)}
+.catTag{display:inline-block;margin-top:3px;font-size:10px;font-weight:800;letter-spacing:.2px;color:var(--royal);background:var(--azure-bg);border-radius:999px;padding:2px 8px}
+
 .toolbar{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin:16px 0;display:flex;gap:9px;flex-wrap:wrap;align-items:center;box-shadow:var(--shadow)}
 .toolbar input{flex:1;min-width:230px}
 input,select,textarea{border:1px solid #cbd5e1;border-radius:9px;padding:9px 10px;font:inherit;background:white;color:var(--text)}
@@ -98,6 +106,37 @@ tbody tr:hover td{background:#F5F9FF}
 .Approved{background:#DCFCE7;color:#166534}
 .ForUpload{background:var(--sky-bg);color:var(--sky-tx)}
 .Revise{background:var(--card-bg);color:var(--card-tx)}
+
+.linkWithStat{display:inline-flex;flex-direction:column;gap:1px;margin:2px 4px 2px 0}
+.statLine{font-size:10px;color:var(--muted);font-weight:600;white-space:nowrap}
+.insightToggleBtn{display:inline-flex;align-items:center;gap:4px;background:var(--gold);color:#4a2f00;border:0;border-radius:999px;padding:4px 9px;font-size:10px;font-weight:800;cursor:pointer;margin:2px 0 2px 4px;box-shadow:0 1px 3px rgba(0,0,0,.15);white-space:nowrap}
+.insightToggleBtn:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.insightDetailRow td{background:#F8FBFF;padding:20px 24px;border-bottom:1px solid #edf0f3}
+.insightDetailWrap{display:flex;flex-wrap:wrap;gap:16px}
+.insightMiniCard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;min-width:280px;box-shadow:var(--shadow)}
+.insightMiniHead{font-weight:800;font-family:'Manrope',Arial,sans-serif;font-size:18px;margin-bottom:12px;color:var(--navy)}
+.insightMiniStats{display:flex;flex-wrap:wrap;gap:12px}
+.insightMiniStats span{background:#EEF3FA;border-radius:999px;padding:8px 16px;font-weight:800;font-size:16px;color:var(--text)}
+.insightCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:16px}
+.insightCard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.insightCard h3{margin:0 0 10px;font-size:13px;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px}
+.insightCard .row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px dashed var(--border)}
+.insightCard .row:last-child{border-bottom:0}
+.insightCard .row b{font-family:'Manrope',Arial,sans-serif;font-size:16px}
+.insightNote{background:#FEF0D6;color:#8A5A05;border-radius:10px;padding:10px 14px;font-size:12px;margin-bottom:14px}
+.insightErr{background:#FBE1E2;color:#8C1D23;border-radius:10px;padding:10px 14px;font-size:12px;margin-bottom:14px}
+.insightPlatformLink{font-weight:700;text-decoration:none;white-space:nowrap;margin-right:10px;display:inline-block}
+.insightPlatformLink.yt{color:var(--azure)}
+.insightPlatformLink.fb{color:#3730A3}
+.insightPlatformLink:hover{text-decoration:underline}
+.insightChartsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin:4px 0 18px}
+.chartCard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+.chartCard .chartTitle{font-weight:800;font-family:'Manrope',Arial,sans-serif;font-size:15px;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.chartBarRow{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.chartBarRow:last-child{margin-bottom:0}
+.chartBarLabel{width:130px;flex:none;font-size:11.5px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:default}
+.chartBarTrack{flex:1;background:#EEF3FA;border-radius:6px;height:22px;position:relative;overflow:hidden}
+.chartBarFill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding:0 8px;color:#fff;font-size:11px;font-weight:800;white-space:nowrap;transition:width .4s ease}
 
 /* Role-based visibility: elements marked admin-only disappear for the
    Approver account. The Approver gets its own "Review" action instead of
@@ -302,16 +341,21 @@ textarea{min-height:90px}
   // tab doesn't see the login screen flash on every page load.
   //
   // Approver share links: the Admin can generate a link scoped to one
-  // content item (?id=<contentId>) or to all content (?all=1). Anyone who
-  // opens it skips the login screen entirely and lands directly in a
+  // content item (?id=<contentId>), to all content (?all=1), or to just
+  // whatever is currently awaiting approval (?approvals=1) — handy when
+  // several items are "For Approval" at once and the approver shouldn't
+  // have to hunt through everything else to find them. Anyone who opens
+  // any of these skips the login screen entirely and lands directly in a
   // read-only-except-review view — the normal Admin and Approver logins
   // below are untouched.
   var shareUrlParams=new URLSearchParams(location.search);
   var shareIdParam=shareUrlParams.get('id');
   var shareAllParam=shareUrlParams.get('all');
+  var shareApprovalsParam=shareUrlParams.get('approvals');
   var shareAllMode=shareAllParam==='1';
+  var shareApprovalsMode=shareApprovalsParam==='1';
   var shareContentId=(shareIdParam&&shareIdParam.trim())?shareIdParam.trim():'';
-  var shareMode=!!shareContentId||shareAllMode;
+  var shareMode=!!shareContentId||shareAllMode||shareApprovalsMode;
   if(shareMode){
     document.getElementById('loginScreen').classList.remove('open');
   }else{
@@ -357,6 +401,7 @@ textarea{min-height:90px}
 <div class="tabBar shareHide" id="tabBar">
   <button type="button" class="tabBtn active" id="tabBtnContent" onclick="switchTab('content')">📋 Content</button>
   <button type="button" class="tabBtn adminOnly" id="tabBtnReviews" onclick="switchTab('reviews')">🧾 Reviews / Approvals <span class="tabCount" id="tabReviewCount" style="display:none">0</span></button>
+  <button type="button" class="tabBtn adminOnly" id="tabBtnInsights" onclick="switchTab('insights')">📈 Insights</button>
 </div>
 
 <div class="tabPane active" id="paneContent">
@@ -370,6 +415,20 @@ textarea{min-height:90px}
 <div class="card stUpload" id="cardUpload" onclick="filterByStatus('For Upload')" title="Show only For Upload"><div class="label">For upload</div><div class="num" id="nUpload">0</div></div>
 <div class="card stRevise" id="cardRevise" onclick="filterByStatus('Revise')" title="Show only Revise"><div class="label">Revise</div><div class="num" id="nRevise">0</div></div>
 </div>
+<div class="categoryTabs" id="categoryTabs">
+<button type="button" class="catTab" id="catTabAll" onclick="filterByCategory('')">📁 All categories <span class="catTabCount" id="catCountAll">0</span></button>
+<button type="button" class="catTab" id="catTabFellowship" onclick="filterByCategory('Fellowship')">🤝 Fellowship <span class="catTabCount" id="catCountFellowship">0</span></button>
+<button type="button" class="catTab" id="catTabServiceProject" onclick="filterByCategory('Service Project')">🌱 Service Project <span class="catTabCount" id="catCountServiceProject">0</span></button>
+<button type="button" class="catTab" id="catTabMeeting" onclick="filterByCategory('Meeting')">📅 Meeting <span class="catTabCount" id="catCountMeeting">0</span></button>
+<button type="button" class="catTab" id="catTabTraining" onclick="filterByCategory('Training')">🎓 Training <span class="catTabCount" id="catCountTraining">0</span></button>
+<button type="button" class="catTab" id="catTabSpecialEvents" onclick="filterByCategory('Special Events')">🎉 Special Events <span class="catTabCount" id="catCountSpecialEvents">0</span></button>
+<button type="button" class="catTab" id="catTabSports" onclick="filterByCategory('Sports')">🏅 Sports <span class="catTabCount" id="catCountSports">0</span></button>
+<button type="button" class="catTab" id="catTabMoASigning" onclick="filterByCategory('MoA Signing')">📝 MoA Signing <span class="catTabCount" id="catCountMoASigning">0</span></button>
+<button type="button" class="catTab" id="catTabRecap" onclick="filterByCategory('Recap')">🎬 Recap <span class="catTabCount" id="catCountRecap">0</span></button>
+<button type="button" class="catTab" id="catTabVideoNews" onclick="filterByCategory('RC Makati Video News')">📰 RC Makati Video News <span class="catTabCount" id="catCountVideoNews">0</span></button>
+<button type="button" class="catTab" id="catTabHymn" onclick="filterByCategory('RCM Hymn')">🎵 RCM Hymn <span class="catTabCount" id="catCountHymn">0</span></button>
+<button type="button" class="catTab" id="catTabWelcomeSong" onclick="filterByCategory('Welcome Song')">👋 Welcome Song <span class="catTabCount" id="catCountWelcomeSong">0</span></button>
+</div>
 <div class="shareHide" style="margin:16px 0">
 <button class="primary adminOnly" onclick="openModal()" style="font-size:17px;padding:16px 28px;border-radius:12px">+ Add Content</button>
 </div>
@@ -378,9 +437,11 @@ textarea{min-height:90px}
 <input id="projectFilter" placeholder="Filter project..." oninput="render()" style="max-width:180px">
 <select id="pf" onchange="render()"><option value="">All platforms</option><option>Facebook</option><option>TikTok</option><option>YouTube</option><option>Instagram</option><option>LinkedIn</option><option>X / Twitter</option><option>Other</option></select>
 <select id="sf" onchange="render()"><option value="">All statuses</option><option>Pending</option><option>Editing</option><option>For Approval</option><option>Approved</option><option>For Upload</option><option>Uploaded</option><option>Revise</option></select>
+<select id="catf" onchange="render()"><option value="">All categories</option><option>Fellowship</option><option>Service Project</option><option>Meeting</option><option>Training</option><option>Special Events</option><option>Sports</option><option>MoA Signing</option><option>Recap</option><option>RC Makati Video News</option><option>RCM Hymn</option><option>Welcome Song</option></select>
 <button class="secondary" onclick="exportCSV()">Export CSV</button>
 <button class="secondary adminOnly" onclick="findDuplicateYoutubeLinks()">🔍 Check duplicate YouTube links</button>
 <button class="secondary adminOnly" onclick="copyAllShareLink()" title="Get a link that shows every content item">🌐 All Content Link</button>
+<button class="secondary adminOnly" onclick="copyApprovalsShareLink()" title="Get a link that shows only content currently &quot;For Approval&quot; — stays up to date as items are added">🕓 For Approval Link</button>
 </div>
 <div class="wrap"><table><thead><tr>
 <th>Thumbnail</th><th>Project</th><th id="eventDateHeader" onclick="toggleDateSort()" style="cursor:pointer;user-select:none" title="Click to sort by Event Date">Event Date <span id="eventDateSortArrow"></span></th><th>Upload Date</th><th>Platform</th><th>Content / Title</th><th>Description</th><th>Status</th><th>Uploaded Links</th><th>Actions</th>
@@ -404,6 +465,14 @@ textarea{min-height:90px}
   </p>
   <div id="revList"></div>
 </div><!-- /#paneReviews -->
+
+<div class="tabPane" id="paneInsights">
+  <div class="toolbar">
+    <div class="hint" style="flex:1">Live view/engagement stats pulled from YouTube and Facebook for content posted through this tracker.</div>
+    <button class="secondary" id="refreshInsightsBtn" onclick="loadInsights(true)">🔄 Refresh Insights</button>
+  </div>
+  <div id="insightsBody"><p class="hint">Loading insights…</p></div>
+</div><!-- /#paneInsights -->
 </div><!-- /.container -->
 
 <div class="modal" id="modal"><div class="box">
@@ -414,6 +483,7 @@ textarea{min-height:90px}
 <div class="field"><label>Date of Upload</label><input type="date" id="uploadDate"><div class="hint">Leave blank if status is Pending.</div></div>
 <div class="field"><label>Main Platform</label><select id="platform"><option>Facebook</option><option>TikTok</option><option>YouTube</option><option>Instagram</option><option>LinkedIn</option><option>X / Twitter</option><option>Other</option></select></div>
 <div class="field"><label>Content Type</label><select id="ctype"><option>Photo</option><option>Video</option><option>Reel / Short</option><option>Poster / Graphic</option><option>Article / Caption</option></select></div>
+<div class="field"><label>Category</label><select id="category"><option>Fellowship</option><option>Service Project</option><option>Meeting</option><option>Training</option><option>Special Events</option><option>Sports</option><option>MoA Signing</option><option>Recap</option><option>RC Makati Video News</option><option>RCM Hymn</option><option>Welcome Song</option></select></div>
 <div class="field full"><label>Content / Title</label><input id="content" placeholder="Example: RC Makati Hope Mission"></div>
 <div class="field full"><label>Description / Caption</label><textarea id="description"></textarea></div>
 <div class="field full"><label>Status — click it anytime to update</label><select id="status"><option>Pending</option><option>Editing</option><option>For Approval</option><option>Approved</option><option>For Upload</option><option>Uploaded</option><option>Revise</option></select></div>
@@ -673,17 +743,29 @@ function applyRoleUI(){
   const spn=$('shareProjectName');
   if(spn){
     if(shareAllMode)spn.textContent='All Content';
+    else if(shareApprovalsMode)spn.textContent='All Content For Approval';
     else if(shareContentId){
       const item=data.find(o=>String(o.id)===shareContentId);
-      spn.textContent=item?(item.content||item.project||'this item'):'this item';
+      spn.textContent=item?((item.content||item.project||'this item')+(item.category?' • '+item.category:'')):'this item';
     }
   }
+  // Category tabs help approvers filter a long "All Content" or "For
+  // Approval" review list, and are just as useful on the normal
+  // Admin/Approver logins — they were previously wiped out by .shareHide
+  // for every share link. The one case where they're pointless is a
+  // single-item share link (?id=...), since that view is already locked
+  // to one content item no matter what the category filter says.
+  const catTabsEl=$('categoryTabs');
+  if(catTabsEl)catTabsEl.style.display=(shareMode&&!shareAllMode&&!shareApprovalsMode)?'none':'';
 }
 function buildContentShareLink(id){
   return location.origin+location.pathname+'?id='+encodeURIComponent(id);
 }
 function buildAllShareLink(){
   return location.origin+location.pathname+'?all=1';
+}
+function buildApprovalsShareLink(){
+  return location.origin+location.pathname+'?approvals=1';
 }
 async function copyContentShareLink(id,contentName){
   const link=buildContentShareLink(id);
@@ -699,6 +781,15 @@ async function copyAllShareLink(){
   try{
     await navigator.clipboard.writeText(link);
     alert('Link copied! Opening it shows every content item for review — no login needed.');
+  }catch(err){
+    prompt('Could not copy automatically. Copy this link:',link);
+  }
+}
+async function copyApprovalsShareLink(){
+  const link=buildApprovalsShareLink();
+  try{
+    await navigator.clipboard.writeText(link);
+    alert('Link copied! Opening it shows only content currently "For Approval" — no login needed. As items move in or out of that status the same link automatically stays up to date, so you only ever need to share it once.');
   }catch(err){
     prompt('Could not copy automatically. Copy this link:',link);
   }
@@ -738,6 +829,13 @@ function logout(){
 const STATUS_CARD_ID={'':'cardTotal',Pending:'cardPending',Uploaded:'cardUploaded',Editing:'cardEditing','For Approval':'cardApproval',Approved:'cardApproved','For Upload':'cardUpload',Revise:'cardRevise'};
 function filterByStatus(status){
   $('sf').value=status;
+  render();
+}
+const CATEGORY_LIST=['Fellowship','Service Project','Meeting','Training','Special Events','Sports','MoA Signing','Recap','RC Makati Video News','RCM Hymn','Welcome Song'];
+const CATEGORY_TAB_ID={'':'catTabAll',Fellowship:'catTabFellowship','Service Project':'catTabServiceProject',Meeting:'catTabMeeting',Training:'catTabTraining','Special Events':'catTabSpecialEvents',Sports:'catTabSports','MoA Signing':'catTabMoASigning',Recap:'catTabRecap','RC Makati Video News':'catTabVideoNews','RCM Hymn':'catTabHymn','Welcome Song':'catTabWelcomeSong'};
+const CATEGORY_COUNT_ID={'':'catCountAll',Fellowship:'catCountFellowship','Service Project':'catCountServiceProject',Meeting:'catCountMeeting',Training:'catCountTraining','Special Events':'catCountSpecialEvents',Sports:'catCountSports','MoA Signing':'catCountMoASigning',Recap:'catCountRecap','RC Makati Video News':'catCountVideoNews','RCM Hymn':'catCountHymn','Welcome Song':'catCountWelcomeSong'};
+function filterByCategory(cat){
+  $('catf').value=cat;
   render();
 }
 
@@ -1020,6 +1118,12 @@ function renderLinksHtml(links){
     return `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.platform)}</a>`;
   }).join('');
 }
+function fmtNum(n){
+  n=Number(n||0);
+  if(n>=1000000)return (n/1000000).toFixed(1).replace(/\.0$/,'')+'M';
+  if(n>=1000)return (n/1000).toFixed(1).replace(/\.0$/,'')+'K';
+  return String(n);
+}
 function fmt(s){if(!s)return '';let a=s.split('-');return a[1]+'/'+a[2]+'/'+a[0]}
 function cls(s){return s.replace(/[^A-Za-z]/g,'')}
 /**
@@ -1046,8 +1150,8 @@ function csvCell(v){
 }
 function exportCSV(){
   if(!lastFiltered.length){alert('No content to export with the current filters.');return;}
-  const headers=['Project','Event Date','Upload Date','Platform','Content / Title','Description','Content Type','Status','Links'];
-  const rows=lastFiltered.map(x=>[x.project,x.eventDate,x.uploadDate,x.platform,x.content,x.description,x.ctype,x.status,(x.links||[]).map(l=>l.platform+': '+l.url).join(' | ')]);
+  const headers=['Project','Category','Event Date','Upload Date','Platform','Content / Title','Description','Content Type','Status','Links'];
+  const rows=lastFiltered.map(x=>[x.project,x.category,x.eventDate,x.uploadDate,x.platform,x.content,x.description,x.ctype,x.status,(x.links||[]).map(l=>l.platform+': '+l.url).join(' | ')]);
   const csv=[headers,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
@@ -1100,13 +1204,187 @@ function toggleDateSort(){
 var activeTab='content'; // var: applyRoleUI may run before this line is reached
 function switchTab(name){
   // Approver / share-link users only ever get the Content list.
-  if(name==='reviews'&&isApproverLike())name='content';
+  if((name==='reviews'||name==='insights')&&isApproverLike())name='content';
   activeTab=name;
   $('paneContent').classList.toggle('active',name==='content');
   $('paneReviews').classList.toggle('active',name==='reviews');
+  $('paneInsights').classList.toggle('active',name==='insights');
   $('tabBtnContent').classList.toggle('active',name==='content');
   $('tabBtnReviews').classList.toggle('active',name==='reviews');
+  $('tabBtnInsights')?.classList.toggle('active',name==='insights');
   if(name==='reviews')renderReviews();
+  if(name==='insights'&&!insightsData&&!insightsLoading)loadInsights();
+}
+
+/**
+ * Facebook/YouTube insights. Loaded lazily (only once the Insights tab is
+ * opened, or on manual refresh) rather than on every page load, since each
+ * load is a live call out to the Apps Script backend which in turn calls
+ * the YouTube/Facebook APIs — no need to pay that cost until someone
+ * actually wants to see the numbers.
+ */
+let insightsData=null;
+let insightsLoading=false;
+let expandedInsightRows=new Set();
+let insightsPlatformFilter=''; // '' = all, 'youtube', 'facebook' — filters the per-post table below
+function filterInsightsPlatform(p){insightsPlatformFilter=p;renderInsightsDashboard();}
+/**
+ * Simple dependency-free horizontal bar chart (plain HTML/CSS, no canvas or
+ * chart library) showing the top posts by views for one platform. Keeps the
+ * Insights tab self-contained — no external script to load or fail.
+ */
+function renderViewsChart_(title,icon,items,color){
+  if(!items.length)return '';
+  const max=Math.max(...items.map(i=>i.views),1);
+  const rows=items.map(i=>{
+    const pct=Math.max(6,Math.round(i.views/max*100));
+    return `<div class="chartBarRow"><div class="chartBarLabel" title="${esc(i.label)}">${esc(i.label)}</div><div class="chartBarTrack"><div class="chartBarFill" style="width:${pct}%;background:${color}">${fmtNum(i.views)}</div></div></div>`;
+  }).join('');
+  return `<div class="chartCard"><div class="chartTitle">${icon} ${esc(title)}</div>${rows}</div>`;
+}
+function toggleInsightRow(id){
+  if(expandedInsightRows.has(id))expandedInsightRows.delete(id);
+  else expandedInsightRows.add(id);
+  render();
+}
+/**
+ * The big, easy-to-read insights strip that unfolds below a content row
+ * when its "▼ Insights" toggle is clicked. Spans every column (colspan
+ * must match the table's actual column count, currently 10) so it reads
+ * as one wide panel rather than being squeezed into the links cell.
+ */
+function renderInsightDetailRow_(x,stats){
+  const open=expandedInsightRows.has(x.id);
+  let cards='';
+  if(stats.youtube){
+    const yt=stats.youtube;
+    const ytLink=(x.links||[]).find(l=>ytId(l.url));
+    const head=ytLink?`<a href="${esc(ytLink.url)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">▶ YouTube ↗</a>`:'▶ YouTube';
+    cards+=`<div class="insightMiniCard"><div class="insightMiniHead">${head}</div><div class="insightMiniStats"><span>👁 ${fmtNum(yt.views)} views</span><span>👍 ${fmtNum(yt.likes)} likes</span><span>💬 ${fmtNum(yt.comments)} comments</span></div></div>`;
+  }
+  if(stats.facebook){
+    const fb=stats.facebook;
+    const fbLink=(x.links||[]).find(l=>isFacebookUrl(l.url));
+    const head=fbLink?`<a href="${esc(fbLink.url)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">📘 Facebook ↗</a>`:'📘 Facebook';
+    cards+=`<div class="insightMiniCard"><div class="insightMiniHead">${head}</div><div class="insightMiniStats"><span>👁 ${fmtNum(fb.views)} views</span><span>👍 ${fmtNum(fb.likes)} likes</span><span>💬 ${fmtNum(fb.comments)} comments</span><span>🔁 ${fmtNum(fb.shares)} shares</span></div></div>`;
+  }
+  return `<tr class="insightDetailRow" style="display:${open?'table-row':'none'}"><td colspan="10"><div class="insightDetailWrap">${cards}</div></td></tr>`;
+}
+async function loadInsights(manual){
+  if(insightsLoading)return;
+  if(!isOnline()){
+    $('insightsBody').innerHTML='<p class="hint">Insights need an internet connection — you appear to be offline.</p>';
+    return;
+  }
+  insightsLoading=true;
+  const btn=$('refreshInsightsBtn');
+  if(btn){btn.disabled=true;btn.textContent='Refreshing...'}
+  if(!manual)$('insightsBody').innerHTML='<p class="hint">Loading insights…</p>';
+  try{
+    insightsData=await apiRequest('getInsights',{force:!!manual});
+    renderInsightsDashboard();
+    render(); // refresh the per-row ▶/Facebook stat lines in the main table too
+  }catch(err){
+    $('insightsBody').innerHTML='<div class="insightErr">Could not load insights: '+esc(err.message)+'</div>';
+  }finally{
+    insightsLoading=false;
+    if(btn){btn.disabled=false;btn.textContent='🔄 Refresh Insights'}
+  }
+}
+function renderInsightsDashboard(){
+  if(!insightsData){$('insightsBody').innerHTML='<p class="hint">No insights loaded yet.</p>';return}
+  const yt=insightsData.dashboard&&insightsData.dashboard.youtube;
+  const fb=insightsData.dashboard&&insightsData.dashboard.facebook;
+  let html='';
+
+  html+='<div class="insightCards">';
+  html+='<div class="insightCard"><h3>▶ YouTube channel</h3>';
+  if(!yt){
+    html+='<div class="hint">Not connected. Enable the YouTube Data API v3 service in the Apps Script project (Editor → Services).</div>';
+  }else if(yt.error){
+    html+='<div class="insightErr" style="margin:0">'+esc(yt.error)+'</div>';
+  }else{
+    html+=`<div class="row"><span>Subscribers</span><b>${fmtNum(yt.subscribers)}</b></div>`;
+    html+=`<div class="row"><span>Total views</span><b>${fmtNum(yt.totalViews)}</b></div>`;
+    html+=`<div class="row"><span>Videos</span><b>${fmtNum(yt.videoCount)}</b></div>`;
+  }
+  html+='</div>';
+
+  html+='<div class="insightCard"><h3>📘 Facebook Page</h3>';
+  if(!fb){
+    html+='<div class="hint">Not connected. Add FB_PAGE_ID and FB_PAGE_ACCESS_TOKEN as Script Properties in the Apps Script project.</div>';
+  }else if(fb.error){
+    html+='<div class="insightErr" style="margin:0">'+esc(fb.error)+'</div>';
+  }else{
+    html+=`<div class="row"><span>Followers</span><b>${fmtNum(fb.followers)}</b></div>`;
+    html+=`<div class="row"><span>Views (28d)</span><b>${fmtNum(fb.views28d)}</b></div>`;
+    html+=`<div class="row"><span>Engagements (28d)</span><b>${fmtNum(fb.engagements28d)}</b></div>`;
+  }
+  html+='</div></div>';
+
+  // Per-post performance table, ranked by views, for every content item
+  // that has a matched YouTube or Facebook stat. Each row also keeps the
+  // platform-specific view counts and the original post URL, so the
+  // Platforms column can link straight to the live video/post and the
+  // charts below can be built per platform.
+  const rows=data
+    .map(x=>({x,stat:insightsData.perPost?insightsData.perPost[x.id]:null}))
+    .filter(r=>r.stat)
+    .map(r=>{
+      const yt=r.stat.youtube,fb=r.stat.facebook;
+      const ytViews=yt?yt.views:0, fbViews=fb?fb.views:0;
+      const ytLikes=yt?yt.likes:0, fbLikes=fb?fb.likes:0;
+      const ytComments=(yt&&yt.comments)||0, fbComments=(fb&&fb.comments)||0;
+      const ytLink=(r.x.links||[]).find(l=>ytId(l.url));
+      const fbLink=(r.x.links||[]).find(l=>isFacebookUrl(l.url));
+      return {
+        x:r.x,
+        views:ytViews+fbViews,likes:ytLikes+fbLikes,comments:ytComments+fbComments,
+        ytViews,fbViews,hasYt:!!yt,hasFb:!!fb,
+        ytUrl:ytLink?ytLink.url:'',fbUrl:fbLink?fbLink.url:''
+      };
+    })
+    .sort((a,b)=>b.views-a.views);
+
+  // Graphs: top posts by views, one chart per platform, plain HTML/CSS bars
+  // (no external chart library — keeps the whole tracker self-contained).
+  const ytChartItems=rows.filter(r=>r.hasYt).sort((a,b)=>b.ytViews-a.ytViews).slice(0,8)
+    .map(r=>({label:r.x.content||r.x.project||'Untitled',views:r.ytViews}));
+  const fbChartItems=rows.filter(r=>r.hasFb).sort((a,b)=>b.fbViews-a.fbViews).slice(0,8)
+    .map(r=>({label:r.x.content||r.x.project||'Untitled',views:r.fbViews}));
+  if(ytChartItems.length||fbChartItems.length){
+    html+='<div class="insightChartsGrid">';
+    html+=renderViewsChart_('Top YouTube videos by views','▶',ytChartItems,'#0067C8');
+    html+=renderViewsChart_('Top Facebook posts by views','📘',fbChartItems,'#3730A3');
+    html+='</div>';
+  }
+
+  if(rows.length){
+    // Tabs to slice the per-post table down to one platform at a time.
+    html+=`<div class="categoryTabs" style="margin-top:6px">
+      <button type="button" class="catTab${insightsPlatformFilter===''?' activeCat':''}" onclick="filterInsightsPlatform('')">📊 All platforms <span class="catTabCount">${rows.length}</span></button>
+      <button type="button" class="catTab${insightsPlatformFilter==='youtube'?' activeCat':''}" onclick="filterInsightsPlatform('youtube')">▶ YouTube <span class="catTabCount">${rows.filter(r=>r.hasYt).length}</span></button>
+      <button type="button" class="catTab${insightsPlatformFilter==='facebook'?' activeCat':''}" onclick="filterInsightsPlatform('facebook')">📘 Facebook <span class="catTabCount">${rows.filter(r=>r.hasFb).length}</span></button>
+    </div>`;
+    const filteredRows=rows.filter(r=>insightsPlatformFilter===''
+      ||(insightsPlatformFilter==='youtube'&&r.hasYt)
+      ||(insightsPlatformFilter==='facebook'&&r.hasFb));
+    html+='<div class="wrap" style="margin-top:4px"><table><thead><tr><th>Project</th><th>Content / Title</th><th>Platforms</th><th>Views</th><th>Likes</th><th>Comments</th></tr></thead><tbody>';
+    if(filteredRows.length){
+      html+=filteredRows.map(r=>{
+        const platformCell=(r.hasYt?`<a class="insightPlatformLink yt" href="${esc(r.ytUrl||'#')}" target="_blank" rel="noopener" title="Open on YouTube">▶ YouTube</a>`:'')
+          +(r.hasFb?`<a class="insightPlatformLink fb" href="${esc(r.fbUrl||'#')}" target="_blank" rel="noopener" title="Open on Facebook">📘 Facebook</a>`:'');
+        return `<tr><td><b>${esc(r.x.project||'')}</b></td><td>${esc(r.x.content||'')}</td><td>${platformCell}</td><td>${fmtNum(r.views)}</td><td>${fmtNum(r.likes)}</td><td>${fmtNum(r.comments)}</td></tr>`;
+      }).join('');
+    }else{
+      html+='<tr><td colspan="6"><p class="hint" style="margin:8px 0">No posts on this platform yet.</p></td></tr>';
+    }
+    html+='</tbody></table></div>';
+  }else if(yt||fb){
+    html+='<p class="hint">No individual posts have matched stats yet — this fills in once a tracked item\'s link matches a live YouTube video or a post on the connected Facebook Page.</p>';
+  }
+
+  $('insightsBody').innerHTML=html;
 }
 
 /** Items that have at least one recorded review, newest activity first. */
@@ -1218,6 +1496,10 @@ function applyReview(contentId,index){
   const copy={...x,
     status:r.decision,
     photos:(x.photos||[]).map(p=>({url:p.url,status:marks[p.url]||'pending'})),
+    // The reviewer's ✓/✕ on the cover Thumbnail (kept in the same review.photos
+    // list, matched by URL) is captured here too, so applying a review also
+    // records whether the thumbnail itself was cleared to use.
+    thumbnailStatus:x.thumbnail?(marks[x.thumbnail]||'pending'):'',
     reviewedBy:r.by,
     reviewedAt:r.at||new Date().toISOString(),
     reviews:list};
@@ -1285,18 +1567,29 @@ function exportReviewsCSV(){
 }
 
 function render(){
- let q=$('search').value.toLowerCase(),p=$('pf').value,s=$('sf').value,proj=($('projectFilter')?.value||'').toLowerCase();
+ let q=$('search').value.toLowerCase(),p=$('pf').value,s=$('sf').value,cat=($('catf')?.value||''),proj=($('projectFilter')?.value||'').toLowerCase();
  let c={Pending:0,Uploaded:0,Editing:0,'For Approval':0,Approved:0,'For Upload':0,Revise:0};
  data.forEach(x=>{if(c[x.status]!=null)c[x.status]++});
  $('nTotal').textContent=data.length;$('nPending').textContent=c.Pending;$('nUploaded').textContent=c.Uploaded;$('nEditing').textContent=c.Editing;$('nApproval').textContent=c['For Approval'];$('nApproved').textContent=c.Approved;$('nUpload').textContent=c['For Upload'];$('nRevise').textContent=c.Revise;
  document.querySelectorAll('.cards .card').forEach(el=>el.classList.remove('activeCard'));
  const activeCardId=STATUS_CARD_ID[s]||'cardTotal';
  $(activeCardId)?.classList.add('activeCard');
+ // Category tabs: counts per category, plus the "All categories" total —
+ // gives an at-a-glance dashboard of how much content sits in each bucket
+ // (Fellowship, Service Project, Meeting, Training, Special Events, Sports)
+ // without having to open the filter dropdown.
+ let catCounts={};
+ CATEGORY_LIST.forEach(cc=>catCounts[cc]=0);
+ data.forEach(x=>{if(x.category&&catCounts[x.category]!=null)catCounts[x.category]++});
+ $(CATEGORY_COUNT_ID['']).textContent=data.length;
+ CATEGORY_LIST.forEach(cc=>{ const el=$(CATEGORY_COUNT_ID[cc]); if(el)el.textContent=catCounts[cc]; });
+ document.querySelectorAll('.catTab').forEach(el=>el.classList.remove('activeCat'));
+ $(CATEGORY_TAB_ID[cat]||'catTabAll')?.classList.add('activeCat');
  let arr=data.filter(x=>{
-   return (!q||[x.project,x.content,x.description,x.eventDate,x.uploadDate,x.platform,x.ctype,x.status,x.notes].join(' ').toLowerCase().includes(q))
+   return (!q||[x.project,x.content,x.description,x.eventDate,x.uploadDate,x.platform,x.ctype,x.category,x.status,x.notes].join(' ').toLowerCase().includes(q))
    &&(!proj||String(x.project||'').toLowerCase().includes(proj))
-   &&(!p||x.platform===p)&&(!s||x.status===s)
-   &&(!shareMode||shareAllMode||String(x.id)===shareContentId);
+   &&(!p||x.platform===p)&&(!s||x.status===s)&&(!cat||x.category===cat)
+   &&(!shareMode||shareAllMode||(shareApprovalsMode?x.status==='For Approval':String(x.id)===shareContentId));
  });
  applyRoleUI();
  // Sort by Event Date (date of the project). Rows without an event date
@@ -1316,8 +1609,14 @@ function render(){
    // Upload/Revise) — replaces the old due-date-based highlighting.
    let row=x.status==='Uploaded'?'rowUploaded':'rowNotUploaded';
    let coverUrl=coverImageOf(x);
-   let thumb=coverUrl?`<img class="thumb" src="${esc(coverUrl)}" data-src="${esc(coverUrl)}" alt="Thumbnail" referrerpolicy="no-referrer" loading="lazy">`:`<div class="thumbEmpty">No image</div>`;
+   // Border color mirrors the .albumTile approved/revise treatment used in
+   // the review grid, so a thumbnail an approver marked "Do Not Upload" is
+   // visibly flagged here too, instead of looking identical to a cleared one.
+   let thumbBorder=x.thumbnailStatus==='approved'?'border:2px solid #16a34a':x.thumbnailStatus==='revise'?'border:2px solid var(--cardinal)':'';
+   let thumb=coverUrl?`<img class="thumb" src="${esc(coverUrl)}" data-src="${esc(coverUrl)}" alt="Thumbnail" referrerpolicy="no-referrer" loading="lazy"${thumbBorder?` style="${thumbBorder}"`:''}>`:`<div class="thumbEmpty">No image</div>`;
    let linkHtml=renderLinksHtml(x.links);
+   let postStats=(insightsData&&insightsData.perPost)?insightsData.perPost[x.id]:null;
+   let insightToggleHtml=postStats?`<button type="button" class="insightToggleBtn" onclick="event.stopPropagation();toggleInsightRow('${x.id}')">${expandedInsightRows.has(x.id)?'▲':'▼'} Insights</button>`:'';
    let actionsHtml=isApproverLike()
      ?`<button class="primary reviewBtn" onclick="openApproveModal('${x.id}')">Review</button>`
      :`<button class="secondary" onclick="openModal('${x.id}')">Edit</button><button class="danger" onclick="del('${x.id}')">Delete</button>`;
@@ -1329,7 +1628,9 @@ function render(){
    let reviewedByTitle=x.reviewedBy?('Reviewed by '+x.reviewedBy+(x.reviewedAt?(' on '+fmt(x.reviewedAt.slice(0,10))):'')+extra):(isApproverLike()?'Click to review':'Click to change status');
    let multiTag=(revList.length>1&&!isApproverLike())?`<span style="margin-left:4px;background:${reviewsDisagree(revList)?'#FEF3C7':'#E7EDF5'};color:${reviewsDisagree(revList)?'#92400E':'#17458F'};border-radius:999px;padding:1px 6px;font-weight:800;cursor:pointer" onclick="event.stopPropagation();switchTab('reviews')" title="Compare all ${revList.length} reviews">${reviewsDisagree(revList)?'⚠ ':''}${revList.length}×</span>`:'';
    let reviewedByHtml=x.reviewedBy?`<div style="font-size:10px;color:var(--muted);margin-top:3px;white-space:nowrap" title="${esc(reviewedByTitle)}">by ${esc(x.reviewedBy)}${multiTag}</div>`:'';
-   return `<tr class="${row}"><td${thumbAttrs}>${thumb}</td><td${contentAttrs}><b>${esc(x.project||'')}</b></td><td>${fmt(x.eventDate)}</td><td>${fmt(x.uploadDate)}</td><td>${esc(x.platform)}</td><td${contentAttrs}>${contentShareBtn}<b>${esc(x.content)}</b></td><td class="descCell" onclick="openDescModal('${x.id}')"><span class="clampText">${esc(x.description)}</span></td><td><span class="badge ${cls(x.status)}" onclick="quickStatus('${x.id}')" title="${esc(reviewedByTitle)}">${esc(x.status)}</span>${reviewedByHtml}</td><td><div class="links">${linkHtml}</div></td><td><div class="actions">${actionsHtml}</div></td></tr>`;
+   let mainRow=`<tr class="${row}"><td${thumbAttrs}>${thumb}</td><td${contentAttrs}><b>${esc(x.project||'')}</b>${x.category?`<div class="catTag">${esc(x.category)}</div>`:''}</td><td>${fmt(x.eventDate)}</td><td>${fmt(x.uploadDate)}</td><td>${esc(x.platform)}</td><td${contentAttrs}>${contentShareBtn}<b>${esc(x.content)}</b></td><td class="descCell" onclick="openDescModal('${x.id}')"><span class="clampText">${esc(x.description)}</span></td><td><span class="badge ${cls(x.status)}" onclick="quickStatus('${x.id}')" title="${esc(reviewedByTitle)}">${esc(x.status)}</span>${reviewedByHtml}</td><td><div class="links">${linkHtml}${insightToggleHtml}</div></td><td><div class="actions">${actionsHtml}</div></td></tr>`;
+   let insightRow=postStats?renderInsightDetailRow_(x,postStats):'';
+   return mainRow+insightRow;
  }).join(''):`<tr><td colspan="10" style="text-align:center;padding:35px;color:#667085">No content found. Click "+ Add Content" to start.</td></tr>`;
  // Keep the Reviews tab badge (and the pane, if it's open) in step with
  // whatever was just loaded or saved.
@@ -1367,6 +1668,10 @@ function ytId(url){
   const m=url.match(/(?:youtube\.com\/(?:watch\?(?:[^#]*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
   return m?m[1]:'';
 }
+/** Mirrors isFacebookUrl_() on the Apps Script side, so the Insights tab can
+ * turn a matched Facebook stat back into a clickable link using the URL
+ * that's already stored on the content item — no backend change needed. */
+function isFacebookUrl(url){return /facebook\.com|fb\.watch/i.test(String(url||''));}
 /**
  * Auto-fills the cover Thumbnail from a pasted YouTube link. Only runs
  * automatically while the thumbnail is still empty, so it never clobbers
@@ -1403,7 +1708,7 @@ function openApproveModal(id){
   apEditId=id;
   $('apProject').textContent=x.project||'';
   $('apContent').textContent=x.content||'';
-  $('apMeta').textContent=[x.platform,x.ctype,x.uploadDate?('Upload date: '+fmt(x.uploadDate)):'',x.reviewedBy?('Last reviewed by '+x.reviewedBy+(x.reviewedAt?(' on '+fmt(x.reviewedAt.slice(0,10))):'')):''].filter(Boolean).join(' • ');
+  $('apMeta').textContent=[x.platform,x.ctype,x.category,x.uploadDate?('Upload date: '+fmt(x.uploadDate)):'',x.reviewedBy?('Last reviewed by '+x.reviewedBy+(x.reviewedAt?(' on '+fmt(x.reviewedAt.slice(0,10))):'')):''].filter(Boolean).join(' • ');
   const apTitle=x.content||'';
   $('apTitleBox').textContent=apTitle||'(No title entered yet)';
   $('apTitleBox').classList.toggle('empty',!apTitle);
@@ -1418,9 +1723,18 @@ function openApproveModal(id){
   // history, not on the shared x.photos the item currently displays, so
   // reusing x.photos here would leak one person's marks onto the next
   // person who opens the same share link.
-  apPhotosState=(x.photos&&x.photos.length)
-    ?x.photos.map(p=>({cid:'a'+(++albumCidSeq),url:p.url,status:'pending',isVideo:isVideoUrl(p.url)}))
-    :(x.thumbnail?[{cid:'a'+(++albumCidSeq),url:x.thumbnail,status:'pending',isVideo:isVideoUrl(x.thumbnail)}]:[]);
+  // The cover Thumbnail is a separate field from the Photos/Videos album,
+  // and reviewers used to only ever see it when the album was empty — so a
+  // project with both a thumbnail AND photos let the thumbnail go out the
+  // door with nobody ever giving it a ✓/✕. It's now always included as its
+  // own tile (deduped if the same file was also added to the album), so
+  // approvers explicitly decide whether the thumbnail itself is OK to use.
+  apPhotosState=[];
+  if(x.thumbnail)apPhotosState.push({cid:'a'+(++albumCidSeq),url:x.thumbnail,status:'pending',isVideo:isVideoUrl(x.thumbnail),isThumb:true});
+  (x.photos||[]).forEach(p=>{
+    if(p.url&&p.url===x.thumbnail)return; // already covered by the thumbnail tile above
+    apPhotosState.push({cid:'a'+(++albumCidSeq),url:p.url,status:'pending',isVideo:isVideoUrl(p.url)});
+  });
   renderApGrid();
   updateApDecisionState();
   $('approveModal').classList.add('open');
@@ -1453,8 +1767,9 @@ function renderApGrid(){
     const isLocalVideo=p.isVideo&&String(p.url).startsWith('data:');
     const media=isLocalVideo?`<video src="${esc(p.url)}" muted></video>`:`<img src="${esc(p.url)}" referrerpolicy="no-referrer">`;
     const badge=p.isVideo&&!isLocalVideo?'▶':'🔍';
-    const label=p.status==='approved'?'✓ Approved':p.status==='revise'?'✕ Do Not Upload':'Pending review';
-    return `<div class="albumTile ${p.status||''}"><div class="tileMedia" onclick="openApLightbox('${p.cid}')" title="Click to enlarge">${media}<span class="zoomBadge">${badge}</span></div><div class="tileStatus">${label}</div><div class="tileChecks"><button type="button" class="primary" style="background:#16a34a" onclick="setApPhotoStatus('${p.cid}','approved')" title="Approve this photo/video">✓</button><button type="button" class="danger" onclick="setApPhotoStatus('${p.cid}','revise')" title="Mark do not upload">✕</button></div></div>`;
+    const label=(p.isThumb?'Cover/Thumbnail — ':'')+(p.status==='approved'?'✓ Approved':p.status==='revise'?'✕ Do Not Upload':'Pending review');
+    const thumbBadge=p.isThumb?'<span style="position:absolute;top:4px;left:4px;background:var(--gold);color:#4a2f00;border-radius:5px;padding:2px 5px;font-size:9px;font-weight:800;pointer-events:none">COVER</span>':'';
+    return `<div class="albumTile ${p.status||''}"><div class="tileMedia" onclick="openApLightbox('${p.cid}')" title="Click to enlarge">${media}<span class="zoomBadge">${badge}</span>${thumbBadge}</div><div class="tileStatus">${label}</div><div class="tileChecks"><button type="button" class="primary" style="background:#16a34a" onclick="setApPhotoStatus('${p.cid}','approved')" title="Approve this photo/video">✓</button><button type="button" class="danger" onclick="setApPhotoStatus('${p.cid}','revise')" title="Mark do not upload">✕</button></div></div>`;
   }).join(''):'<p class="hint">No photos or videos have been attached to this content yet.</p>';
 }
 function openApLightbox(cid){
@@ -1536,8 +1851,8 @@ function closeDescModal(){$('descModal').classList.remove('open')}
 function openModal(id=null){
  modalToken++;
  editId=id;$('mtitle').textContent=id?'Edit Content':'Add Content';$('linkRows').innerHTML='';
- let x=id?data.find(a=>a.id===id):{project:'',eventDate:'',uploadDate:'',platform:'Facebook',ctype:'Photo',content:'',description:'',status:'Pending',thumbnail:'',photos:[],links:[]};
- $('project').value=x.project||'';$('eventDate').value=x.eventDate||'';$('uploadDate').value=x.uploadDate||'';$('platform').value=x.platform||'Facebook';$('ctype').value=x.ctype||'Photo';$('content').value=x.content||'';$('description').value=x.description||'';$('status').value=x.status||'For Upload';$('thumb').value=x.thumbnail||'';
+ let x=id?data.find(a=>a.id===id):{project:'',eventDate:'',uploadDate:'',platform:'Facebook',ctype:'Photo',category:'Fellowship',content:'',description:'',status:'Pending',thumbnail:'',photos:[],links:[]};
+ $('project').value=x.project||'';$('eventDate').value=x.eventDate||'';$('uploadDate').value=x.uploadDate||'';$('platform').value=x.platform||'Facebook';$('ctype').value=x.ctype||'Photo';$('category').value=x.category||'Fellowship';$('content').value=x.content||'';$('description').value=x.description||'';$('status').value=x.status||'For Upload';$('thumb').value=x.thumbnail||'';
  thumbUploading=false;
  $('thumbUploadWrap').classList.remove('show');
  // Remembers this project's own thumbnail at the moment the modal opened,
@@ -2006,10 +2321,15 @@ function saveContent(){
    uploadDate:$('uploadDate').value,
    platform:$('platform').value,
    ctype:$('ctype').value,
+   category:$('category').value,
    content:$('content').value.trim(),
    description:$('description').value.trim(),
    status:$('status').value,
    thumbnail:$('thumb').value,
+   // Carry the existing reviewed thumbnailStatus forward on an edit, but
+   // reset it if the thumbnail file itself has actually been swapped out —
+   // a fresh image was never seen by whoever approved the old one.
+   thumbnailStatus:(editId&&data.find(a=>a.id===editId)?.thumbnail===$('thumb').value)?(data.find(a=>a.id===editId)?.thumbnailStatus||''):'',
    photos:modalPhotos.map(p=>({url:p.url,status:p.status||'pending'})),
    links:[...document.querySelectorAll('#linkRows .linkRow')]
      .map(r=>({platform:r.querySelector('.linkPlatform').value,url:r.querySelector('.linkUrl').value.trim()}))
@@ -2068,7 +2388,14 @@ function quickStatus(id){
       setAppStatus('disconnected','Apps Script: Offline (manual)','Working offline by choice. Switch to Live mode to sync with Google Sheets.');
     }else{
       await checkAppsScript();
-      if(isOnline()) await loadFromAppsScript();
+      if(isOnline()){
+        await loadFromAppsScript();
+        // Pre-load insights in the background right after content loads, so the
+        // "▼ Insights" toggle already appears on rows in the Content tab instead
+        // of only appearing after someone opens the Insights tab first (which is
+        // the only thing that used to trigger loadInsights()).
+        if(!insightsData&&!insightsLoading)loadInsights();
+      }
     }
   });
 </script>

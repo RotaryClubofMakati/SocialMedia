@@ -696,7 +696,7 @@ body.role-request .requestOnly{display:inline-block}
 <button type="button" class="arbRemove" id="arbRemoveBtn" onclick="removeRejectedPhotos()">🗑 Remove rejected</button>
 </div>
 <div id="albumGrid" class="albumGrid"></div>
-<div class="hint">This is separate from the cover Thumbnail above. Add photos and/or videos — the Approver checks (✓ approve) or marks (✕ do not upload) each one individually before it goes out. Once reviewed, use the bar above to download the approved files and remove the ones marked do not upload — you'll be asked to confirm before anything is deleted.</div>
+<div class="hint">This is separate from the cover Thumbnail above. Add photos and/or videos — the Approver checks (✓ approve) or marks (✕ do not upload) each one individually before it goes out. Once reviewed, use the bar above to download the approved files (as one zip) and remove the ones marked do not upload — you'll be asked to confirm before anything is deleted.</div>
 </div>
 <div class="field full"><label>Social Media Links — add 2 or more if the same content is posted on several platforms</label>
 <div id="linkRows"></div><button type="button" class="secondary" onclick="addLinkRow()">+ Add Social Link</button>
@@ -2389,8 +2389,10 @@ function renderAlbumReviewBar(){
   // no point cluttering the form while everything is still "pending review".
   bar.classList.toggle('show',approved.length>0||rejected.length>0);
   $('arbText').innerHTML='<span class="arbApproved">'+approved.length+' approved</span> · <span class="arbRevise">'+rejected.length+' marked do not upload</span>';
-  $('arbDownloadBtn').disabled=approved.length===0;
-  $('arbDownloadBtn').textContent='⬇ Download approved ('+approved.length+')';
+  if(!zipBusy_){ // don't overwrite the "Zipping…" progress text mid-download
+    $('arbDownloadBtn').disabled=approved.length===0;
+    $('arbDownloadBtn').textContent='⬇ Download approved ('+approved.length+')';
+  }
   $('arbRemoveBtn').disabled=rejected.length===0;
   $('arbRemoveBtn').textContent='🗑 Remove rejected ('+rejected.length+')';
 }
@@ -2407,23 +2409,71 @@ function driveDownloadUrl_(url){
   const m=url.match(/[?&]id=([^&]+)/);
   return m?('https://drive.google.com/uc?export=download&id='+m[1]):url;
 }
-function downloadApprovedPhotos(){
+function triggerDownload_(url){
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='';
+  a.rel='noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+/**
+ * Download approved photos/videos as ONE .zip built by the Apps Script.
+ *
+ * Why not one download per file (the old behaviour): browsers only allow a
+ * page's first automatic download and silently block the rest, so with
+ * several approved files only a single one ever arrived. The backend now
+ * zips them in Drive and the page downloads that single file instead.
+ * A single approved file is still downloaded directly (no point zipping
+ * one photo). Very large sets (>~40MB total) are split into a few zips
+ * because Apps Script can't build a single blob over ~50MB.
+ */
+let zipBusy_=false;
+async function downloadApprovedPhotos(){
+  if(zipBusy_)return;
   const approved=modalPhotos.filter(p=>p.status==='approved'&&p.url);
   if(!approved.length){alert('No photos have been approved by the Approver yet.');return;}
-  approved.forEach((p,i)=>{
-    // Stagger slightly — firing several downloads in the same instant is
-    // what usually trips a browser's popup/download blocker.
-    setTimeout(()=>{
-      const a=document.createElement('a');
-      a.href=driveDownloadUrl_(p.url);
-      a.download='';
-      a.rel='noopener';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    },i*350);
-  });
-  if(approved.length>1)alert('Downloading '+approved.length+' approved photo(s)/video(s). If your browser blocks any of them, allow downloads/pop-ups for this site and try again.');
+  if(approved.length===1){ // nothing to zip
+    triggerDownload_(driveDownloadUrl_(approved[0].url));
+    return;
+  }
+  if(!isOnline()){alert('Internet is required to download the approved files as a zip.');return;}
+  // Only Drive-hosted files can be zipped. Anything else (a still-uploading
+  // local copy, or a pasted non-Drive link) is reported instead of silently lost.
+  const driveUrls=approved.map(p=>p.url).filter(u=>/drive\.google\.com/.test(u));
+  let notZipped=approved.length-driveUrls.length;
+  if(!driveUrls.length){alert('None of the approved files are stored in Google Drive, so they can\'t be zipped.');return;}
+  zipBusy_=true;
+  const btn=$('arbDownloadBtn');
+  btn.disabled=true;
+  btn.textContent='⏳ Preparing zip…';
+  const builtIds=[];
+  try{
+    const plan=await apiRequest('zipPlan',{urls:driveUrls,zipName:($('content').value||'').trim()});
+    notZipped+=plan.skipped||0;
+    if(!plan.parts.length)throw new Error('None of the approved files could be read from Drive.');
+    if(plan.parts.length>1)showToast('These files are large, so they\'re split into '+plan.parts.length+' zip files. If your browser asks, allow multiple downloads.');
+    for(let i=0;i<plan.parts.length;i++){
+      btn.textContent='⏳ Zipping '+(plan.parts.length>1?((i+1)+'/'+plan.parts.length):plan.total+' file(s)')+'…';
+      const part=await apiRequest('zipBuild',{ids:plan.parts[i].ids,name:plan.parts[i].name});
+      builtIds.push(part.id);
+      triggerDownload_(part.downloadUrl);
+      if(i<plan.parts.length-1)await new Promise(r=>setTimeout(r,1500)); // don't fire back-to-back
+    }
+    showToast('✓ Downloading '+plan.total+' file(s) as '+(plan.parts.length>1?plan.parts.length+' zips':'a zip')+(notZipped?' — '+notZipped+' couldn\'t be included (not in Drive / no access).':'.'));
+    // The temp zip in Drive is only needed for the download itself.
+    setTimeout(()=>{apiRequest('zipCleanup',{ids:builtIds}).catch(()=>{});},10*60*1000);
+  }catch(err){
+    const msg=String(err&&err.message||err);
+    alert(/Unknown action/i.test(msg)
+      ?'The Apps Script backend doesn\'t have the zip feature yet.\n\nPaste the updated script (v1_9.gs) into Apps Script and redeploy: Deploy > Manage deployments > pencil icon > Version: "New version" > Deploy.'
+      :'Could not build the zip: '+msg+'\n\nPlease try again.');
+    if(builtIds.length)apiRequest('zipCleanup',{ids:builtIds}).catch(()=>{});
+  }finally{
+    zipBusy_=false;
+    renderAlbumReviewBar();
+  }
 }
 function removeRejectedPhotos(){
   const rejected=modalPhotos.filter(p=>p.status==='revise');

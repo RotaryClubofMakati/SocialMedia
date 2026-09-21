@@ -557,7 +557,7 @@ body.role-request .requestOnly{display:inline-block}
 <button class="secondary adminOnly" onclick="copyRequestLink()" style="font-size:15px;padding:15px 20px;border-radius:12px;margin-left:10px" title="Get a link you can give to anyone who wants to suggest new content. Their request waits for your approval.">🔗 Content Request Link</button>
 </div>
 <div class="requestOnly" style="margin:16px 0">
-<button class="primary" onclick="openRequestModal()" style="font-size:17px;padding:16px 28px;border-radius:12px">📩 Request Content</button>
+<button class="primary" onclick="openRequestModal()" style="font-size:17px;padding:16px 28px;border-radius:12px">📩 For Posting</button>
 </div>
 <div class="toolbar shareHide">
 <input id="search" placeholder="Search project, content, description, event, platform..." oninput="render()">
@@ -940,7 +940,7 @@ function applyRoleUI(){
   }
   const shh=$('shareHeaderHint');
   if(shh)shh.textContent=requestMode
-    ?'Browse what\u2019s already planned, or click "Request Content" below to suggest something new — no login needed.'
+    ?'Browse what\u2019s already planned, or click "For Posting" below to suggest something new — no login needed.'
     :'Check each photo/video below, then approve it or send it back for revision — same review as the full system. No login is needed for this link.';
   // Category tabs help approvers filter a long "All Content" review list,
   // and are just as useful on the normal Admin/Approver logins — they were

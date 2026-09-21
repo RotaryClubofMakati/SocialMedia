@@ -329,6 +329,97 @@ textarea{min-height:90px}
 
 @media(max-width:1100px){.cards{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:600px){.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.full{grid-column:auto}}
+
+/* =====================================================================
+   NEW: notification bell, Overdue / Due-today dashboard, content requests
+   ===================================================================== */
+/* The global button{padding:10px 14px} was squeezing every 34px header icon down to a 4px-wide sliver. */
+.iconBtn{padding:0}
+.bellWrap{position:relative;display:inline-flex}
+.bellBtn{position:relative}
+.bellBtn.ring svg{animation:bellRing .9s ease-in-out 1;transform-origin:50% 10%}
+@keyframes bellRing{0%,100%{transform:rotate(0)}15%{transform:rotate(15deg)}30%{transform:rotate(-13deg)}45%{transform:rotate(10deg)}60%{transform:rotate(-6deg)}75%{transform:rotate(3deg)}}
+.bellBadge{position:absolute;top:-7px;right:-7px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:var(--cardinal);color:#fff;font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--navy);line-height:1}
+.notifPanel{display:none;position:fixed;z-index:60;width:min(420px,calc(100vw - 24px));max-height:min(72vh,600px);background:#fff;color:var(--text);border:1px solid var(--border);border-radius:14px;box-shadow:0 14px 36px rgba(15,25,45,.3);overflow:hidden;flex-direction:column}
+.notifPanel.open{display:flex}
+.notifHead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);background:#F8FBFF}
+.notifHead b{font-family:'Manrope',Arial,sans-serif;font-size:15px;color:var(--navy)}
+.notifHead button{background:transparent;color:var(--azure);padding:4px 6px;font-size:12px}
+.notifList{overflow:auto}
+.notifItem{display:flex;gap:10px;padding:12px 14px;border-bottom:1px solid #edf0f3;cursor:pointer;align-items:flex-start;background:#fff}
+.notifItem.unread{background:#EFF6FF}
+.notifItem:hover{background:#E4EFFC}
+.notifDot{flex:none;width:8px;height:8px;border-radius:50%;margin-top:6px;background:transparent}
+.notifItem.unread .notifDot{background:var(--azure)}
+.notifBody{flex:1;min-width:0}
+.notifTitle{font-size:13px;line-height:1.45;word-break:break-word}
+.notifChips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.notifChip{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;background:#EEF3FA;color:var(--navy)}
+.notifChip.ok{background:#DCFCE7;color:#166534}
+.notifChip.no{background:var(--card-bg);color:var(--card-tx)}
+.notifChip.new{background:var(--gold-bg);color:var(--gold-tx)}
+.notifNote{font-size:12px;color:#344054;background:#F5F8FC;border-radius:8px;padding:6px 9px;margin-top:6px;white-space:pre-wrap;word-break:break-word}
+.notifSub{font-size:11px;color:var(--muted);margin-top:5px}
+.notifEmpty{padding:34px 18px;text-align:center;color:var(--muted);font-size:13px}
+
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:var(--navy);color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(15,25,45,.35);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:80;max-width:min(520px,calc(100vw - 24px))}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+.dueDash{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 0 16px}
+.dueCard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.dueCard.overdue{border-top:4px solid var(--cardinal)}
+.dueCard.today{border-top:4px solid var(--gold)}
+.dueHead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px}
+.dueHead h3{margin:0;font-family:'Manrope',Arial,sans-serif;font-size:15px;color:var(--navy)}
+.dueHead .hint{margin:2px 0 0}
+.dueCount{font-family:'Manrope',Arial,sans-serif;font-size:28px;font-weight:800;line-height:1}
+.dueCard.overdue .dueCount{color:var(--cardinal)}
+.dueCard.today .dueCount{color:#B7791F}
+.dueList{max-height:250px;overflow:auto;border-top:1px solid var(--border)}
+.dueItem{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid #edf0f3;cursor:pointer}
+.dueItem:last-child{border-bottom:0}
+.dueItem:hover{background:#F5F9FF}
+.dueMain{min-width:0}
+.dueTitle{font-weight:700;font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dueSub{font-size:11px;color:var(--muted);margin-top:2px}
+.duePill{flex:none;font-size:11px;font-weight:800;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.duePill.overdue{background:var(--card-bg);color:var(--card-tx)}
+.duePill.today{background:var(--gold-bg);color:var(--gold-tx)}
+.dueEmpty{padding:18px 16px;font-size:13px;color:var(--muted);border-top:1px solid var(--border)}
+.dueTag{display:inline-block;margin-top:3px;font-size:10px;font-weight:800;border-radius:999px;padding:2px 8px}
+.dueTag.overdue{background:var(--card-bg);color:var(--card-tx)}
+.dueTag.today{background:var(--gold-bg);color:var(--gold-tx)}
+.dueSetBy{font-size:10px;color:var(--muted);margin-top:2px;white-space:nowrap}
+.reqTag{display:inline-block;margin-top:3px;font-size:10px;font-weight:800;color:var(--gold-tx);background:var(--gold-bg);border-radius:999px;padding:2px 8px}
+@media(max-width:800px){.dueDash{grid-template-columns:1fr}}
+
+.reqCard{background:#fff;border:1px solid var(--border);border-left:5px solid var(--gold);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.reqCard.Accepted{border-left-color:#16a34a}
+.reqCard.Declined{border-left-color:#98A2B3}
+.reqTop{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.reqWho{font-weight:800;font-size:15px;color:var(--navy)}
+.reqWhen{font-size:11px;color:var(--muted);margin-top:2px}
+.reqTitle{font-weight:800;font-size:15px;margin:10px 0 2px}
+.reqProject{font-size:12px;color:var(--muted)}
+.reqChips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.reqDesc{white-space:pre-wrap;word-break:break-word;font-size:13px;line-height:1.55;background:#F9FBFD;border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-top:10px}
+.reqActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.reqStatus{font-size:11px;font-weight:800;border-radius:999px;padding:4px 10px}
+.reqStatus.Pending{background:var(--gold-bg);color:var(--gold-tx)}
+.reqStatus.Accepted{background:#DCFCE7;color:#166534}
+.reqStatus.Declined{background:#E7EBF2;color:#42536B}
+
+/* Public "request content" link (?request=1): behaves just like the
+   "View & Review All Content" approver link (?all=1) — same content list,
+   same review powers — plus one extra button, styled like the admin's
+   "+ Add Content", that opens the request form in a modal. */
+.requestOnly{display:none}
+body.role-request .requestOnly{display:inline-block}
+.reqWrap{max-width:760px;margin:0 auto}
+.reqBox{background:#fff;border:1px solid var(--border);border-radius:16px;padding:26px;box-shadow:var(--shadow)}
+.reqBox h2{margin:0 0 6px;font-size:22px;color:var(--navy)}
+.hpField{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}
+.reqNeed{color:var(--cardinal)}
 </style>
 </head>
 <body>
@@ -367,10 +458,15 @@ textarea{min-height:90px}
   var shareIdParam=shareUrlParams.get('id');
   var shareAllParam=shareUrlParams.get('all');
   var shareApprovalsParam=shareUrlParams.get('approvals');
-  var shareAllMode=shareAllParam==='1';
+  // ?request=1 is the public "request new content" link. It shows the same
+  // full, read-only-except-review content list as ?all=1 (no login), with
+  // one extra button up top that opens the request form in a modal.
+  var requestMode=shareUrlParams.get('request')==='1';
+  var shareAllMode=shareAllParam==='1'||requestMode;
   var shareApprovalsMode=shareApprovalsParam==='1';
   var shareContentId=(shareIdParam&&shareIdParam.trim())?shareIdParam.trim():'';
   var shareMode=!!shareContentId||shareAllMode||shareApprovalsMode;
+  if(requestMode)document.body.classList.add('role-request');
   if(shareMode){
     document.getElementById('loginScreen').classList.remove('open');
   }else{
@@ -393,6 +489,16 @@ textarea{min-height:90px}
 </div>
 </div>
 <div class="headerRight">
+<div class="bellWrap adminOnly shareHide" id="bellWrap">
+  <button type="button" class="iconBtn bellBtn" id="bellBtn" onclick="toggleBell(event)" aria-haspopup="true" aria-expanded="false" aria-label="Notifications" title="Notifications — reviews, upload dates and new content requests">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+    <span class="bellBadge" id="bellBadge" style="display:none">0</span>
+  </button>
+  <div class="notifPanel" id="notifPanel" role="dialog" aria-label="Notifications">
+    <div class="notifHead"><b>Notifications</b><button type="button" onclick="markAllNotifsRead()">Mark all as read</button></div>
+    <div class="notifList" id="notifList"></div>
+  </div>
+</div>
 <span class="roleBadge" id="roleBadge">Admin</span>
 <div class="liveSwitchWrap shareHide">
   <span id="liveToggleLabel">Live mode</span>
@@ -410,16 +516,18 @@ textarea{min-height:90px}
 <div class="toolbar" id="shareHeader">
   <div style="display:flex;flex-direction:column;gap:2px">
     <div class="brandFont" style="font-weight:800;font-size:16px;color:var(--navy)">Reviewing: <span id="shareProjectName"></span></div>
-    <div class="hint">Check each photo/video below, then approve it or send it back for revision — same review as the full system. No login is needed for this link.</div>
+    <div class="hint" id="shareHeaderHint">Check each photo/video below, then approve it or send it back for revision — same review as the full system. No login is needed for this link.</div>
   </div>
 </div>
 <div class="tabBar shareHide" id="tabBar">
   <button type="button" class="tabBtn active" id="tabBtnContent" onclick="switchTab('content')">📋 Content</button>
   <button type="button" class="tabBtn adminOnly" id="tabBtnReviews" onclick="switchTab('reviews')">🧾 Reviews / Approvals <span class="tabCount" id="tabReviewCount" style="display:none">0</span></button>
+  <button type="button" class="tabBtn adminOnly" id="tabBtnRequests" onclick="switchTab('requests')">📥 Requests <span class="tabCount" id="tabRequestCount" style="display:none">0</span></button>
   <button type="button" class="tabBtn adminOnly" id="tabBtnInsights" onclick="switchTab('insights')">📈 Insights</button>
 </div>
 
 <div class="tabPane active" id="paneContent">
+<div class="dueDash adminOnly shareHide" id="dueDashboard"></div>
 <div class="cards shareHide">
 <div class="card" id="cardTotal" onclick="filterByStatus('')" title="Show all content"><div class="label">Total content</div><div class="num" id="nTotal">0</div></div>
 <div class="card stPending" id="cardPending" onclick="filterByStatus('Pending')" title="Show only Pending"><div class="label">Pending</div><div class="num" id="nPending">0</div></div>
@@ -446,6 +554,10 @@ textarea{min-height:90px}
 </div>
 <div class="shareHide" style="margin:16px 0">
 <button class="primary adminOnly" onclick="openModal()" style="font-size:17px;padding:16px 28px;border-radius:12px">+ Add Content</button>
+<button class="secondary adminOnly" onclick="copyRequestLink()" style="font-size:15px;padding:15px 20px;border-radius:12px;margin-left:10px" title="Get a link you can give to anyone who wants to suggest new content. Their request waits for your approval.">🔗 Content Request Link</button>
+</div>
+<div class="requestOnly" style="margin:16px 0">
+<button class="primary" onclick="openRequestModal()" style="font-size:17px;padding:16px 28px;border-radius:12px">📩 Request Content</button>
 </div>
 <div class="toolbar shareHide">
 <input id="search" placeholder="Search project, content, description, event, platform..." oninput="render()">
@@ -481,6 +593,24 @@ textarea{min-height:90px}
   <div id="revList"></div>
 </div><!-- /#paneReviews -->
 
+<div class="tabPane" id="paneRequests">
+  <div class="toolbar">
+    <select id="reqFilter" onchange="renderRequests()">
+      <option value="Pending">Waiting for my decision</option>
+      <option value="Accepted">Accepted</option>
+      <option value="Declined">Declined</option>
+      <option value="">All requests</option>
+    </select>
+    <button class="secondary" onclick="loadRequests(true)">🔄 Refresh</button>
+    <button class="secondary" onclick="copyRequestLink()">🔗 Copy request link</button>
+  </div>
+  <p class="hint" style="margin:2px 0 14px">
+    Content suggested through the request link waits here. Nothing is added to your content list until you press
+    <b>Accept</b> — it then appears as a <b>Pending</b> item with the requester's name on it.
+  </p>
+  <div id="reqList"></div>
+</div><!-- /#paneRequests -->
+
 <div class="tabPane" id="paneInsights">
   <div class="toolbar">
     <div class="hint" style="flex:1">Live view/engagement stats pulled from YouTube and Facebook for content posted through this tracker.</div>
@@ -490,12 +620,43 @@ textarea{min-height:90px}
 </div><!-- /#paneInsights -->
 </div><!-- /.container -->
 
+<div class="modal" id="requestModal" onclick="if(event.target===this)closeRequestModal()">
+  <div class="reqWrap box">
+    <div class="reqBox" id="reqFormBox" style="box-shadow:none;border:0;padding:0">
+      <h2>Request new content</h2>
+      <p class="hint" style="font-size:13px;margin:0 0 16px">Tell the content team what you would like made. Your request goes on a waiting list — it is only added to the club's content list once the admin accepts it.</p>
+      <div class="grid">
+        <div class="field full"><label>Your name <span class="reqNeed">*</span></label><input id="rqName" maxlength="80" placeholder="So the content team knows who is asking" autocomplete="name"></div>
+        <div class="field"><label>Project <span class="reqNeed">*</span></label><input id="rqProject" maxlength="150" placeholder="Example: Hope Mission, AI Academy"></div>
+        <div class="field"><label>Date of Event</label><input type="date" id="rqEventDate"></div>
+        <div class="field"><label>Main Platform</label><select id="rqPlatform"><option>Facebook</option><option>TikTok</option><option>YouTube</option><option>Instagram</option><option>LinkedIn</option><option>X / Twitter</option><option>Other</option></select></div>
+        <div class="field"><label>Content Type</label><select id="rqCtype"><option>Photo</option><option>Video</option><option>Reel / Short</option><option>Poster / Graphic</option><option>Article / Caption</option></select></div>
+        <div class="field full"><label>Category</label><select id="rqCategory"><option>Fellowship</option><option>Service Project</option><option>Meeting</option><option>Training</option><option>Special Events</option><option>Sports</option><option>MoA Signing</option><option>Recap</option><option>RC Makati Video News</option><option>RCM Hymn</option><option>Welcome Song</option></select></div>
+        <div class="field full"><label>Content / Title <span class="reqNeed">*</span></label><input id="rqContent" maxlength="200" placeholder="Example: RC Makati Hope Mission"></div>
+        <div class="field full"><label>Details / Caption</label><textarea id="rqDescription" maxlength="5000" placeholder="What should the content show or say? Any wording, names or instructions."></textarea></div>
+        <div class="field full"><label>Link to photos / videos (optional)</label><input id="rqRefLink" maxlength="500" placeholder="Paste a Google Drive or other share link"><div class="hint">The content team will use this link to find the files.</div></div>
+        <div class="hpField" aria-hidden="true"><label>Website</label><input id="rqWebsite" tabindex="-1" autocomplete="off"></div>
+      </div>
+      <div class="modalActions"><button class="secondary" onclick="closeRequestModal()">Cancel</button><button class="primary" id="rqSubmit" onclick="submitRequestForm()" style="font-size:15px;padding:13px 22px">Send request</button></div>
+    </div>
+    <div class="reqBox" id="reqDoneBox" style="display:none;text-align:center;box-shadow:none;border:0;padding:0">
+      <h2>Request sent ✓</h2>
+      <p class="hint" style="font-size:13px;margin:6px 0 18px">Thank you, <b id="rqDoneName"></b>. The admin will review your request and add it to the content list if it is accepted.</p>
+      <button class="secondary" onclick="resetRequestForm()">Send another request</button>
+      <button class="primary" onclick="closeRequestModal()">Back to content list</button>
+    </div>
+  </div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+
 <div class="modal" id="modal"><div class="box">
 <h2 id="mtitle">Add Content</h2>
 <div class="grid">
+<div class="field full hint" id="requestedByNote" style="display:none;margin:0;background:#FEF0D6;color:#8A5A05;border-radius:9px;padding:9px 12px;font-weight:700"></div>
 <div class="field"><label>Project</label><input id="project" placeholder="Example: Hope Mission, AI Academy, Bowling Tournament"></div>
 <div class="field"><label>Date of Event</label><input type="date" id="eventDate"></div>
-<div class="field"><label>Date of Upload</label><input type="date" id="uploadDate"><div class="hint">Leave blank if status is Pending.</div></div>
+<div class="field"><label>Date of Upload <span style="font-weight:500;color:var(--muted)">(optional)</span></label><input type="date" id="uploadDate"><div class="hint">Leave blank if it isn't decided yet — an approver can set it, or you can set it later.</div><div class="hint" id="uploadDateSetBy" style="font-weight:700"></div></div>
 <div class="field"><label>Main Platform</label><select id="platform"><option>Facebook</option><option>TikTok</option><option>YouTube</option><option>Instagram</option><option>LinkedIn</option><option>X / Twitter</option><option>Other</option></select></div>
 <div class="field"><label>Content Type</label><select id="ctype"><option>Photo</option><option>Video</option><option>Reel / Short</option><option>Poster / Graphic</option><option>Article / Caption</option></select></div>
 <div class="field"><label>Category</label><select id="category"><option>Fellowship</option><option>Service Project</option><option>Meeting</option><option>Training</option><option>Special Events</option><option>Sports</option><option>MoA Signing</option><option>Recap</option><option>RC Makati Video News</option><option>RCM Hymn</option><option>Welcome Song</option></select></div>
@@ -581,6 +742,12 @@ textarea{min-height:90px}
 <div id="apLinks" class="links" style="min-height:20px"></div>
 </div>
 <div class="field full" style="margin-top:14px">
+<label>📅 Upload date — when should the content team upload this? <span class="hint" style="font-weight:500">— optional</span></label>
+<input type="date" id="apUploadDate" style="max-width:240px">
+<div class="hint" id="apUploadDateNote"></div>
+<div class="hint">This shows up on the content team's Overdue / Due Today dashboard as soon as you submit.</div>
+</div>
+<div class="field full" style="margin-top:14px">
 <label>Notes for the content team (say what to fix, e.g. the description)
   <span class="hint" style="font-weight:500">— required if you send it back for revision</span></label>
 <textarea id="apNotes" placeholder="Example: please change the caption, it's too formal / wrong event date" oninput="updateApDecisionState()"></textarea>
@@ -662,7 +829,7 @@ const ADMIN_USER='Aaron';
 const ADMIN_PASS='Aaron';
 // Additional admin accounts. Each entry is {user, pass}; add more here
 // the same way to hand out more admin logins without removing Aaron's.
-const EXTRA_ADMINS=[{user:'jiyan',pass:'jiyan'}];
+const EXTRA_ADMINS=[{user:'jiyan',pass:'jiyan'},{user:'ron',pass:'ron'}];
 // Approver account: can review content that is "For Approval", attach the
 // final photo/video, and mark it Approved or send it back for Revision.
 // Change these two values to whatever credentials the club wants to hand
@@ -763,13 +930,18 @@ function applyRoleUI(){
   if(sh)sh.style.display=currentRole==='shareApprover'?'flex':'none';
   const spn=$('shareProjectName');
   if(spn){
-    if(shareAllMode)spn.textContent='All Content';
+    if(requestMode)spn.textContent='All Content';
+    else if(shareAllMode)spn.textContent='All Content';
     else if(shareApprovalsMode)spn.textContent='All Content For Approval';
     else if(shareContentId){
       const item=data.find(o=>String(o.id)===shareContentId);
       spn.textContent=item?((item.content||item.project||'this item')+(item.category?' • '+item.category:'')):'this item';
     }
   }
+  const shh=$('shareHeaderHint');
+  if(shh)shh.textContent=requestMode
+    ?'Browse what\u2019s already planned, or click "Request Content" below to suggest something new — no login needed.'
+    :'Check each photo/video below, then approve it or send it back for revision — same review as the full system. No login is needed for this link.';
   // Category tabs help approvers filter a long "All Content" review list,
   // and are just as useful on the normal Admin/Approver logins — they were
   // previously wiped out by .shareHide for every share link. They're
@@ -824,7 +996,7 @@ function tryLogin(){
     sessionStorage.setItem(ROLE_KEY,'admin');
     $('loginError').style.display='none';
     $('loginScreen').classList.remove('open');
-    applyRoleUI();render();
+    applyRoleUI();render();loadRequests();
   }else if(u===APPROVER_USER&&p===APPROVER_PASS){
     currentRole='approver';
     sessionStorage.setItem(AUTH_KEY,'1');
@@ -1021,6 +1193,7 @@ async function loadFromAppsScript(){
     const rows=await apiRequest('getData',{});
     data=Array.isArray(rows)?rows:[];
     saveLocal();
+    serverLoaded=true;
     setAppStatus('connected','Apps Script: Connected','Live data loaded from Google Sheets.');
     if(shareMode){
       applyRoleUI();
@@ -1253,15 +1426,18 @@ function toggleDateSort(){
 var activeTab='content'; // var: applyRoleUI may run before this line is reached
 function switchTab(name){
   // Approver / share-link users only ever get the Content list.
-  if((name==='reviews'||name==='insights')&&isApproverLike())name='content';
+  if((name==='reviews'||name==='insights'||name==='requests')&&isApproverLike())name='content';
   activeTab=name;
   $('paneContent').classList.toggle('active',name==='content');
   $('paneReviews').classList.toggle('active',name==='reviews');
   $('paneInsights').classList.toggle('active',name==='insights');
+  $('paneRequests').classList.toggle('active',name==='requests');
   $('tabBtnContent').classList.toggle('active',name==='content');
   $('tabBtnReviews').classList.toggle('active',name==='reviews');
   $('tabBtnInsights')?.classList.toggle('active',name==='insights');
+  $('tabBtnRequests')?.classList.toggle('active',name==='requests');
   if(name==='reviews')renderReviews();
+  if(name==='requests'){renderRequests();loadRequests();}
   if(name==='insights'&&!insightsData&&!insightsLoading)loadInsights();
 }
 
@@ -1678,7 +1854,10 @@ function render(){
    let reviewedByTitle=x.reviewedBy?('Reviewed by '+x.reviewedBy+(x.reviewedAt?(' on '+fmt(x.reviewedAt.slice(0,10))):'')+extra):(isApproverLike()?'Click to review':'Click to change status');
    let multiTag=(revList.length>1&&!isApproverLike())?`<span style="margin-left:4px;background:${reviewsDisagree(revList)?'#FEF3C7':'#E7EDF5'};color:${reviewsDisagree(revList)?'#92400E':'#17458F'};border-radius:999px;padding:1px 6px;font-weight:800;cursor:pointer" onclick="event.stopPropagation();switchTab('reviews')" title="Compare all ${revList.length} reviews">${reviewsDisagree(revList)?'⚠ ':''}${revList.length}×</span>`:'';
    let reviewedByHtml=x.reviewedBy?`<div style="font-size:10px;color:var(--muted);margin-top:3px;white-space:nowrap" title="${esc(reviewedByTitle)}">by ${esc(x.reviewedBy)}${multiTag}</div>`:'';
-   let mainRow=`<tr class="${row}"><td${thumbAttrs}>${thumb}</td><td${contentAttrs}><b>${esc(x.project||'')}</b>${x.category?`<div class="catTag">${esc(x.category)}</div>`:''}</td><td>${fmt(x.eventDate)}</td><td>${fmt(x.uploadDate)}</td><td>${esc(x.platform)}</td><td${contentAttrs}>${contentShareBtn}<b>${esc(x.content)}</b></td><td class="descCell" onclick="openDescModal('${x.id}')"><span class="clampText">${esc(x.description)}</span></td><td><span class="badge ${cls(x.status)}" onclick="quickStatus('${x.id}')" title="${esc(reviewedByTitle)}">${esc(x.status)}</span>${reviewedByHtml}</td><td><div class="links">${linkHtml}${insightToggleHtml}</div></td><td><div class="actions">${actionsHtml}</div></td></tr>`;
+   let ds=dueState(x);
+   let dueTag=ds.state==='overdue'?`<div class="dueTag overdue">Overdue ${ds.days}d</div>`:(ds.state==='today'?'<div class="dueTag today">Due today</div>':'');
+   let uploadCell=x.uploadDate?(fmt(x.uploadDate)+dueTag+(x.uploadSetBy?`<div class="dueSetBy">Set by ${esc(x.uploadSetBy)}</div>`:'')):'<span style="color:#98a2b3">Not set</span>';
+   let mainRow=`<tr class="${row}"><td${thumbAttrs}>${thumb}</td><td${contentAttrs}><b>${esc(x.project||'')}</b>${x.category?`<div class="catTag">${esc(x.category)}</div>`:''}${x.requestedBy?`<div class="reqTag" title="This content was requested through the request link">Requested by ${esc(x.requestedBy)}</div>`:''}</td><td>${fmt(x.eventDate)}</td><td>${uploadCell}</td><td>${esc(x.platform)}</td><td${contentAttrs}>${contentShareBtn}<b>${esc(x.content)}</b></td><td class="descCell" onclick="openDescModal('${x.id}')"><span class="clampText">${esc(x.description)}</span></td><td><span class="badge ${cls(x.status)}" onclick="quickStatus('${x.id}')" title="${esc(reviewedByTitle)}">${esc(x.status)}</span>${reviewedByHtml}</td><td><div class="links">${linkHtml}${insightToggleHtml}</div></td><td><div class="actions">${actionsHtml}</div></td></tr>`;
    let insightRow=postStats?renderInsightDetailRow_(x,postStats):'';
    return mainRow+insightRow;
  }).join(''):`<tr><td colspan="10" style="text-align:center;padding:35px;color:#667085">No content found. Click "+ Add Content" to start.</td></tr>`;
@@ -1687,6 +1866,8 @@ function render(){
  if(!isApproverLike()){
    updateReviewTabCount();
    if(activeTab==='reviews')renderReviews();
+   renderDueDashboard();
+   updateBell();
  }
  // Fall back gracefully if a Drive thumbnail is blocked from hotlinking.
  $('tbody').querySelectorAll('img.thumb').forEach(img=>{
@@ -1698,7 +1879,7 @@ function render(){
    };
  });
 }
-function addLinkRow(platform='',url=''){let div=document.createElement('div');div.className='linkRow';div.innerHTML=`<select class="linkPlatform"><option ${platform==='Facebook'?'selected':''}>Facebook</option><option ${platform==='TikTok'?'selected':''}>TikTok</option><option ${platform==='YouTube'?'selected':''}>YouTube</option><option ${platform==='Instagram'?'selected':''}>Instagram</option><option ${platform==='LinkedIn'?'selected':''}>LinkedIn</option><option ${platform==='X / Twitter'?'selected':''}>X / Twitter</option><option ${platform==='Other'?'selected':''}>Other</option></select><input class="linkUrl" value="${esc(url)}" placeholder="Paste uploaded post/video URL" oninput="tryAutoThumbFromLinks()">`;$('linkRows').appendChild(div)}
+function addLinkRow(platform='',url=''){let div=document.createElement('div');div.className='linkRow';div.innerHTML=`<select class="linkPlatform"><option ${platform==='Facebook'?'selected':''}>Facebook</option><option ${platform==='TikTok'?'selected':''}>TikTok</option><option ${platform==='YouTube'?'selected':''}>YouTube</option><option ${platform==='Instagram'?'selected':''}>Instagram</option><option ${platform==='LinkedIn'?'selected':''}>LinkedIn</option><option ${platform==='X / Twitter'?'selected':''}>X / Twitter</option><option ${platform==='Website'?'selected':''}>Website</option><option ${platform==='Other'?'selected':''}>Other</option></select><input class="linkUrl" value="${esc(url)}" placeholder="Paste uploaded post/video URL" oninput="tryAutoThumbFromLinks()">`;$('linkRows').appendChild(div)}
 /**
  * Pulls the video thumbnail straight from a pasted YouTube link so you don't
  * have to upload a separate image file. Only kicks in if no thumbnail has
@@ -1768,6 +1949,8 @@ function openApproveModal(id){
   $('apLinksWrap').style.display=(x.links&&x.links.length)?'block':'none';
   $('apReviewerName').value=localStorage.getItem(REVIEWER_NAME_KEY)||'';
   $('apNotes').value='';
+  $('apUploadDate').value=x.uploadDate||'';
+  $('apUploadDateNote').textContent=x.uploadDate?('Currently scheduled: '+fmt(x.uploadDate)+(x.uploadSetBy?(' (set by '+x.uploadSetBy+')'):'')+'. Change it if needed.'):'No upload date has been set yet.';
   // Every reviewer starts with a completely fresh, unmarked grid — never
   // pre-filled with a previous reviewer's (or the admin's) ✓/✕ marks. Those
   // marks live in that earlier reviewer's own `review.photos` entry in the
@@ -1848,7 +2031,10 @@ function submitApprove(newStatus){
   const photos=apPhotosState.map(p=>({url:p.url,status:p.status||'pending'}));
   // Keep this reviewer's verdict alongside everyone else's instead of
   // replacing it, so the Reviews tab can show them side by side.
+  const setDate=($('apUploadDate').value||'').trim();
+  const dateChanged=!!setDate&&setDate!==(x.uploadDate||'');
   const review={id:at+'|'+reviewerName,by:reviewerName,at:at,decision:newStatus,notes:notes,photos:photos};
+  if(dateChanged)review.uploadDate=setDate;
   const history=getReviewsFor(x).concat([review]);
   // This only records the reviewer's verdict in the review history — it
   // deliberately does NOT touch the item's live status, photo marks,
@@ -1858,6 +2044,9 @@ function submitApprove(newStatus){
   // Approved/Revise. That's what lets several reviewers weigh in on the
   // same item without any one submission silently overriding its status.
   let copy={...x,reviews:history};
+  // Unlike the verdict, the upload date takes effect right away — it is a
+  // schedule, not a status change — so it appears on the staff dashboard immediately.
+  if(dateChanged){copy.uploadDate=setDate;copy.uploadSetBy=reviewerName;}
   appendReviewLocal(x.id,review);
   localStorage.setItem(REVIEWER_NAME_KEY,reviewerName);
   let btns=[$('apApproveBtn'),$('apReviseBtn'),document.querySelector('#approveModal .modalActions .secondary')];
@@ -1866,7 +2055,7 @@ function submitApprove(newStatus){
     btns.forEach(b=>{if(b)b.disabled=false});
     if(ok){
       closeApproveModal();render();
-      alert('Thanks, '+reviewerName+' — your review has been recorded.\n\nAn Admin will apply it from the Reviews/Approvals tab; the status won\'t change until then.');
+      alert('Thanks, '+reviewerName+' — your review has been recorded.'+(dateChanged?'\n\nUpload date set to '+fmt(setDate)+' — the content team will see it on their dashboard.':'')+'\n\nAn Admin will apply it from the Reviews/Approvals tab; the status won\'t change until then.');
     }
     else alert('Could not save review: '+(err&&err.message?err.message:err||'Unknown error'));
   });
@@ -1904,6 +2093,9 @@ function openModal(id=null){
  editId=id;$('mtitle').textContent=id?'Edit Content':'Add Content';$('linkRows').innerHTML='';
  let x=id?data.find(a=>a.id===id):{project:'',eventDate:'',uploadDate:'',platform:'Facebook',ctype:'Photo',category:'Fellowship',content:'',description:'',status:'Pending',thumbnail:'',photos:[],links:[]};
  $('project').value=x.project||'';$('eventDate').value=x.eventDate||'';$('uploadDate').value=x.uploadDate||'';$('platform').value=x.platform||'Facebook';$('ctype').value=x.ctype||'Photo';$('category').value=x.category||'Fellowship';$('content').value=x.content||'';$('description').value=x.description||'';$('status').value=x.status||'For Upload';$('thumb').value=x.thumbnail||'';
+ $('requestedByNote').style.display=x.requestedBy?'block':'none';
+ $('requestedByNote').textContent=x.requestedBy?('📥 Requested by '+x.requestedBy):'';
+ $('uploadDateSetBy').textContent=(x.uploadDate&&x.uploadSetBy)?('Set by '+x.uploadSetBy):'';
  thumbUploading=false;
  $('thumbUploadWrap').classList.remove('show');
  // Remembers this project's own thumbnail at the moment the modal opened,
@@ -2387,7 +2579,23 @@ function saveContent(){
      .filter(l=>l.url)
  };
  if(!x.content){alert('Please enter Content / Title.');return}
- if(!$('uploadDate').value && $('status').value!=='Pending'){alert('Please enter Date of Upload, or set Status to Pending if it has not been uploaded yet.');return}
+ // Date of Upload is optional now: an approver or staff can set it later.
+ {
+   const prev=editId?data.find(a=>a.id===editId):null;
+   const nd=x.uploadDate;
+   // Remember who scheduled the date. Unchanged date keeps its original setter;
+   // a date typed in here is Staff's; clearing it clears the setter.
+   x.uploadSetBy=nd?((prev&&prev.uploadDate===nd)?(prev.uploadSetBy||''):'Staff'):'';
+   if(prev){
+     // Editing used to send only the form fields, which quietly blanked the
+     // saved review history and notes on every edit. Carry them through.
+     x.requestedBy=prev.requestedBy||'';
+     x.reviews=getReviewsFor(prev).filter(r=>!r.legacy);
+     x.notes=prev.notes||'';
+     x.reviewedBy=prev.reviewedBy||'';
+     x.reviewedAt=prev.reviewedAt||'';
+   }
+ }
  if(!$('project').value.trim()){alert('Please enter Project.');return}
  // Catches the #1 cause of "different projects play the same video":
  // the same YouTube link pasted on two projects (usually from copying an
@@ -2424,12 +2632,425 @@ function quickStatus(id){
    });
  }
 }
+/* =====================================================================
+   UPLOAD-DATE SCHEDULING + OVERDUE / DUE-TODAY DASHBOARD
+   ---------------------------------------------------------------------
+   Date of Upload (x.uploadDate) is now optional. It gets filled in either
+   by staff (Add/Edit Content) or by an approver when they submit a review;
+   x.uploadSetBy remembers who ("Staff" or the approver's name).
+   Anything that isn't "Uploaded" yet and has a date is tracked:
+     - date is before today  -> Overdue
+     - date is today          -> Due today
+   "Today" is the viewer's local date (not UTC), so it flips at local
+   midnight instead of 8am Manila time.
+-------------------------------------------------------------------- */
+function todayStr(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function isYmd(s){return /^\d{4}-\d{2}-\d{2}$/.test(String(s||''));}
+function dayDiff(fromYmd,toYmd){
+  const a=fromYmd.split('-').map(Number),b=toYmd.split('-').map(Number);
+  return Math.round((Date.UTC(b[0],b[1]-1,b[2])-Date.UTC(a[0],a[1]-1,a[2]))/86400000);
+}
+/** {state:'overdue'|'today'|'', days:<days late>} for one content item. */
+function dueState(x){
+  if(!x||!isYmd(x.uploadDate)||x.status==='Uploaded')return {state:'',days:0};
+  const d=dayDiff(x.uploadDate,todayStr());
+  if(d>0)return {state:'overdue',days:d};
+  if(d===0)return {state:'today',days:0};
+  return {state:'',days:d};
+}
+function renderDueDashboard(){
+  const host=$('dueDashboard');
+  if(!host)return;
+  if(isApproverLike()||requestMode){host.innerHTML='';return;}
+  const over=[],today=[];
+  data.forEach(x=>{
+    const s=dueState(x);
+    if(s.state==='overdue')over.push({x,days:s.days});
+    else if(s.state==='today')today.push({x});
+  });
+  over.sort((a,b)=>b.days-a.days); // most overdue first
+  today.sort((a,b)=>String(a.x.content||'').localeCompare(String(b.x.content||'')));
+  const row=(o,kind)=>{
+    const x=o.x;
+    const pill=kind==='overdue'?(o.days+(o.days===1?' day late':' days late')):'Due today';
+    const sub=[x.project,x.platform,x.status].filter(Boolean).join(' • ');
+    const when=kind==='overdue'?('Was due '+fmt(x.uploadDate)):'';
+    const by=x.uploadSetBy?('Date set by '+x.uploadSetBy):'';
+    return `<div class="dueItem" onclick="openModal('${escJs(x.id)}')" title="Click to open">
+      <div class="dueMain"><div class="dueTitle">${esc(x.content||x.project||'(untitled)')}</div>
+      <div class="dueSub">${esc(sub)}</div>
+      ${(when||by)?`<div class="dueSub">${esc([when,by].filter(Boolean).join(' • '))}</div>`:''}</div>
+      <div class="duePill ${kind}">${pill}</div></div>`;
+  };
+  const card=(kind,title,hint,list,emptyMsg)=>`<div class="dueCard ${kind}">
+    <div class="dueHead"><div><h3>${title}</h3><div class="hint">${hint}</div></div><div class="dueCount">${list.length}</div></div>
+    ${list.length?`<div class="dueList">${list.map(o=>row(o,kind)).join('')}</div>`:`<div class="dueEmpty">${emptyMsg}</div>`}
+  </div>`;
+  host.innerHTML=
+    card('overdue','⚠ Overdue','Upload date has passed and it is not uploaded yet',over,'Nothing is overdue.')+
+    card('today','📅 Due today','Scheduled to be uploaded today',today,'Nothing is due today.');
+}
+
+/* =====================================================================
+   NOTIFICATION BELL (Admin / Staff)
+   ---------------------------------------------------------------------
+   Notifications are not stored anywhere new — they are derived from data
+   that already exists:
+     • every review an approver submitted (x.reviews), including any
+       upload date they set with it
+     • every content request still waiting for a decision
+   Which ones this person has already seen is remembered in this browser
+   only (localStorage), so each staff member has their own unread count.
+-------------------------------------------------------------------- */
+const NOTIF_SEEN_KEY='rcMakatiNotifSeen_v1';
+var serverLoaded=false;      // true once real data (not just the cached copy) has arrived
+var lastNotifIds=null;       // ids present at the previous refresh, to spot brand-new ones
+var requests=[];
+var requestsError='';
+var requestBusy=false;
+var requestsSettled=false;  // true once the first request-queue fetch has finished (success or failure)
+
+function loadSeenSet(){
+  try{return new Set(JSON.parse(localStorage.getItem(NOTIF_SEEN_KEY)||'[]')||[]);}
+  catch(e){return new Set();}
+}
+function saveSeenSet(set){
+  try{localStorage.setItem(NOTIF_SEEN_KEY,JSON.stringify([...set].slice(-800)));}catch(e){}
+}
+function buildNotifications(){
+  const out=[];
+  data.forEach(x=>{
+    getReviewsFor(x).forEach(r=>{
+      if(r.legacy)return; // recorded before review history existed — not news
+      out.push({id:'rv|'+(r.id||(r.by+'|'+(r.at||''))),type:'review',at:r.at||'',itemId:x.id,
+        item:x.content||x.project||x.id,by:r.by,decision:r.decision,notes:r.notes||'',date:r.uploadDate||''});
+    });
+  });
+  requests.forEach(q=>{
+    if(q.status!=='Pending')return;
+    out.push({id:'rq|'+q.id,type:'request',at:q.submittedAt||'',reqId:q.id,item:q.content||q.project||q.id,by:q.requestedBy,
+      project:q.project||''});
+  });
+  return out.sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+}
+function timeAgo(iso){
+  const d=new Date(iso);
+  if(!iso||isNaN(d))return '';
+  const s=Math.floor((Date.now()-d.getTime())/1000);
+  if(s<60)return 'just now';
+  const m=Math.floor(s/60);if(m<60)return m+' min ago';
+  const h=Math.floor(m/60);if(h<24)return h+(h===1?' hour ago':' hours ago');
+  const dd=Math.floor(h/24);if(dd<7)return dd+(dd===1?' day ago':' days ago');
+  return fmtWhen(iso);
+}
+function showToast(msg){
+  const t=$('toast');
+  if(!t)return;
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),5500);
+}
+function updateBell(){
+  if(isApproverLike()||requestMode)return;
+  const badge=$('bellBadge');
+  if(!badge)return;
+  const list=buildNotifications();
+  const firstRun=localStorage.getItem(NOTIF_SEEN_KEY)===null;
+  let seen=loadSeenSet();
+  if(firstRun){
+    // First time on this browser: everything that already exists is treated as
+    // seen, so the bell starts at 0 and only lights up for what happens next.
+    if(!serverLoaded){badge.style.display='none';return;}
+    list.forEach(n=>seen.add(n.id));saveSeenSet(seen);
+  }
+  const unread=list.filter(n=>!seen.has(n.id));
+  badge.textContent=unread.length>99?'99+':unread.length;
+  badge.style.display=unread.length?'flex':'none';
+  $('bellBtn').title=unread.length?(unread.length+' unread notification'+(unread.length===1?'':'s')):'Notifications';
+  // Wait until the request queue has also been fetched once, so requests that were
+  // already waiting when the page opened don't pop up as if they were new.
+  if(serverLoaded&&requestsSettled){
+    if(lastNotifIds){
+      const fresh=unread.filter(n=>!lastNotifIds.has(n.id));
+      if(fresh.length){
+        const b=$('bellBtn');b.classList.remove('ring');void b.offsetWidth;b.classList.add('ring');
+        const f=fresh[0];
+        showToast(fresh.length>1?('🔔 '+fresh.length+' new notifications')
+          :f.type==='review'?('🔔 '+f.by+' sent a review for “'+f.item+'”')
+          :('🔔 '+f.by+' requested new content: “'+f.item+'”'));
+      }
+    }
+    lastNotifIds=new Set(list.map(n=>n.id));
+  }
+  if($('notifPanel').classList.contains('open'))renderNotifPanel();
+}
+function renderNotifPanel(){
+  const list=buildNotifications().slice(0,40);
+  const seen=loadSeenSet();
+  const host=$('notifList');
+  if(!list.length){
+    host.innerHTML='<div class="notifEmpty">No notifications yet.<br>You will see it here when an approver sends a review or someone requests new content.</div>';
+    return;
+  }
+  host.innerHTML=list.map(n=>{
+    const unread=!seen.has(n.id);
+    let title,chips='',note='';
+    if(n.type==='review'){
+      title=`<b>${esc(n.by)}</b> sent a review for <b>“${esc(n.item)}”</b>`;
+      chips=`<span class="notifChip ${n.decision==='Revise'?'no':'ok'}">${n.decision==='Revise'?'✕ Needs revision':'✓ OK to upload'}</span>`
+        +(n.date?`<span class="notifChip">📅 Upload on ${esc(fmt(n.date))}</span>`:'');
+      if(n.notes)note=`<div class="notifNote">${esc(n.notes.length>140?n.notes.slice(0,140)+'…':n.notes)}</div>`;
+    }else{
+      title=`<b>${esc(n.by)}</b> requested new content: <b>“${esc(n.item)}”</b>`;
+      chips=`<span class="notifChip new">📥 Waiting for your decision</span>`+(n.project?`<span class="notifChip">${esc(n.project)}</span>`:'');
+    }
+    return `<div class="notifItem ${unread?'unread':''}" data-nid="${esc(n.id)}" role="button" tabindex="0">
+      <span class="notifDot"></span>
+      <div class="notifBody"><div class="notifTitle">${title}</div>
+      <div class="notifChips">${chips}</div>${note}
+      <div class="notifSub">${esc(timeAgo(n.at))}</div></div></div>`;
+  }).join('');
+}
+function positionNotifPanel(){
+  const b=$('bellBtn').getBoundingClientRect(),p=$('notifPanel');
+  p.style.top=Math.round(b.bottom+10)+'px';
+  const w=p.offsetWidth||420;
+  p.style.left=Math.max(12,Math.min(window.innerWidth-w-12,Math.round(b.right-w)))+'px';
+}
+function openBell(){
+  const p=$('notifPanel');
+  p.classList.add('open');
+  renderNotifPanel();
+  positionNotifPanel();
+  $('bellBtn').setAttribute('aria-expanded','true');
+}
+function closeBell(){
+  $('notifPanel').classList.remove('open');
+  $('bellBtn').setAttribute('aria-expanded','false');
+}
+function toggleBell(e){
+  if(e)e.stopPropagation();
+  if($('notifPanel').classList.contains('open'))closeBell();else openBell();
+}
+function markAllNotifsRead(){
+  const seen=loadSeenSet();
+  buildNotifications().forEach(n=>seen.add(n.id));
+  saveSeenSet(seen);updateBell();
+}
+function openNotif(id){
+  const n=buildNotifications().find(o=>o.id===id);
+  const seen=loadSeenSet();seen.add(id);saveSeenSet(seen);
+  closeBell();
+  if(n&&n.type==='review'){
+    switchTab('reviews');
+    // The Reviews tab normally hides items with only one review, so show
+    // everything and jump straight to this item.
+    $('revFilter').value='all';$('revSearch').value=n.item;renderReviews();
+  }else if(n&&n.type==='request'){
+    switchTab('requests');$('reqFilter').value='Pending';renderRequests();
+  }
+  updateBell();
+  const bar=$('tabBar');if(bar)bar.scrollIntoView({behavior:'smooth',block:'start'});
+}
+document.addEventListener('click',e=>{
+  const item=e.target.closest&&e.target.closest('#notifList .notifItem');
+  if(item){openNotif(item.dataset.nid);return;}
+  const panel=$('notifPanel');
+  if(panel&&panel.classList.contains('open')&&!e.target.closest('#bellWrap'))closeBell();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&$('notifPanel')&&$('notifPanel').classList.contains('open'))closeBell();
+  if(e.key==='Enter'&&e.target&&e.target.classList&&e.target.classList.contains('notifItem'))openNotif(e.target.dataset.nid);
+});
+window.addEventListener('resize',()=>{if($('notifPanel')&&$('notifPanel').classList.contains('open'))positionNotifPanel();});
+
+/* =====================================================================
+   CONTENT REQUESTS
+   ---------------------------------------------------------------------
+   Public side  : index.html?request=1  -> a form that only SENDS a request.
+   Admin side   : Requests tab -> Accept (becomes a Pending content item
+                  with the requester's name) / Decline / Delete.
+-------------------------------------------------------------------- */
+function buildRequestLink(){return location.origin+location.pathname+'?request=1';}
+async function copyRequestLink(){
+  const link=buildRequestLink();
+  try{
+    await navigator.clipboard.writeText(link);
+    alert('Request link copied!\n\nAnyone with this link can suggest new content. Their request is NOT added to your list — it waits in the Requests tab until you accept it, and they must enter their name.');
+  }catch(err){
+    prompt('Could not copy automatically. Copy this link:',link);
+  }
+}
+function updateRequestBadge(){
+  const n=requests.filter(q=>q.status==='Pending').length;
+  const b=$('tabRequestCount');
+  if(!b)return;
+  b.textContent=n;b.style.display=n?'inline-block':'none';
+  b.title=n+' request(s) waiting for your decision';
+}
+async function loadRequests(manual){
+  if(isApproverLike()||requestMode||!isOnline())return;
+  try{
+    const rows=await apiRequest('getRequests',{});
+    requests=Array.isArray(rows)?rows:[];
+    requestsError='';
+  }catch(err){
+    // Most likely the Apps Script hasn't been redeployed with the new version yet.
+    requestsError=String(err&&err.message||err);
+  }
+  requestsSettled=true;
+  updateRequestBadge();
+  if(activeTab==='requests')renderRequests();
+  updateBell();
+  if(manual&&!requestsError)showToast('Requests refreshed');
+}
+function renderRequests(){
+  const host=$('reqList');
+  if(!host)return;
+  if(requestsError){
+    host.innerHTML='<div class="insightErr">Could not load requests: '+esc(requestsError)+'<br><br>If this says <b>Unknown action</b>, the updated Apps Script has not been deployed yet: Deploy → Manage deployments → ✏ Edit → Version: New version → Deploy.</div>';
+    return;
+  }
+  const f=$('reqFilter')?$('reqFilter').value:'Pending';
+  const list=requests.filter(q=>!f||q.status===f);
+  if(!list.length){
+    host.innerHTML='<div class="revEmpty">'+(f==='Pending'?'No requests are waiting for your decision.<br>Share the <b>Content Request Link</b> so people can suggest new content.':'Nothing to show here.')+'</div>';
+    return;
+  }
+  host.innerHTML=list.map(q=>{
+    const chips=[q.category,q.platform,q.ctype,q.eventDate?('Event: '+fmt(q.eventDate)):''].filter(Boolean)
+      .map(c=>`<span class="notifChip">${esc(c)}</span>`).join('');
+    const ref=q.refLink?`<div class="hint" style="margin-top:8px">Link: ${/^https?:\/\//i.test(q.refLink)?`<a href="${esc(q.refLink)}" target="_blank" rel="noopener">${esc(q.refLink)}</a>`:esc(q.refLink)}</div>`:'';
+    let actions='';
+    if(q.status==='Pending'){
+      actions=`<button class="primary" style="background:#16a34a" onclick="acceptRequest('${escJs(q.id)}')">✓ Accept — add to my list</button>
+        <button class="secondary" onclick="declineRequest('${escJs(q.id)}')">✕ Decline</button>`;
+    }else{
+      actions=`<span class="hint" style="margin:0">${q.status==='Accepted'?('Added to your list as <b>'+esc(q.contentId)+'</b>'):'Declined'}${q.decidedAt?(' • '+esc(fmtWhen(q.decidedAt))):''}${q.decisionNote?(' • Note: '+esc(q.decisionNote)):''}</span>
+        <button class="revDel" style="padding:8px 12px;border-radius:9px;font-weight:700" onclick="deleteRequest('${escJs(q.id)}')">🗑 Delete</button>`;
+    }
+    return `<div class="reqCard ${esc(q.status)}">
+      <div class="reqTop"><div><div class="reqWho">${esc(q.requestedBy)}</div><div class="reqWhen">${esc(fmtWhen(q.submittedAt))} • ${esc(q.id)}</div></div>
+      <span class="reqStatus ${esc(q.status)}">${esc(q.status==='Pending'?'Waiting for your decision':q.status)}</span></div>
+      <div class="reqTitle">${esc(q.content)}</div>
+      <div class="reqProject">${esc(q.project)}</div>
+      <div class="reqChips">${chips}</div>
+      ${q.description?`<div class="reqDesc">${esc(q.description)}</div>`:''}${ref}
+      <div class="reqActions">${actions}</div></div>`;
+  }).join('');
+}
+async function acceptRequest(id){
+  if(requestBusy)return;
+  const q=requests.find(r=>r.id===id);if(!q)return;
+  if(!confirm('Add "'+q.content+'" (requested by '+q.requestedBy+') to your content list?\n\nIt will be created with status Pending, with '+q.requestedBy+'\'s name on it.'))return;
+  requestBusy=true;
+  try{
+    const res=await apiRequest('acceptRequest',{id:id});
+    if(res&&Array.isArray(res.content)){data=res.content;saveLocal();}
+    requests=(res&&Array.isArray(res.requests))?res.requests:requests;
+    render();updateRequestBadge();renderRequests();updateBell();
+    showToast('✓ Added to your list as '+(res&&res.contentId||'a new item')+' (Pending)');
+  }catch(err){alert('Could not accept that request: '+(err&&err.message?err.message:err));}
+  requestBusy=false;
+}
+async function declineRequest(id){
+  if(requestBusy)return;
+  const q=requests.find(r=>r.id===id);if(!q)return;
+  const note=prompt('Decline "'+q.content+'" from '+q.requestedBy+'?\n\nOptional note for your own records (the requester is not notified):','');
+  if(note===null)return;
+  requestBusy=true;
+  try{
+    requests=await apiRequest('declineRequest',{id:id,note:note.trim()});
+    updateRequestBadge();renderRequests();updateBell();
+  }catch(err){alert('Could not decline that request: '+(err&&err.message?err.message:err));}
+  requestBusy=false;
+}
+async function deleteRequest(id){
+  if(requestBusy)return;
+  const q=requests.find(r=>r.id===id);if(!q)return;
+  if(!confirm('Delete this request record from '+q.requestedBy+'? This cannot be undone.\n\n(If it was accepted, the content item itself is not affected.)'))return;
+  requestBusy=true;
+  try{
+    requests=await apiRequest('deleteRequest',{id:id});
+    updateRequestBadge();renderRequests();updateBell();
+  }catch(err){alert('Could not delete that request: '+(err&&err.message?err.message:err));}
+  requestBusy=false;
+}
+
+/* ---- public request form (?request=1) — a modal over the shared content list ---- */
+const REQUESTER_NAME_KEY='rcMakatiRequesterName';
+function initRequestPage(){
+  document.title='Request content — Rotary Club of Makati';
+  $('rqName').value=localStorage.getItem(REQUESTER_NAME_KEY)||'';
+}
+function openRequestModal(){
+  $('reqDoneBox').style.display='none';$('reqFormBox').style.display='block';
+  $('requestModal').classList.add('open');
+}
+function closeRequestModal(){
+  $('requestModal').classList.remove('open');
+}
+async function submitRequestForm(){
+  const g=id=>$(id).value.trim();
+  const name=g('rqName');
+  if(!name){alert('Please enter your name so the content team knows who is asking.');$('rqName').focus();return;}
+  if(!g('rqProject')){alert('Please enter the Project.');$('rqProject').focus();return;}
+  if(!g('rqContent')){alert('Please enter the Content / Title.');$('rqContent').focus();return;}
+  if(navigator.onLine===false){alert('You appear to be offline. Please reconnect and try again.');return;}
+  const btn=$('rqSubmit');btn.disabled=true;btn.textContent='Sending…';
+  try{
+    await apiRequest('submitRequest',{
+      requestedBy:name,project:g('rqProject'),eventDate:$('rqEventDate').value,platform:$('rqPlatform').value,
+      ctype:$('rqCtype').value,category:$('rqCategory').value,content:g('rqContent'),description:g('rqDescription'),
+      refLink:g('rqRefLink'),website:g('rqWebsite')
+    });
+    localStorage.setItem(REQUESTER_NAME_KEY,name);
+    $('rqDoneName').textContent=name;
+    $('reqFormBox').style.display='none';$('reqDoneBox').style.display='block';
+    window.scrollTo(0,0);
+  }catch(err){
+    alert('Could not send your request: '+(err&&err.message?err.message:err)+'\n\nPlease try again in a moment.');
+  }
+  btn.disabled=false;btn.textContent='Send request';
+}
+function resetRequestForm(){
+  ['rqProject','rqEventDate','rqContent','rqDescription','rqRefLink','rqWebsite'].forEach(id=>{$(id).value='';});
+  $('reqDoneBox').style.display='none';$('reqFormBox').style.display='block';
+  $('rqProject').focus();
+}
+
+/* =====================================================================
+   QUIET AUTO-REFRESH (Admin / Staff)
+   ---------------------------------------------------------------------
+   Every minute — and whenever the tab becomes visible again — the list
+   and the request queue are re-read in the background so the bell and the
+   Overdue / Due Today dashboard stay current without pressing reload.
+   The server caches getData for a few minutes and clears that cache on
+   every save, so this is cheap.
+-------------------------------------------------------------------- */
+async function silentRefresh(){
+  if(requestMode||shareMode||isApproverLike()||!isOnline()||saving||document.hidden)return;
+  if($('loginScreen')&&$('loginScreen').classList.contains('open'))return;
+  try{
+    const rows=await apiRequest('getData',{});
+    if(saving)return;
+    if(Array.isArray(rows)){data=rows;saveLocal();serverLoaded=true;}
+    render();
+    loadRequests();
+  }catch(err){/* stay quiet — the connection badge already reports problems */}
+}
+setInterval(silentRefresh,60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)silentRefresh();});
+
   // Start in the correct environment and verify the backend.
   window.addEventListener('online', function(){ if(!forceOffline){ checkAppsScript(); loadFromAppsScript(); } });
   window.addEventListener('offline', function(){
     if(!forceOffline) setAppStatus('disconnected','Apps Script: Offline','Internet is unavailable. Local data remains available.');
   });
   window.addEventListener('load', async function(){
+    if(requestMode)initRequestPage();
     applyRoleUI();
     const arrow=$('eventDateSortArrow');
     if(arrow)arrow.textContent=dateSortDir==='asc'?'▲':'▼';
@@ -2446,6 +3067,7 @@ function quickStatus(id){
         // of only appearing after someone opens the Insights tab first (which is
         // the only thing that used to trigger loadInsights()).
         if(!insightsData&&!insightsLoading)loadInsights();
+        loadRequests();
       }
     }
   });

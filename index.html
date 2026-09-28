@@ -319,6 +319,19 @@ textarea{min-height:90px}
    needs to read (and be able to copy) it verbatim. */
 #apTitleBox{font-size:16px;font-weight:700;line-height:1.5;color:var(--navy);white-space:pre-wrap;word-break:break-word;border:1px solid var(--border);border-radius:9px;padding:12px 14px;background:#F9FBFD}
 #apTitleBox.empty{font-weight:500;font-style:italic;color:var(--muted)}
+/* Editable title/description in the review modal (reviewer may leave them as-is) */
+#apTitleInput{width:100%;font-size:16px;font-weight:700;color:var(--navy);padding:12px 14px;border:1px solid var(--border);border-radius:9px;background:#F9FBFD}
+#apDescInput{width:100%;min-height:150px;font-size:15px;line-height:1.6;color:#344054;padding:14px;border:1px solid var(--border);border-radius:9px;background:#F9FBFD;resize:vertical}
+.apEditedTag{display:none;margin-left:8px;font-size:10px;font-weight:800;color:#8A5A05;background:#FEF0D6;border-radius:999px;padding:2px 8px}
+.apEditedTag.show{display:inline-block}
+.revSuggest{margin-top:8px;font-size:12px;line-height:1.5;background:#FEF9E7;border:1px solid #F3DFA2;border-radius:9px;padding:8px 10px;white-space:pre-wrap;word-break:break-word}
+.revSuggest b{color:#8A5A05}
+.reqEdit{margin-top:12px;border:1px dashed #E0B341;background:#FFFBEB;border-radius:11px;padding:12px 14px}
+.reqEdit .rqField{font-size:12px;margin-top:8px;line-height:1.5;word-break:break-word;white-space:pre-wrap}
+.reqEdit .rqOld{color:#98A2B3;text-decoration:line-through}
+.reqEdit .rqNew{color:#166534;font-weight:700}
+.reqHist{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6}
+.myReqCard{border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:#fff}
 .apCopyBtn{margin-left:8px;background:#E7EDF5;color:var(--navy);border:0;border-radius:7px;padding:3px 9px;font-size:11px;font-weight:700;cursor:pointer}
 .apCopyBtn:hover{background:#D5E0EE}
 .apBox .albumTile{width:172px}
@@ -399,6 +412,7 @@ textarea{min-height:90px}
 .reqCard{background:#fff;border:1px solid var(--border);border-left:5px solid var(--gold);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
 .reqCard.Accepted{border-left-color:#16a34a}
 .reqCard.Declined{border-left-color:#98A2B3}
+.reqCard.hasEdit{border-left-color:#E0B341;box-shadow:0 0 0 2px #FDECB3}
 .reqTop{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}
 .reqWho{font-weight:800;font-size:15px;color:var(--navy)}
 .reqWhen{font-size:11px;color:var(--muted);margin-top:2px}
@@ -488,7 +502,7 @@ body.role-request .requestOnly{display:inline-block}
 <h1>Rotary Club of Makati Content Tracker</h1>
 <p class="tag">One place to monitor content, approvals, uploads, links, and thumbnails.</p>
 <span id="appscriptStatus" class="checking" title="Checking Google Apps Script connection"><span class="dot"></span>Apps Script: Checking...</span>
-<p class="tag" style="margin-top:6px;opacity:.7;font-size:11px;line-height:1.5">Content_trackerV2.0<br>System developed by Aaron Glo<br>© 2026 Rotary Club of Makati</p>
+<p class="tag" style="margin-top:6px;opacity:.7;font-size:11px;line-height:1.5">Content_trackerV1.0<br>System developed by Aaron Glo<br>© 2026 Rotary Club of Makati</p>
 </div>
 </div>
 <div class="headerRight">
@@ -561,6 +575,7 @@ body.role-request .requestOnly{display:inline-block}
 </div>
 <div class="requestOnly" style="margin:16px 0">
 <button class="primary" onclick="openRequestModal()" style="font-size:17px;padding:16px 28px;border-radius:12px">📩 For Posting</button>
+<button class="secondary" onclick="openMyRequests()" style="font-size:15px;padding:15px 22px;border-radius:12px;margin-left:10px">✏ My requests</button>
 </div>
 <div class="toolbar shareHide">
 <input id="search" placeholder="Search project, content, description, event, platform..." oninput="render()">
@@ -599,17 +614,19 @@ body.role-request .requestOnly{display:inline-block}
 <div class="tabPane" id="paneRequests">
   <div class="toolbar">
     <select id="reqFilter" onchange="renderRequests()">
-      <option value="Pending">Waiting for my decision</option>
+      <option value="">All requests (history)</option>
+      <option value="editpending">✏ Edits waiting for my approval</option>
+      <option value="Pending">Pending</option>
       <option value="Accepted">Accepted</option>
       <option value="Declined">Declined</option>
-      <option value="">All requests</option>
     </select>
     <button class="secondary" onclick="loadRequests(true)">🔄 Refresh</button>
     <button class="secondary" onclick="copyRequestLink()">🔗 Copy request link</button>
   </div>
   <p class="hint" style="margin:2px 0 14px">
-    Content suggested through the request link waits here. Nothing is added to your content list until you press
-    <b>Accept</b> — it then appears as a <b>Pending</b> item with the requester's name on it.
+    Every request sent through the request link is added to your content list right away as a <b>Pending</b> item, and is
+    also kept here as a permanent record. If a requester wants to change their request, the change waits here until you
+    <b>approve</b> it — nothing on your content list is changed before then.
   </p>
   <div id="reqList"></div>
 </div><!-- /#paneRequests -->
@@ -626,8 +643,8 @@ body.role-request .requestOnly{display:inline-block}
 <div class="modal" id="requestModal" onclick="if(event.target===this)closeRequestModal()">
   <div class="reqWrap box">
     <div class="reqBox" id="reqFormBox" style="box-shadow:none;border:0;padding:0">
-      <h2>Request new content</h2>
-      <p class="hint" style="font-size:13px;margin:0 0 16px">Tell the content team what you would like made. Your request goes on a waiting list — it is only added to the club's content list once the admin accepts it.</p>
+      <h2 id="rqHeading">Request new content</h2>
+      <p class="hint" style="font-size:13px;margin:0 0 16px" id="rqIntro">Tell the content team what you would like made. It is added to the club's content list right away as <b>Pending</b>. If you need to change it later, use <b>My requests</b> — changes are checked by the admin first.</p>
       <div class="grid">
         <div class="field full"><label>Your name <span class="reqNeed">*</span></label><input id="rqName" maxlength="80" placeholder="So the content team knows who is asking" autocomplete="name"></div>
         <div class="field"><label>Project <span class="reqNeed">*</span></label><input id="rqProject" maxlength="150" placeholder="Example: Hope Mission, AI Academy"></div>
@@ -638,16 +655,25 @@ body.role-request .requestOnly{display:inline-block}
         <div class="field full"><label>Content / Title <span class="reqNeed">*</span></label><input id="rqContent" maxlength="200" placeholder="Example: RC Makati Hope Mission"></div>
         <div class="field full"><label>Details / Caption</label><textarea id="rqDescription" maxlength="5000" placeholder="What should the content show or say? Any wording, names or instructions."></textarea></div>
         <div class="field full"><label>Link to photos / videos (optional)</label><input id="rqRefLink" maxlength="500" placeholder="Paste a Google Drive or other share link"><div class="hint">The content team will use this link to find the files.</div></div>
+        <div class="field full" id="rqReasonWrap" style="display:none"><label>What did you change, and why? (optional)</label><textarea id="rqReason" maxlength="500" placeholder="Example: the event date moved to Oct 12"></textarea><div class="hint">The admin will see your old and new version side by side. Nothing changes until they approve it.</div></div>
         <div class="hpField" aria-hidden="true"><label>Website</label><input id="rqWebsite" tabindex="-1" autocomplete="off"></div>
       </div>
       <div class="modalActions"><button class="secondary" onclick="closeRequestModal()">Cancel</button><button class="primary" id="rqSubmit" onclick="submitRequestForm()" style="font-size:15px;padding:13px 22px">Send request</button></div>
     </div>
     <div class="reqBox" id="reqDoneBox" style="display:none;text-align:center;box-shadow:none;border:0;padding:0">
       <h2>Request sent ✓</h2>
-      <p class="hint" style="font-size:13px;margin:6px 0 18px">Thank you, <b id="rqDoneName"></b>. The admin will review your request and add it to the content list if it is accepted.</p>
+      <p class="hint" style="font-size:13px;margin:6px 0 18px" id="rqDoneMsg">Thank you, <b id="rqDoneName"></b>. Your request is now on the content list as <b>Pending</b>. Need to change something later? Use <b>My requests</b> — the admin approves any change first.</p>
       <button class="secondary" onclick="resetRequestForm()">Send another request</button>
       <button class="primary" onclick="closeRequestModal()">Back to content list</button>
     </div>
+  </div>
+</div>
+<div class="modal" id="myReqModal" onclick="if(event.target===this)closeMyRequests()">
+  <div class="reqWrap box">
+    <h2>My requests</h2>
+    <p class="hint" style="font-size:13px;margin:0 0 14px">Requests you sent from this browser. You can ask to change one — the admin has to approve the change before it is applied.</p>
+    <div id="myReqList"><p class="hint">Loading…</p></div>
+    <div class="modalActions"><button class="secondary" onclick="closeMyRequests()">Close</button></div>
   </div>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
@@ -732,13 +758,16 @@ body.role-request .requestOnly{display:inline-block}
 </div>
 
 <div class="field full" style="margin-top:14px">
-<label>Title — the exact title used for the post (e.g. the YouTube title)
+<label>Title — the exact title used for the post (e.g. the YouTube title). You can edit it.
+  <span class="apEditedTag" id="apTitleEdited">✏ edited</span>
   <button type="button" class="apCopyBtn" onclick="copyApTitle()" title="Copy this title">⧉ Copy</button></label>
-<div id="apTitleBox"></div>
+<input id="apTitleInput" maxlength="200" placeholder="(No title entered yet)" oninput="updateApEditedTags()">
 </div>
 <div class="field full" style="margin-top:14px">
-<label>Description / Caption — read the whole thing before deciding</label>
-<div id="apDescription"></div>
+<label>Description / Caption — read the whole thing before deciding. You can edit it.
+  <span class="apEditedTag" id="apDescEdited">✏ edited</span></label>
+<textarea id="apDescInput" placeholder="(No description)" oninput="updateApEditedTags()"></textarea>
+<div class="hint">Only change these if you want to suggest new wording — if you leave them alone, the title and description stay exactly as they are. Your notes below are kept either way.</div>
 </div>
 <div class="field full" style="margin-top:14px" id="apLinksWrap">
 <label>Social Media Links</label>
@@ -1682,6 +1711,8 @@ function renderReviews(){
         <div style="margin-top:8px"><span class="revVerdict ${dec}">${r.decision==='Revise'?'✕ Needs revision':'✓ OK to upload'}</span></div>
         <div class="revTally">${t.total?`<span class="ok">${t.ok} approved</span> · <span class="no">${t.no} do not upload</span> · ${t.total-t.ok-t.no} unmarked`:'No photos/videos attached'}</div>
         ${thumbs?`<div class="revThumbs">${thumbs}</div>`:''}
+        ${r.content!==undefined?`<div class="revSuggest"><b>✏ Suggested title:</b>\n${esc(r.content)}</div>`:''}
+        ${r.description!==undefined?`<div class="revSuggest"><b>✏ Suggested description:</b>\n${esc(r.description)}</div>`:''}
         <div class="revNotes ${r.notes?'':'empty'}">${r.notes?esc(r.notes):'No notes left by this reviewer.'}</div>
         <div class="revActions">
           <button class="revUse" ${chosen?'disabled':''} onclick="applyReview('${escJs(x.id)}',${i})">${chosen?'Currently applied':'Use this review'}</button>
@@ -1718,7 +1749,10 @@ function applyReview(contentId,index){
   if(!r)return;
   if(!confirm('Apply '+r.by+"'s review to \""+(x.content||'this item')+'"?\n\n'+
     'Status becomes: '+r.decision+'\n'+
-    'The photo ✓/✕ marks and notes will be set to what '+r.by+' decided.\n\n'+
+    'The photo ✓/✕ marks and notes will be set to what '+r.by+' decided.\n'+
+    (r.content!==undefined?'The TITLE will change to: '+r.content+'\n':'')+
+    (r.description!==undefined?'The DESCRIPTION will be replaced with '+r.by+'\'s version.\n':'')+
+    (r.content===undefined&&r.description===undefined?'Title and description are left unchanged (the reviewer did not edit them).\n':'')+'\n'+
     'The other reviews stay on record — you can switch back anytime.'))return;
   const marks={};
   (Array.isArray(r.photos)?r.photos:[]).forEach(p=>{marks[p.url]=p.status||'pending';});
@@ -1733,6 +1767,9 @@ function applyReview(contentId,index){
     reviewedAt:r.at||new Date().toISOString(),
     reviews:list};
   if(r.notes)copy.notes=r.notes;
+  // Reviewer's edited wording becomes the real content — only when they changed it.
+  if(r.content!==undefined&&r.content!=='')copy.content=r.content;
+  if(r.description!==undefined)copy.description=r.description;
   saveToAppsScript(copy,function(ok,err){
     if(ok)renderReviews();
     else alert('Could not apply that review: '+(err&&err.message?err.message:err||'Unknown error'));
@@ -1936,6 +1973,13 @@ function tryAutoThumbFromLinks(force){
 let apEditId=null;
 let apModalToken=0;
 let apPhotosState=[];
+let apOrigTitle='',apOrigDesc='';
+function apTitleChanged(){return ($('apTitleInput').value||'').trim()!==apOrigTitle.trim();}
+function apDescChanged(){return ($('apDescInput').value||'').trim()!==apOrigDesc.trim();}
+function updateApEditedTags(){
+  $('apTitleEdited').classList.toggle('show',apTitleChanged());
+  $('apDescEdited').classList.toggle('show',apDescChanged());
+}
 function openApproveModal(id){
   apModalToken++;
   const x=data.find(a=>a.id===id); if(!x)return;
@@ -1944,10 +1988,11 @@ function openApproveModal(id){
   $('apContent').textContent=x.content||'';
   $('apMeta').textContent=[x.platform,x.ctype,x.category,x.uploadDate?('Upload date: '+fmt(x.uploadDate)):'',x.reviewedBy?('Last reviewed by '+x.reviewedBy+(x.reviewedAt?(' on '+fmt(x.reviewedAt.slice(0,10))):'')):''].filter(Boolean).join(' • ');
   $('apUploadDest').innerHTML=renderUploadDestHtml(x);
-  const apTitle=x.content||'';
-  $('apTitleBox').textContent=apTitle||'(No title entered yet)';
-  $('apTitleBox').classList.toggle('empty',!apTitle);
-  $('apDescription').textContent=x.description||'(No description)';
+  apOrigTitle=x.content||'';
+  apOrigDesc=x.description||'';
+  $('apTitleInput').value=apOrigTitle;
+  $('apDescInput').value=apOrigDesc;
+  updateApEditedTags();
   $('apLinks').innerHTML=renderLinksHtml(x.links);
   $('apLinksWrap').style.display=(x.links&&x.links.length)?'block':'none';
   $('apReviewerName').value=localStorage.getItem(REVIEWER_NAME_KEY)||'';
@@ -1978,9 +2023,8 @@ function openApproveModal(id){
 }
 /** Copies the title verbatim so it can be pasted straight into YouTube etc. */
 async function copyApTitle(){
-  const box=$('apTitleBox');
-  if(!box||box.classList.contains('empty')){alert('There is no title on this content yet.');return;}
-  const text=box.textContent;
+  const text=($('apTitleInput').value||'').trim();
+  if(!text){alert('There is no title on this content yet.');return;}
   try{await navigator.clipboard.writeText(text);
     const b=document.querySelector('.apCopyBtn');
     if(b){const old=b.textContent;b.textContent='✓ Copied';setTimeout(()=>{b.textContent=old},1400);}
@@ -2038,6 +2082,10 @@ function submitApprove(newStatus){
   const dateChanged=!!setDate&&setDate!==(x.uploadDate||'');
   const review={id:at+'|'+reviewerName,by:reviewerName,at:at,decision:newStatus,notes:notes,photos:photos};
   if(dateChanged)review.uploadDate=setDate;
+  // Suggested wording is stored ONLY if the reviewer actually changed it, so a
+  // review that just leaves notes never touches the title or description.
+  if(apTitleChanged())review.content=$('apTitleInput').value.trim();
+  if(apDescChanged())review.description=$('apDescInput').value.trim();
   const history=getReviewsFor(x).concat([review]);
   // This only records the reviewer's verdict in the review history — it
   // deliberately does NOT touch the item's live status, photo marks,
@@ -2783,9 +2831,10 @@ function buildNotifications(){
     });
   });
   requests.forEach(q=>{
-    if(q.status!=='Pending')return;
-    out.push({id:'rq|'+q.id,type:'request',at:q.submittedAt||'',reqId:q.id,item:q.content||q.project||q.id,by:q.requestedBy,
-      project:q.project||''});
+    if(q.status==='Pending')out.push({id:'rq|'+q.id,type:'request',at:q.submittedAt||'',reqId:q.id,item:q.content||q.project||q.id,by:q.requestedBy,
+      project:q.project||'',legacy:isLegacyQueued(q)});
+    const e=editPending(q)?lastEditOf(q):null;
+    if(e)out.push({id:'rqe|'+q.id+'|'+e.at,type:'request',edit:true,at:e.at||'',reqId:q.id,item:q.content||q.project||q.id,by:q.requestedBy,project:q.project||''});
   });
   return out.sort((a,b)=>String(b.at).localeCompare(String(a.at)));
 }
@@ -2832,6 +2881,7 @@ function updateBell(){
         const f=fresh[0];
         showToast(fresh.length>1?('🔔 '+fresh.length+' new notifications')
           :f.type==='review'?('🔔 '+f.by+' sent a review for “'+f.item+'”')
+          :f.edit?('🔔 '+f.by+' asked to change their request: “'+f.item+'”')
           :('🔔 '+f.by+' requested new content: “'+f.item+'”'));
       }
     }
@@ -2856,8 +2906,8 @@ function renderNotifPanel(){
         +(n.date?`<span class="notifChip">📅 Upload on ${esc(fmt(n.date))}</span>`:'');
       if(n.notes)note=`<div class="notifNote">${esc(n.notes.length>140?n.notes.slice(0,140)+'…':n.notes)}</div>`;
     }else{
-      title=`<b>${esc(n.by)}</b> requested new content: <b>“${esc(n.item)}”</b>`;
-      chips=`<span class="notifChip new">📥 Waiting for your decision</span>`+(n.project?`<span class="notifChip">${esc(n.project)}</span>`:'');
+      title=n.edit?`<b>${esc(n.by)}</b> asked to change their request: <b>“${esc(n.item)}”</b>`:`<b>${esc(n.by)}</b> requested new content: <b>“${esc(n.item)}”</b>`;
+      chips=`<span class="notifChip new">${n.edit?'✏ Edit waiting for your approval':(n.legacy?'📥 Waiting for your decision':'📥 Added as Pending')}</span>`+(n.project?`<span class="notifChip">${esc(n.project)}</span>`:'');
     }
     return `<div class="notifItem ${unread?'unread':''}" data-nid="${esc(n.id)}" role="button" tabindex="0">
       <span class="notifDot"></span>
@@ -2902,7 +2952,7 @@ function openNotif(id){
     // everything and jump straight to this item.
     $('revFilter').value='all';$('revSearch').value=n.item;renderReviews();
   }else if(n&&n.type==='request'){
-    switchTab('requests');$('reqFilter').value='Pending';renderRequests();
+    switchTab('requests');$('reqFilter').value=(n.edit?'editpending':'');renderRequests();
   }
   updateBell();
   const bar=$('tabBar');if(bar)bar.scrollIntoView({behavior:'smooth',block:'start'});
@@ -2931,17 +2981,20 @@ async function copyRequestLink(){
   const link=buildRequestLink();
   try{
     await navigator.clipboard.writeText(link);
-    alert('Request link copied!\n\nAnyone with this link can suggest new content. Their request is NOT added to your list — it waits in the Requests tab until you accept it, and they must enter their name.');
+    alert('Request link copied!\n\nAnyone with this link can request new content. Each request is added to your list right away as Pending and also recorded in the Requests tab. If they want to change it later, you must approve the change first. They must enter their name.');
   }catch(err){
     prompt('Could not copy automatically. Copy this link:',link);
   }
 }
+function lastEditOf(q){const l=Array.isArray(q.editLog)?q.editLog:[];return l.length?l[l.length-1]:null;}
+function editPending(q){const e=lastEditOf(q);return !!e&&e.status==='Pending';}
+function isLegacyQueued(q){return q.status==='Pending'&&!q.contentId;} // old-style request that was never added to the list
 function updateRequestBadge(){
-  const n=requests.filter(q=>q.status==='Pending').length;
+  const n=requests.filter(q=>editPending(q)||isLegacyQueued(q)).length;
   const b=$('tabRequestCount');
   if(!b)return;
   b.textContent=n;b.style.display=n?'inline-block':'none';
-  b.title=n+' request(s) waiting for your decision';
+  b.title=n+' request item(s) need your decision';
 }
 async function loadRequests(manual){
   if(isApproverLike()||requestMode||!isOnline())return;
@@ -2959,6 +3012,13 @@ async function loadRequests(manual){
   updateBell();
   if(manual&&!requestsError)showToast('Requests refreshed');
 }
+const REQ_FIELD_LABELS={project:'Project',eventDate:'Event date',platform:'Platform',ctype:'Content type',category:'Category',content:'Title',description:'Description',refLink:'Reference link'};
+function reqDiffHtml(e){
+  return (e.changed||[]).map(k=>{
+    const o=k==='eventDate'?fmt(e.before[k]):e.before[k],n=k==='eventDate'?fmt(e.after[k]):e.after[k];
+    return `<div class="rqField"><b>${esc(REQ_FIELD_LABELS[k]||k)}:</b> <span class="rqOld">${esc(o||'(empty)')}</span> → <span class="rqNew">${esc(n||'(empty)')}</span></div>`;
+  }).join('');
+}
 function renderRequests(){
   const host=$('reqList');
   if(!host)return;
@@ -2966,33 +3026,78 @@ function renderRequests(){
     host.innerHTML='<div class="insightErr">Could not load requests: '+esc(requestsError)+'<br><br>If this says <b>Unknown action</b>, the updated Apps Script has not been deployed yet: Deploy → Manage deployments → ✏ Edit → Version: New version → Deploy.</div>';
     return;
   }
-  const f=$('reqFilter')?$('reqFilter').value:'Pending';
-  const list=requests.filter(q=>!f||q.status===f);
+  const f=$('reqFilter')?$('reqFilter').value:'';
+  const list=requests.filter(q=>!f||(f==='editpending'?editPending(q):q.status===f));
   if(!list.length){
-    host.innerHTML='<div class="revEmpty">'+(f==='Pending'?'No requests are waiting for your decision.<br>Share the <b>Content Request Link</b> so people can suggest new content.':'Nothing to show here.')+'</div>';
+    host.innerHTML='<div class="revEmpty">'+(f==='editpending'?'No edits are waiting for your approval.':(!requests.length?'No requests yet.<br>Share the <b>Content Request Link</b> so people can suggest new content.':'Nothing to show here.'))+'</div>';
     return;
   }
   host.innerHTML=list.map(q=>{
     const chips=[q.category,q.platform,q.ctype,q.eventDate?('Event: '+fmt(q.eventDate)):''].filter(Boolean)
       .map(c=>`<span class="notifChip">${esc(c)}</span>`).join('');
     const ref=q.refLink?`<div class="hint" style="margin-top:8px">Link: ${/^https?:\/\//i.test(q.refLink)?`<a href="${esc(q.refLink)}" target="_blank" rel="noopener">${esc(q.refLink)}</a>`:esc(q.refLink)}</div>`:'';
-    let actions='';
-    if(q.status==='Pending'){
+    const item=q.contentId?data.find(x=>String(x.id)===String(q.contentId)):null;
+    const log=Array.isArray(q.editLog)?q.editLog:[];
+    const pend=editPending(q)?lastEditOf(q):null;
+    let actions='',statusLabel=q.status;
+    if(isLegacyQueued(q)){
+      statusLabel='Waiting for your decision';
       actions=`<button class="primary" style="background:#16a34a" onclick="acceptRequest('${escJs(q.id)}')">✓ Accept — add to my list</button>
         <button class="secondary" onclick="declineRequest('${escJs(q.id)}')">✕ Decline</button>`;
     }else{
-      actions=`<span class="hint" style="margin:0">${q.status==='Accepted'?('Added to your list as <b>'+esc(q.contentId)+'</b>'):'Declined'}${q.decidedAt?(' • '+esc(fmtWhen(q.decidedAt))):''}${q.decisionNote?(' • Note: '+esc(q.decisionNote)):''}</span>
-        <button class="revDel" style="padding:8px 12px;border-radius:9px;font-weight:700" onclick="deleteRequest('${escJs(q.id)}')">🗑 Delete</button>`;
+      if(q.contentId){
+        statusLabel=item?('In content list • '+item.status):'In content list';
+        actions=`<span class="hint" style="margin:0">Content item <b>${esc(q.contentId)}</b>${item?(' • status: <b>'+esc(item.status)+'</b>'):' (no longer in the list)'}</span>
+          ${item?`<button class="secondary" onclick="openModal('${escJs(q.contentId)}')">Open item</button>`:''}`;
+      }else{
+        actions=`<span class="hint" style="margin:0">${q.status==='Accepted'?('Added to your list as <b>'+esc(q.contentId)+'</b>'):'Declined'}${q.decidedAt?(' • '+esc(fmtWhen(q.decidedAt))):''}${q.decisionNote?(' • Note: '+esc(q.decisionNote)):''}</span>`;
+      }
+      actions+=`<button class="revDel" style="padding:8px 12px;border-radius:9px;font-weight:700" onclick="deleteRequest('${escJs(q.id)}')">🗑 Delete record</button>`;
     }
-    return `<div class="reqCard ${esc(q.status)}">
+    const editBlock=pend?`<div class="reqEdit"><b>✏ ${esc(q.requestedBy)} asked to change this request</b> <span class="hint" style="margin:0">• ${esc(fmtWhen(pend.at))}</span>
+        ${pend.reason?`<div class="rqField"><b>Reason:</b> ${esc(pend.reason)}</div>`:''}
+        ${reqDiffHtml(pend)}
+        <div class="reqActions"><button class="primary" style="background:#16a34a" onclick="approveRequestEdit('${escJs(q.id)}')">✓ Approve edit — apply to my list</button>
+        <button class="secondary" onclick="rejectRequestEdit('${escJs(q.id)}')">✕ Reject edit</button></div></div>`:'';
+    const past=log.filter(e=>e.status!=='Pending');
+    const hist=past.length?`<div class="reqHist"><b>Edit history:</b> ${past.slice().reverse().map(e=>esc(e.status)+' • '+esc(fmtWhen(e.decidedAt||e.at))+' ('+esc((e.changed||[]).map(k=>REQ_FIELD_LABELS[k]||k).join(', '))+')'+(e.note?' — '+esc(e.note):'')).join('<br>')}</div>`:'';
+    return `<div class="reqCard ${esc(q.status)} ${pend?'hasEdit':''}">
       <div class="reqTop"><div><div class="reqWho">${esc(q.requestedBy)}</div><div class="reqWhen">${esc(fmtWhen(q.submittedAt))} • ${esc(q.id)}</div></div>
-      <span class="reqStatus ${esc(q.status)}">${esc(q.status==='Pending'?'Waiting for your decision':q.status)}</span></div>
+      <span class="reqStatus ${esc(q.status)}">${esc(statusLabel)}</span></div>
       <div class="reqTitle">${esc(q.content)}</div>
       <div class="reqProject">${esc(q.project)}</div>
       <div class="reqChips">${chips}</div>
       ${q.description?`<div class="reqDesc">${esc(q.description)}</div>`:''}${ref}
+      ${editBlock}${hist}
       <div class="reqActions">${actions}</div></div>`;
   }).join('');
+}
+async function approveRequestEdit(id){
+  if(requestBusy)return;
+  const q=requests.find(r=>r.id===id);if(!q)return;
+  if(!confirm('Approve this change from '+q.requestedBy+'?\n\nYour content item will be updated with their new details.'))return;
+  requestBusy=true;
+  try{
+    const res=await apiRequest('approveRequestEdit',{id:id});
+    if(res&&Array.isArray(res.content)){data=res.content;saveLocal();}
+    if(res&&Array.isArray(res.requests))requests=res.requests;
+    render();updateRequestBadge();renderRequests();updateBell();
+    showToast('✓ Edit approved and applied');
+  }catch(err){alert('Could not approve that edit: '+(err&&err.message?err.message:err));}
+  requestBusy=false;
+}
+async function rejectRequestEdit(id){
+  if(requestBusy)return;
+  const q=requests.find(r=>r.id===id);if(!q)return;
+  const note=prompt('Reject this change from '+q.requestedBy+'?\n\nOptional note for your records (the requester will see it as \"Rejected\"):','');
+  if(note===null)return;
+  requestBusy=true;
+  try{
+    requests=await apiRequest('rejectRequestEdit',{id:id,note:note.trim()});
+    updateRequestBadge();renderRequests();updateBell();
+    showToast('Edit rejected');
+  }catch(err){alert('Could not reject that edit: '+(err&&err.message?err.message:err));}
+  requestBusy=false;
 }
 async function acceptRequest(id){
   if(requestBusy)return;
@@ -3038,12 +3143,27 @@ function initRequestPage(){
   document.title='Request content — Rotary Club of Makati';
   $('rqName').value=localStorage.getItem(REQUESTER_NAME_KEY)||'';
 }
+const MY_REQS_KEY='rcMakatiMyRequests_v1';
+var reqEditId=null;
+function loadMyReqs(){try{return JSON.parse(localStorage.getItem(MY_REQS_KEY)||'[]')||[];}catch(e){return [];}}
+function saveMyReqs(list){try{localStorage.setItem(MY_REQS_KEY,JSON.stringify(list.slice(-50)));}catch(e){}}
+function setRequestFormMode(editing){
+  $('rqHeading').textContent=editing?'Edit my request':'Request new content';
+  $('rqReasonWrap').style.display=editing?'block':'none';
+  $('rqName').disabled=!!editing;
+  $('rqSubmit').textContent=editing?'Send change for approval':'Send request';
+  $('rqIntro').innerHTML=editing
+    ?'Change what you need, then send it. <b>Nothing changes on the content list until the admin approves your change.</b>'
+    :'Tell the content team what you would like made. It is added to the club\'s content list right away as <b>Pending</b>. If you need to change it later, use <b>My requests</b> — changes are checked by the admin first.';
+}
 function openRequestModal(){
+  reqEditId=null;setRequestFormMode(false);
   $('reqDoneBox').style.display='none';$('reqFormBox').style.display='block';
   $('requestModal').classList.add('open');
 }
 function closeRequestModal(){
   $('requestModal').classList.remove('open');
+  reqEditId=null;setRequestFormMode(false);
 }
 async function submitRequestForm(){
   const g=id=>$(id).value.trim();
@@ -3052,26 +3172,86 @@ async function submitRequestForm(){
   if(!g('rqProject')){alert('Please enter the Project.');$('rqProject').focus();return;}
   if(!g('rqContent')){alert('Please enter the Content / Title.');$('rqContent').focus();return;}
   if(navigator.onLine===false){alert('You appear to be offline. Please reconnect and try again.');return;}
-  const btn=$('rqSubmit');btn.disabled=true;btn.textContent='Sending…';
+  const btn=$('rqSubmit');const oldLabel=btn.textContent;btn.disabled=true;btn.textContent='Sending…';
   try{
-    await apiRequest('submitRequest',{
-      requestedBy:name,project:g('rqProject'),eventDate:$('rqEventDate').value,platform:$('rqPlatform').value,
-      ctype:$('rqCtype').value,category:$('rqCategory').value,content:g('rqContent'),description:g('rqDescription'),
-      refLink:g('rqRefLink'),website:g('rqWebsite')
-    });
-    localStorage.setItem(REQUESTER_NAME_KEY,name);
-    $('rqDoneName').textContent=name;
-    $('reqFormBox').style.display='none';$('reqDoneBox').style.display='block';
-    window.scrollTo(0,0);
+    if(reqEditId){
+      const mine=loadMyReqs().find(m=>m.id===reqEditId);
+      if(!mine)throw new Error('This request was not sent from this browser.');
+      await apiRequest('submitRequestEdit',{id:mine.id,token:mine.token,reason:g('rqReason'),fields:{
+        project:g('rqProject'),eventDate:$('rqEventDate').value,platform:$('rqPlatform').value,ctype:$('rqCtype').value,
+        category:$('rqCategory').value,content:g('rqContent'),description:g('rqDescription'),refLink:g('rqRefLink')}});
+      $('rqDoneName').textContent=name;
+      $('rqDoneMsg').innerHTML='Thank you, <b>'+esc(name)+'</b>. Your change was sent to the admin. <b>Nothing changes until it is approved.</b> You can follow it under <b>My requests</b>.';
+      $('reqFormBox').style.display='none';$('reqDoneBox').style.display='block';
+      window.scrollTo(0,0);
+    }else{
+      const res=await apiRequest('submitRequest',{
+        requestedBy:name,project:g('rqProject'),eventDate:$('rqEventDate').value,platform:$('rqPlatform').value,
+        ctype:$('rqCtype').value,category:$('rqCategory').value,content:g('rqContent'),description:g('rqDescription'),
+        refLink:g('rqRefLink'),website:g('rqWebsite')
+      });
+      // Remember this request (and its secret token) on this device so the
+      // requester can later propose edits to it — and only their own.
+      if(res&&res.id&&res.token){
+        const list=loadMyReqs();
+        list.push({id:res.id,token:res.token,contentId:res.contentId||'',name:name,content:g('rqContent')});
+        saveMyReqs(list);
+      }
+      localStorage.setItem(REQUESTER_NAME_KEY,name);
+      $('rqDoneName').textContent=name;
+      $('rqDoneMsg').innerHTML='Thank you, <b>'+esc(name)+'</b>. Your request is now on the content list as <b>Pending</b>. Need to change something later? Use <b>My requests</b> — the admin approves any change first.';
+      $('reqFormBox').style.display='none';$('reqDoneBox').style.display='block';
+      window.scrollTo(0,0);
+      loadFromAppsScript(); // show the new Pending item in the list right away
+    }
   }catch(err){
-    alert('Could not send your request: '+(err&&err.message?err.message:err)+'\n\nPlease try again in a moment.');
+    alert('Could not send: '+(err&&err.message?err.message:err)+'\n\nPlease try again in a moment.');
   }
-  btn.disabled=false;btn.textContent='Send request';
+  btn.disabled=false;btn.textContent=oldLabel;
 }
 function resetRequestForm(){
-  ['rqProject','rqEventDate','rqContent','rqDescription','rqRefLink','rqWebsite'].forEach(id=>{$(id).value='';});
+  ['rqProject','rqEventDate','rqContent','rqDescription','rqRefLink','rqWebsite','rqReason'].forEach(id=>{$(id).value='';});
+  reqEditId=null;setRequestFormMode(false);
   $('reqDoneBox').style.display='none';$('reqFormBox').style.display='block';
   $('rqProject').focus();
+}
+/* ---- "My requests": the requester's own requests, proven by a private token kept in this browser ---- */
+var myReqRows=[];
+function closeMyRequests(){$('myReqModal').classList.remove('open');}
+async function openMyRequests(){
+  $('myReqModal').classList.add('open');
+  const mine=loadMyReqs();
+  const host=$('myReqList');
+  if(!mine.length){host.innerHTML='<p class="hint">You have not sent any request from this browser yet.</p>';return;}
+  host.innerHTML='<p class="hint">Loading…</p>';
+  try{
+    myReqRows=await apiRequest('getMyRequests',{items:mine.map(m=>({id:m.id,token:m.token}))});
+    myReqRows=Array.isArray(myReqRows)?myReqRows:[];
+  }catch(err){host.innerHTML='<p class="hint">Could not load your requests: '+esc(err&&err.message?err.message:err)+'</p>';return;}
+  if(!myReqRows.length){host.innerHTML='<p class="hint">Your requests could not be found (they may have been deleted by the admin).</p>';return;}
+  host.innerHTML=myReqRows.slice().reverse().map(q=>{
+    const log=Array.isArray(q.editLog)?q.editLog:[];
+    const last=log.length?log[log.length-1]:null;
+    let editNote='';
+    if(last&&last.status==='Pending')editNote='<div class="hint" style="color:#8A5A05;font-weight:700;margin-top:6px">✏ Your change is waiting for admin approval.</div>';
+    else if(last&&last.status==='Approved')editNote='<div class="hint" style="color:#166534;font-weight:700;margin-top:6px">✓ Your last change was approved.</div>';
+    else if(last&&last.status==='Rejected')editNote='<div class="hint" style="color:#8C1D23;font-weight:700;margin-top:6px">✕ Your last change was not approved'+(last.note?(': '+esc(last.note)):'.')+'</div>';
+    const waiting=last&&last.status==='Pending';
+    return `<div class="myReqCard"><div class="reqTitle" style="margin-top:0">${esc(q.content)}</div>
+      <div class="reqProject">${esc(q.project)} • ${esc(q.id)} • Content status: <b>${esc(q.contentStatus||q.status)}</b></div>${editNote}
+      <div class="reqActions"><button class="secondary" onclick="startEditRequest('${escJs(q.id)}')">${waiting?'✏ Replace my pending change':'✏ Edit request'}</button></div></div>`;
+  }).join('');
+}
+function startEditRequest(id){
+  const q=myReqRows.find(r=>r.id===id);if(!q)return;
+  reqEditId=id;setRequestFormMode(true);
+  $('rqName').value=q.requestedBy||'';
+  $('rqProject').value=q.project||'';$('rqEventDate').value=q.eventDate||'';
+  $('rqPlatform').value=q.platform||'Facebook';$('rqCtype').value=q.ctype||'Photo';$('rqCategory').value=q.category||'Fellowship';
+  $('rqContent').value=q.content||'';$('rqDescription').value=q.description||'';$('rqRefLink').value=q.refLink||'';$('rqReason').value='';
+  closeMyRequests();
+  $('reqDoneBox').style.display='none';$('reqFormBox').style.display='block';
+  $('requestModal').classList.add('open');
 }
 
 /* =====================================================================

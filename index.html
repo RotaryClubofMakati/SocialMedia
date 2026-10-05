@@ -349,6 +349,11 @@ textarea{min-height:90px}
 .apDecideBar button:disabled{opacity:.45;cursor:not-allowed}
 @media(max-width:700px){.apBox{padding:18px}.apBox .albumTile{width:138px}.apBox .albumTile img,.apBox .albumTile video{width:126px;height:94px}}
 .hint{font-size:11px;color:var(--muted);margin-top:4px}
+.btnSpin{display:inline-block;width:14px;height:14px;margin-right:8px;vertical-align:-2px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:btnSpin .7s linear infinite}
+@keyframes btnSpin{to{transform:rotate(360deg)}}
+#rqSubmit:disabled,#rqCancel:disabled{opacity:.7;cursor:wait}
+.rqClosing{font-size:12px;color:var(--muted);margin-top:12px}
+
 
 @media(max-width:1100px){.cards{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:600px){.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.full{grid-column:auto}}
@@ -545,7 +550,7 @@ body.role-request .requestOnly{display:inline-block}
 <h1>Rotary Club of Makati Content Tracker</h1>
 <p class="tag">One place to monitor content, approvals, uploads, links, and thumbnails.</p>
 <span id="appscriptStatus" class="checking" title="Checking Google Apps Script connection"><span class="dot"></span>Apps Script: Checking...</span>
-<p class="tag" style="margin-top:6px;opacity:.7;font-size:11px;line-height:1.5">Content_trackerV2.1<br>System developed by Aaron Glo<br>© 2026 Rotary Club of Makati</p>
+<p class="tag" style="margin-top:6px;opacity:.7;font-size:11px;line-height:1.5">Content_trackerV1.0<br>System developed by Aaron Glo<br>© 2026 Rotary Club of Makati</p>
 </div>
 </div>
 <div class="headerRight">
@@ -688,7 +693,7 @@ body.role-request .requestOnly{display:inline-block}
 </div><!-- /#paneInsights -->
 </div><!-- /.container -->
 
-<div class="modal" id="requestModal" onclick="if(event.target===this)closeRequestModal()">
+<div class="modal" id="requestModal" onclick="if(event.target===this&&!requestSending)closeRequestModal()">
   <div class="reqWrap box">
     <div class="reqBox" id="reqFormBox" style="box-shadow:none;border:0;padding:0">
       <h2 id="rqHeading">Request new content</h2>
@@ -706,13 +711,14 @@ body.role-request .requestOnly{display:inline-block}
         <div class="field full" id="rqReasonWrap" style="display:none"><label>What did you change, and why? (optional)</label><textarea id="rqReason" maxlength="500" placeholder="Example: the event date moved to Oct 12"></textarea><div class="hint">The admin will see your old and new version side by side. Nothing changes until they approve it.</div></div>
         <div class="hpField" aria-hidden="true"><label>Website</label><input id="rqWebsite" tabindex="-1" autocomplete="off"></div>
       </div>
-      <div class="modalActions"><button class="secondary" onclick="closeRequestModal()">Cancel</button><button class="primary" id="rqSubmit" onclick="submitRequestForm()" style="font-size:15px;padding:13px 22px">Send request</button></div>
+      <div class="modalActions"><button class="secondary" id="rqCancel" onclick="closeRequestModal()">Cancel</button><button class="primary" id="rqSubmit" onclick="submitRequestForm()" style="font-size:15px;padding:13px 22px">Send request</button></div>
     </div>
     <div class="reqBox" id="reqDoneBox" style="display:none;text-align:center;box-shadow:none;border:0;padding:0">
       <h2>Request sent ✓</h2>
       <p class="hint" style="font-size:13px;margin:6px 0 18px" id="rqDoneMsg">Thank you, <b id="rqDoneName"></b>. Your request is now on the content list as <b>Pending</b>. Need to change something later? Use <b>My requests</b> — the admin approves any change first.</p>
       <button class="secondary" onclick="resetRequestForm()">Send another request</button>
       <button class="primary" onclick="closeRequestModal()">Back to content list</button>
+      <div class="rqClosing" id="rqClosing"></div>
     </div>
   </div>
 </div>
@@ -3211,59 +3217,104 @@ function setRequestFormMode(editing){
     :'Tell the content team what you would like made. It is added to the club\'s content list right away as <b>Pending</b>. If you need to change it later, use <b>My requests</b> — changes are checked by the admin first.';
 }
 function openRequestModal(){
+  clearReqAutoClose();reqSubmitKey=null;
   reqEditId=null;setRequestFormMode(false);
   $('reqDoneBox').style.display='none';$('reqFormBox').style.display='block';
   $('requestModal').classList.add('open');
 }
+var requestSending=false;      // hard lock: only one send can be in flight
+var reqSubmitKey=null;         // same key is reused if the person retries after an error
+var reqAutoCloseTimer=null,reqAutoCloseTick=null;
+function newSubmitKey(){return 'k'+Date.now().toString(36)+Math.random().toString(36).slice(2,10);}
+function clearReqAutoClose(){
+  if(reqAutoCloseTimer){clearTimeout(reqAutoCloseTimer);reqAutoCloseTimer=null;}
+  if(reqAutoCloseTick){clearInterval(reqAutoCloseTick);reqAutoCloseTick=null;}
+  const c=$('rqClosing');if(c)c.textContent='';
+}
+function startReqAutoClose(seconds){
+  clearReqAutoClose();
+  let left=seconds;const c=$('rqClosing');
+  const paint=()=>{if(c)c.textContent='Closing automatically in '+left+'s…';};
+  paint();
+  reqAutoCloseTick=setInterval(()=>{left--;if(left>0)paint();},1000);
+  reqAutoCloseTimer=setTimeout(()=>{clearReqAutoClose();closeRequestModal();},seconds*1000);
+}
 function closeRequestModal(){
+  if(requestSending)return; // never close while a send is in progress
+  clearReqAutoClose();
   $('requestModal').classList.remove('open');
   reqEditId=null;setRequestFormMode(false);
 }
+function setRequestSending(on,label){
+  requestSending=on;
+  const btn=$('rqSubmit'),cancel=$('rqCancel');
+  if(btn){btn.disabled=on;if(on)btn.innerHTML='<span class="btnSpin"></span>'+label;else btn.textContent=label;}
+  if(cancel)cancel.disabled=on;
+}
 async function submitRequestForm(){
+  if(requestSending)return;   // ignore double-clicks / repeated taps
   const g=id=>$(id).value.trim();
   const name=getRequester();
   if(!name){alert('Please log in first by choosing your name.');location.reload();return;}
   if(!g('rqProject')){alert('Please enter the Project.');$('rqProject').focus();return;}
   if(!g('rqContent')){alert('Please enter the Content / Title.');$('rqContent').focus();return;}
   if(navigator.onLine===false){alert('You appear to be offline. Please reconnect and try again.');return;}
-  const btn=$('rqSubmit');const oldLabel=btn.textContent;btn.disabled=true;btn.textContent='Sending…';
+  const editing=!!reqEditId;
+  const idleLabel=editing?'Send change for approval':'Send request';
+  setRequestSending(true,editing?'Sending change…':'Sending request…');
+  if(!reqSubmitKey)reqSubmitKey=newSubmitKey();
+  let sent=false;
   try{
-    if(reqEditId){
+    if(editing){
       await apiRequest('submitRequestEdit',{id:reqEditId,requester:name,reason:g('rqReason'),fields:{
         project:g('rqProject'),eventDate:$('rqEventDate').value,platform:$('rqPlatform').value,ctype:$('rqCtype').value,
         category:$('rqCategory').value,content:g('rqContent'),description:g('rqDescription'),refLink:g('rqRefLink')}});
       $('rqDoneName').textContent=name;
       $('rqDoneMsg').innerHTML='Thank you, <b>'+esc(name)+'</b>. Your change was sent to the admin. <b>Nothing changes until it is approved.</b> You can follow it under <b>My requests</b>.';
-      $('reqFormBox').style.display='none';$('reqDoneBox').style.display='block';
-      window.scrollTo(0,0);
+      sent=true;
     }else{
       const res=await apiRequest('submitRequest',{
         requestedBy:name,project:g('rqProject'),eventDate:$('rqEventDate').value,platform:$('rqPlatform').value,
         ctype:$('rqCtype').value,category:$('rqCategory').value,content:g('rqContent'),description:g('rqDescription'),
-        refLink:g('rqRefLink'),website:g('rqWebsite')
+        refLink:g('rqRefLink'),website:g('rqWebsite'),clientKey:reqSubmitKey
       });
-      // Remember this request (and its secret token) on this device so the
-      // requester can later propose edits to it — and only their own.
-      if(res&&res.id&&res.token){
-        const list=loadMyReqs();
-        list.push({id:res.id,token:res.token,contentId:res.contentId||'',name:name,content:g('rqContent')});
-        saveMyReqs(list);
+      $('rqDoneName').textContent=name;
+      if(res&&res.duplicate){
+        // The server already has this exact request: nothing new was created.
+        $('rqDoneMsg').innerHTML='<b>'+esc(name)+'</b>, this request was already sent'+(res.id?' (<b>'+esc(res.id)+'</b>)':'')+' and is on the content list. <b>No duplicate was created.</b> Use <b>My requests</b> if you need to change it.';
+      }else{
+        // Remember this request (and its secret token) on this device so the
+        // requester can later propose edits to it — and only their own.
+        if(res&&res.id&&res.token){
+          const list=loadMyReqs();
+          list.push({id:res.id,token:res.token,contentId:res.contentId||'',name:name,content:g('rqContent')});
+          saveMyReqs(list);
+        }
+        $('rqDoneMsg').innerHTML='Thank you, <b>'+esc(name)+'</b>. Your request is now on the content list as <b>Pending</b>. Need to change something later? Use <b>My requests</b> — the admin approves any change first.';
       }
       localStorage.setItem(REQUESTER_NAME_KEY,name);
-      $('rqDoneName').textContent=name;
-      $('rqDoneMsg').innerHTML='Thank you, <b>'+esc(name)+'</b>. Your request is now on the content list as <b>Pending</b>. Need to change something later? Use <b>My requests</b> — the admin approves any change first.';
-      $('reqFormBox').style.display='none';$('reqDoneBox').style.display='block';
-      window.scrollTo(0,0);
-      loadFromAppsScript(); // show the new Pending item in the list right away
+      sent=true;
     }
   }catch(err){
-    alert('Could not send: '+(err&&err.message?err.message:err)+'\n\nPlease try again in a moment.');
+    alert('Could not send: '+(err&&err.message?err.message:err)+'\n\nPlease try again in a moment. (If it was already received, it will not be added twice.)');
   }
-  btn.disabled=false;btn.textContent=oldLabel;
+  if(sent){
+    // clear the form so the same request cannot be re-sent by accident, then show the confirmation and auto-close
+    ['rqProject','rqEventDate','rqContent','rqDescription','rqRefLink','rqWebsite','rqReason'].forEach(id=>{$(id).value='';});
+    reqSubmitKey=null;
+    $('reqFormBox').style.display='none';$('reqDoneBox').style.display='block';
+    window.scrollTo(0,0);
+    if(!editing)loadFromAppsScript(); // show the new Pending item in the list right away
+    setRequestSending(false,idleLabel);
+    startReqAutoClose(4);
+  }else{
+    setRequestSending(false,idleLabel);
+  }
 }
 function resetRequestForm(){
+  clearReqAutoClose();
   ['rqProject','rqEventDate','rqContent','rqDescription','rqRefLink','rqWebsite','rqReason'].forEach(id=>{$(id).value='';});
-  reqEditId=null;setRequestFormMode(false);
+  reqEditId=null;reqSubmitKey=null;setRequestFormMode(false);
   $('reqDoneBox').style.display='none';$('reqFormBox').style.display='block';
   $('rqProject').focus();
 }
@@ -3287,14 +3338,28 @@ async function openMyRequests(){
     else if(last&&last.status==='Approved')editNote='<div class="hint" style="color:#166534;font-weight:700;margin-top:6px">✓ Your last change was approved.</div>';
     else if(last&&last.status==='Rejected')editNote='<div class="hint" style="color:#8C1D23;font-weight:700;margin-top:6px">✕ Your last change was not approved'+(last.note?(': '+esc(last.note)):'.')+'</div>';
     const waiting=last&&last.status==='Pending';
+    const canDel=!q.contentStatus||q.contentStatus==='Pending';
     return `<div class="myReqCard"><div class="reqTitle" style="margin-top:0">${esc(q.content)}</div>
       <div class="reqProject">${esc(q.project)} • ${esc(q.id)} • Content status: <b>${esc(q.contentStatus||q.status)}</b></div>${editNote}
-      <div class="reqActions"><button class="secondary" onclick="startEditRequest('${escJs(q.id)}')">${waiting?'✏ Replace my pending change':'✏ Edit request'}</button></div></div>`;
+      <div class="reqActions"><button class="secondary" onclick="startEditRequest('${escJs(q.id)}')">${waiting?'✏ Replace my pending change':'✏ Edit request'}</button>${canDel?`<button class="revDel" style="padding:8px 12px;border-radius:9px;font-weight:700" onclick="deleteMyRequest('${escJs(q.id)}')">🗑 Delete request</button>`:''}</div></div>`;
   }).join('');
+}
+async function deleteMyRequest(id){
+  const q=myReqRows.find(r=>r.id===id);if(!q)return;
+  if(!confirm('Delete your request "'+(q.content||id)+'"?\n\nIt will also be removed from the content list. This cannot be undone.'))return;
+  if(navigator.onLine===false){alert('You appear to be offline. Please reconnect and try again.');return;}
+  const saved=loadMyReqs().find(r=>r.id===id);
+  try{
+    await apiRequest('deleteMyRequest',{id:id,requester:getRequester(),token:saved?saved.token:''});
+    saveMyReqs(loadMyReqs().filter(r=>r.id!==id));
+    myReqRows=myReqRows.filter(r=>r.id!==id);
+    openMyRequests();      // refresh the list
+    loadFromAppsScript();  // drop the item from the shared content list too
+  }catch(err){alert('Could not delete that request: '+(err&&err.message?err.message:err));}
 }
 function startEditRequest(id){
   const q=myReqRows.find(r=>r.id===id);if(!q)return;
-  reqEditId=id;setRequestFormMode(true);
+  clearReqAutoClose();reqEditId=id;setRequestFormMode(true);
   $('rqName').value=q.requestedBy||'';
   $('rqProject').value=q.project||'';$('rqEventDate').value=q.eventDate||'';
   $('rqPlatform').value=q.platform||'Facebook';$('rqCtype').value=q.ctype||'Photo';$('rqCategory').value=q.category||'Fellowship';

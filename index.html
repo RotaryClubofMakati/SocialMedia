@@ -76,6 +76,13 @@ header .tag{margin:4px 0 0;opacity:.85;font-size:13px}
 .catTab.activeCat{background:var(--royal);color:#fff;border-color:var(--royal)}
 .catTab .catTabCount{background:rgba(15,59,115,.08);border-radius:999px;padding:1px 8px;font-size:11px;font-weight:800}
 .catTab.activeCat .catTabCount{background:rgba(255,255,255,.25)}
+.monthTab,.mTab{display:inline-flex;align-items:center;gap:7px;background:var(--card);color:var(--navy);border:1px solid var(--border);border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
+.monthTab:hover,.mTab:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(15,59,115,.14)}
+.monthTab.activeMonth,.mTab.activeM{background:var(--royal);color:#fff;border-color:var(--royal)}
+.monthTab .mCount,.mTab .mCount{background:rgba(15,59,115,.08);border-radius:999px;padding:1px 8px;font-size:11px;font-weight:800}
+.monthTab.activeMonth .mCount,.mTab.activeM .mCount{background:rgba(255,255,255,.25)}
+.mTabsRow{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 10px}
+.mTabsLabel{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:6px 0 5px}
 .typeBadge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:800;border-radius:999px;padding:4px 10px;white-space:nowrap}
 .typeBadge.t-video{background:#FDE7E9;color:#9B1C2B}
 .typeBadge.t-reel{background:#F3E8FF;color:#6B21A8}
@@ -643,6 +650,7 @@ body.role-request .requestOnly{display:inline-block}
 <button type="button" class="catTab" id="catTabDistrictAffair" onclick="filterByCategory('District Affair')">🏛 District Affair <span class="catTabCount" id="catCountDistrictAffair">0</span></button>
 <button type="button" class="catTab" id="catTabOthers" onclick="filterByCategory('Others')">📌 Others <span class="catTabCount" id="catCountOthers">0</span></button>
 </div>
+<div class="categoryTabs shareHide" id="monthTabs" style="margin-top:-6px"></div>
 <div class="shareHide" style="margin:16px 0">
 <button class="primary adminOnly" onclick="openModal()" style="font-size:17px;padding:16px 28px;border-radius:12px">+ Add Content</button>
 <button class="secondary adminOnly" onclick="copyRequestLink()" style="font-size:15px;padding:15px 20px;border-radius:12px;margin-left:10px" title="Get a link you can give to anyone who wants to suggest new content. Their request waits for your approval.">🔗 Content Request Link</button>
@@ -750,6 +758,7 @@ body.role-request .requestOnly{display:inline-block}
   <div class="reqWrap box">
     <h2>My requests</h2>
     <p class="hint" style="font-size:13px;margin:0 0 14px">All the requests saved under your name, on any device. You can ask to change one — the admin has to approve the change before it is applied.</p>
+    <div id="myReqBar"></div>
     <div id="myReqList"><p class="hint">Loading…</p></div>
     <div class="modalActions"><button class="secondary" onclick="closeMyRequests()">Close</button></div>
   </div>
@@ -1138,6 +1147,25 @@ function filterByStatus(status){
 const CATEGORY_LIST=['Fellowship','Service Project','Meeting','Training','Special Events','Sports','MoA Signing','Recap','RC Makati Video News','RCM Hymn','Welcome Song','District Affair','Others'];
 const CATEGORY_TAB_ID={'':'catTabAll',Fellowship:'catTabFellowship','Service Project':'catTabServiceProject',Meeting:'catTabMeeting',Training:'catTabTraining','Special Events':'catTabSpecialEvents',Sports:'catTabSports','MoA Signing':'catTabMoASigning',Recap:'catTabRecap','RC Makati Video News':'catTabVideoNews','RCM Hymn':'catTabHymn','Welcome Song':'catTabWelcomeSong','District Affair':'catTabDistrictAffair',Others:'catTabOthers'};
 const CATEGORY_COUNT_ID={'':'catCountAll',Fellowship:'catCountFellowship','Service Project':'catCountServiceProject',Meeting:'catCountMeeting',Training:'catCountTraining','Special Events':'catCountSpecialEvents',Sports:'catCountSports','MoA Signing':'catCountMoASigning',Recap:'catCountRecap','RC Makati Video News':'catCountVideoNews','RCM Hymn':'catCountHymn','Welcome Song':'catCountWelcomeSong','District Affair':'catCountDistrictAffair',Others:'catCountOthers'};
+/* ---- Month filter (by Event Date) ---- */
+let monthFilter='';
+function monthKeyOf(d){return /^\d{4}-\d{2}/.test(String(d||''))?String(d).slice(0,7):'none';}
+function monthLabelOf(k){
+  if(k==='none')return 'No event date';
+  const p=k.split('-');
+  return new Date(+p[0],+p[1]-1,1).toLocaleString('en',{month:'short',year:'numeric'});
+}
+function filterByMonth(k){monthFilter=k;render();}
+function renderMonthTabs(){
+  const host=$('monthTabs');if(!host)return;
+  const counts={};
+  data.forEach(x=>{const k=monthKeyOf(x.eventDate);counts[k]=(counts[k]||0)+1;});
+  const keys=Object.keys(counts).filter(k=>k!=='none').sort().reverse();
+  if(counts.none)keys.push('none');
+  if(monthFilter&&!counts[monthFilter])monthFilter='';
+  const tab=(k,label,n)=>`<button type="button" class="monthTab ${monthFilter===k?'activeMonth':''}" onclick="filterByMonth('${k}')">${label} <span class="mCount">${n}</span></button>`;
+  host.innerHTML=tab('','🗓 All months',data.length)+keys.map(k=>tab(k,esc(monthLabelOf(k)),counts[k])).join('');
+}
 function filterByCategory(cat){
   $('catf').value=cat;
   render();
@@ -1955,10 +1983,11 @@ function render(){
  CATEGORY_LIST.forEach(cc=>{ const el=$(CATEGORY_COUNT_ID[cc]); if(el)el.textContent=catCounts[cc]; });
  document.querySelectorAll('.catTab').forEach(el=>el.classList.remove('activeCat'));
  $(CATEGORY_TAB_ID[cat]||'catTabAll')?.classList.add('activeCat');
+ renderMonthTabs();
  let arr=data.filter(x=>{
    return (!q||[x.project,x.content,x.description,x.eventDate,x.uploadDate,x.platform,x.ctype,x.category,x.status,x.notes].join(' ').toLowerCase().includes(q))
    &&(!proj||String(x.project||'').toLowerCase().includes(proj))
-   &&(!p||x.platform===p)&&(!s||x.status===s)&&(!cat||x.category===cat)&&(!tf||x.ctype===tf)
+   &&(!p||x.platform===p)&&(!s||x.status===s)&&(!cat||x.category===cat)&&(!tf||x.ctype===tf)&&(!monthFilter||monthKeyOf(x.eventDate)===monthFilter)
    &&(!shareMode||shareAllMode||(shareApprovalsMode?x.status==='For Approval':String(x.id)===shareContentId));
  });
  applyRoleUI();
@@ -3405,7 +3434,9 @@ function myReqStatusPill(q){
   else if(st==='Editing'||st==='For Approval'||st==='Approved'||st==='For Upload'){cls='InProgress';label=st==='For Upload'?'📤 Ready for upload':(st==='Approved'?'👍 Approved — preparing upload':'🛠 In progress ('+st+')');}
   return '<span class="myReqStatus '+cls+'">'+esc(label)+'</span>';
 }
-async function openMyRequests(){
+let myReqTab='',myReqMonth='';
+async function openMyRequests(keep){
+  if(keep!==true){myReqTab='';myReqMonth='';}
   $('myReqModal').classList.add('open');
   const host=$('myReqList');
   host.innerHTML='<p class="hint">Loading…</p>';
@@ -3413,8 +3444,34 @@ async function openMyRequests(){
     myReqRows=await apiRequest('getRequestsByRequester',{name:getRequester()});
     myReqRows=Array.isArray(myReqRows)?myReqRows:[];
   }catch(err){host.innerHTML='<p class="hint">Could not load your requests: '+esc(err&&err.message?err.message:err)+'</p>';return;}
-  if(!myReqRows.length){host.innerHTML='<p class="hint">You have not sent any request yet.</p>';return;}
-  host.innerHTML=myReqRows.slice().reverse().map((q,qi)=>{
+  renderMyReqs();
+}
+/** Which status tab a request belongs to (follows the real content status). */
+function myReqGroup(q){
+  if(q.status==='Declined')return 'Declined';
+  return q.contentStatus||'Pending';
+}
+function setMyReqTab(t){myReqTab=t;renderMyReqs();}
+function setMyReqMonth(m){myReqMonth=m;renderMyReqs();}
+function renderMyReqs(){
+  const host=$('myReqList'),bar=$('myReqBar');
+  if(!myReqRows.length){bar.innerHTML='';host.innerHTML='<p class="hint">You have not sent any request yet.</p>';return;}
+  const STAT=[['','📁 All'],['Pending','⏳ Pending'],['Editing','🛠 Editing'],['For Approval','🕓 For Approval'],['Approved','👍 Approved'],['For Upload','📤 For Upload'],['Uploaded','✓ Uploaded'],['Revise','↺ Revise'],['Declined','✕ Declined']];
+  const inMonth=q=>!myReqMonth||monthKeyOf(q.eventDate)===myReqMonth;
+  const inTab=q=>!myReqTab||myReqGroup(q)===myReqTab;
+  const sCount={};myReqRows.filter(inMonth).forEach(q=>{const g=myReqGroup(q);sCount[g]=(sCount[g]||0)+1;});
+  const mCount={};myReqRows.filter(inTab).forEach(q=>{const k=monthKeyOf(q.eventDate);mCount[k]=(mCount[k]||0)+1;});
+  const total=myReqRows.filter(inMonth).length;
+  const sTabs=STAT.filter(t=>t[0]===''||sCount[t[0]]||myReqTab===t[0])
+    .map(t=>`<button type="button" class="mTab ${myReqTab===t[0]?'activeM':''}" onclick="setMyReqTab('${t[0]}')">${t[1]} <span class="mCount">${t[0]===''?total:(sCount[t[0]]||0)}</span></button>`).join('');
+  const mKeys=Object.keys(mCount).filter(k=>k!=='none').sort().reverse();if(mCount.none)mKeys.push('none');
+  if(myReqMonth&&!mKeys.includes(myReqMonth))mKeys.push(myReqMonth);
+  const mTabs=`<button type="button" class="mTab ${myReqMonth===''?'activeM':''}" onclick="setMyReqMonth('')">🗓 All months <span class="mCount">${myReqRows.filter(inTab).length}</span></button>`
+    +mKeys.map(k=>`<button type="button" class="mTab ${myReqMonth===k?'activeM':''}" onclick="setMyReqMonth('${k}')">${esc(monthLabelOf(k))} <span class="mCount">${mCount[k]||0}</span></button>`).join('');
+  bar.innerHTML=`<div class="mTabsLabel">Status</div><div class="mTabsRow">${sTabs}</div><div class="mTabsLabel">Month (event date)</div><div class="mTabsRow">${mTabs}</div>`;
+  const shown=myReqRows.map((q,qi)=>({q,qi})).reverse().filter(o=>inMonth(o.q)&&inTab(o.q));
+  if(!shown.length){host.innerHTML='<p class="hint">No requests match this tab and month.</p>';return;}
+  host.innerHTML=shown.map(({q,qi})=>{
     const log=Array.isArray(q.editLog)?q.editLog:[];
     const last=log.length?log[log.length-1]:null;
     let editNote='';
@@ -3438,7 +3495,7 @@ async function deleteMyRequest(id){
     await apiRequest('deleteMyRequest',{id:id,requester:getRequester(),token:saved?saved.token:''});
     saveMyReqs(loadMyReqs().filter(r=>r.id!==id));
     myReqRows=myReqRows.filter(r=>r.id!==id);
-    openMyRequests();      // refresh the list
+    openMyRequests(true);  // refresh the list, keep the chosen tab and month
     loadFromAppsScript();  // drop the item from the shared content list too
   }catch(err){alert('Could not delete that request: '+(err&&err.message?err.message:err));}
 }

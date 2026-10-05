@@ -286,6 +286,10 @@ video.preview{width:200px;height:120px;border-radius:9px;background:#111;display
 .links{display:flex;gap:5px;flex-wrap:wrap}
 .links a{background:#edf4fa;color:var(--azure);border-radius:7px;padding:5px 7px;text-decoration:none;font-size:10px;font-weight:700}
 .links a:hover{background:#dcebfb}
+.links a.reqLinkChip,a.reqLinkChip{background:var(--gold-bg);color:var(--gold-tx);border:1px solid #E0B341;border-radius:7px;padding:5px 8px;text-decoration:none;font-size:10px;font-weight:800;display:inline-block}
+.links a.reqLinkChip:hover,a.reqLinkChip:hover{background:#FDECB3}
+.reqLinkBox{margin-top:10px;background:#FFFBEB;border:1px solid #E0B341;border-radius:9px;padding:9px 12px;font-size:12px;word-break:break-all}
+.reqLinkBox a{color:var(--azure);font-weight:700}
 .actions{display:flex;gap:6px}
 .actions button{padding:6px 9px;font-size:11px}
 
@@ -437,6 +441,26 @@ textarea{min-height:90px}
 .reqStatus.Pending{background:var(--gold-bg);color:var(--gold-tx)}
 .reqStatus.Accepted{background:#DCFCE7;color:#166534}
 .reqStatus.Declined{background:#E7EBF2;color:#42536B}
+.reqCard.Uploaded{border-left-color:#16a34a;background:#F4FBF6}
+.reqCard.Uploaded.hasEdit{border-left-color:#E0B341}
+.reqStatus.Uploaded{background:#16a34a;color:#fff}
+.reqStatus.InProgress{background:#FDECEC;color:#8C1D23}
+.reqStatus.Ready{background:#E0ECFF;color:#1D4ED8}
+.myReqStatus{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:3px 10px;margin-left:4px}
+.myReqStatus.Uploaded{background:#16a34a;color:#fff}
+.myReqStatus.Pending{background:var(--gold-bg);color:var(--gold-tx)}
+.myReqStatus.InProgress{background:#E0ECFF;color:#1D4ED8}
+.myReqStatus.Revise{background:#FDECEC;color:#8C1D23}
+.myReqStatus.Declined{background:#E7EBF2;color:#42536B}
+.myUpl{margin-top:10px;background:#F0FAF3;border:1px solid #BFE3CB;border-radius:10px;padding:10px 12px}
+.myUpl .uplTitle{font-size:12px;font-weight:800;color:#166534;margin-bottom:6px}
+.myUpl .uplLinks{display:flex;gap:6px;flex-wrap:wrap}
+.myUpl .uplLinks a{background:#fff;border:1px solid #BFE3CB;color:var(--azure);border-radius:8px;padding:6px 10px;text-decoration:none;font-size:12px;font-weight:700}
+.myUpl .uplLinks a:hover{background:#E4F5EA}
+.myUpl .uplView{margin-top:8px;background:#fff;border:1px solid #BFE3CB;border-radius:8px;padding:10px 12px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word;display:none}
+.myUpl .uplView.open{display:block}
+
+
 
 /* Public "request content" link (?request=1): behaves just like the
    "View & Review All Content" approver link (?all=1) — same content list,
@@ -823,6 +847,7 @@ body.role-request .requestOnly{display:inline-block}
 <textarea id="apDescInput" placeholder="(No description)" oninput="updateApEditedTags()"></textarea>
 <div class="hint">Only change these if you want to suggest new wording — if you leave them alone, the title and description stay exactly as they are. Your notes below are kept either way.</div>
 </div>
+<div class="reqLinkBox" id="apReqLink" style="display:none"></div>
 <div class="field full" style="margin-top:14px" id="apLinksWrap">
 <label>Social Media Links</label>
 <div id="apLinks" class="links" style="min-height:20px"></div>
@@ -1392,6 +1417,25 @@ function escJs(s){return String(s??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")
  * and plays inline in the lightbox on click instead of just navigating
  * away — everything else still opens in a new tab as before.
  */
+/** The reference link the requestor attached (stored in the item's notes / details). '' if none. */
+function requestorLink(x){
+  if(!x||!x.requestedBy)return '';
+  let m=String(x.notes||'').match(/Reference:\s*(\S+)/);
+  if(!m)m=String(x.description||'').match(/Reference link:\s*(\S+)/);
+  return m?m[1]:'';
+}
+/** Small gold button for the content list's Links column. */
+function requestorLinkChip(x){
+  const u=requestorLink(x);if(!u)return '';
+  if(/^https?:\/\//i.test(u))return `<a class="reqLinkChip" href="${esc(u)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="${esc(u)}">🔗 Requestor's link</a>`;
+  return `<span class="reqLinkChip" title="${esc(u)}">🔗 ${esc(u)}</span>`;
+}
+/** Wider box for the Edit / Review windows. */
+function requestorLinkBox(x){
+  const u=requestorLink(x);if(!u)return '';
+  const body=/^https?:\/\//i.test(u)?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a>`:esc(u);
+  return `<b>🔗 Link from the requestor:</b> ${body}`;
+}
 function renderLinksHtml(links){
   return (links||[]).map(l=>{
     const yid=ytId(l.url);
@@ -1957,7 +2001,7 @@ function render(){
    let ds=dueState(x);
    let dueTag=ds.state==='overdue'?`<div class="dueTag overdue">Overdue ${ds.days}d</div>`:(ds.state==='today'?'<div class="dueTag today">Due today</div>':'');
    let uploadCell=x.uploadDate?(fmt(x.uploadDate)+dueTag+(x.uploadSetBy?`<div class="dueSetBy">Set by ${esc(x.uploadSetBy)}</div>`:'')):'<span style="color:#98a2b3">Not set</span>';
-   let mainRow=`<tr class="${row}"><td${thumbAttrs}>${thumb}</td><td${contentAttrs}><b>${esc(x.project||'')}</b>${x.category?`<div class="catTag">${esc(x.category)}</div>`:''}${x.requestedBy?`<div class="reqTag" title="This content was requested through the request link">Requested by ${esc(x.requestedBy)}</div>`:''}</td><td>${fmt(x.eventDate)}</td><td>${uploadCell}</td><td>${esc(x.platform)}</td><td>${typeBadgeHtml(x.ctype)}</td><td${contentAttrs}>${contentShareBtn}<b>${esc(x.content)}</b></td><td class="descCell" onclick="openDescModal('${x.id}')"><span class="clampText">${esc(x.description)}</span></td><td><span class="badge ${cls(x.status)}" onclick="quickStatus('${x.id}')" title="${esc(reviewedByTitle)}">${esc(x.status)}</span>${reviewedByHtml}</td><td><div class="links">${linkHtml}${insightToggleHtml}</div></td><td><div class="actions">${actionsHtml}</div></td></tr>`;
+   let mainRow=`<tr class="${row}"><td${thumbAttrs}>${thumb}</td><td${contentAttrs}><b>${esc(x.project||'')}</b>${x.category?`<div class="catTag">${esc(x.category)}</div>`:''}${x.requestedBy?`<div class="reqTag" title="This content was requested through the request link">Requested by ${esc(x.requestedBy)}</div>${requestorLinkChip(x)?`<div style="margin-top:5px">${requestorLinkChip(x)}</div>`:''}`:''}</td><td>${fmt(x.eventDate)}</td><td>${uploadCell}</td><td>${esc(x.platform)}</td><td>${typeBadgeHtml(x.ctype)}</td><td${contentAttrs}>${contentShareBtn}<b>${esc(x.content)}</b></td><td class="descCell" onclick="openDescModal('${x.id}')"><span class="clampText">${esc(x.description)}</span></td><td><span class="badge ${cls(x.status)}" onclick="quickStatus('${x.id}')" title="${esc(reviewedByTitle)}">${esc(x.status)}</span>${reviewedByHtml}</td><td><div class="links">${linkHtml}${insightToggleHtml}</div></td><td><div class="actions">${actionsHtml}</div></td></tr>`;
    let insightRow=postStats?renderInsightDetailRow_(x,postStats):'';
    return mainRow+insightRow;
  }).join(''):`<tr><td colspan="11" style="text-align:center;padding:35px;color:#667085">No content found. Click "+ Add Content" to start.</td></tr>`;
@@ -2054,6 +2098,7 @@ function openApproveModal(id){
   $('apDescInput').value=apOrigDesc;
   updateApEditedTags();
   $('apLinks').innerHTML=renderLinksHtml(x.links);
+  $('apReqLink').innerHTML=requestorLinkBox(x);$('apReqLink').style.display=requestorLink(x)?'block':'none';
   $('apLinksWrap').style.display=(x.links&&x.links.length)?'block':'none';
   $('apReviewerName').value=localStorage.getItem(REVIEWER_NAME_KEY)||'';
   $('apNotes').value='';
@@ -2205,7 +2250,7 @@ function openModal(id=null){
  let x=id?data.find(a=>a.id===id):{project:'',eventDate:'',uploadDate:'',platform:'Facebook',ctype:'Photo',category:'Fellowship',content:'',description:'',status:'Pending',thumbnail:'',photos:[],links:[]};
  $('project').value=x.project||'';$('eventDate').value=x.eventDate||'';$('uploadDate').value=x.uploadDate||'';$('platform').value=x.platform||'Facebook';$('ctype').value=x.ctype||'Photo';$('category').value=x.category||'Fellowship';$('content').value=x.content||'';$('description').value=x.description||'';$('status').value=x.status||'For Upload';$('thumb').value=x.thumbnail||'';
  $('requestedByNote').style.display=x.requestedBy?'block':'none';
- $('requestedByNote').textContent=x.requestedBy?('📥 Requested by '+x.requestedBy):'';
+ $('requestedByNote').innerHTML=x.requestedBy?('📥 Requested by '+esc(x.requestedBy)+(requestorLink(x)?'<div style="margin-top:6px;font-weight:600;word-break:break-all">'+requestorLinkBox(x)+'</div>':'')):'';
  $('uploadDateSetBy').textContent=(x.uploadDate&&x.uploadSetBy)?('Set by '+x.uploadSetBy):'';
  thumbUploading=false;
  $('thumbUploadWrap').classList.remove('show');
@@ -3107,9 +3152,10 @@ function renderRequests(){
         <button class="secondary" onclick="declineRequest('${escJs(q.id)}')">✕ Decline</button>`;
     }else{
       if(q.contentId){
-        statusLabel=item?('In content list • '+item.status):'In content list';
+        statusLabel=item?(item.status==='Uploaded'?'✓ Uploaded':('In content list • '+item.status)):'In content list';
         actions=`<span class="hint" style="margin:0">Content item <b>${esc(q.contentId)}</b>${item?(' • status: <b>'+esc(item.status)+'</b>'):' (no longer in the list)'}</span>
-          ${item?`<button class="secondary" onclick="openModal('${escJs(q.contentId)}')">Open item</button>`:''}`;
+          ${item?`<button class="secondary" onclick="openModal('${escJs(q.contentId)}')">Open item</button>`:''}
+          ${item&&item.status!=='Uploaded'?`<button class="primary" style="background:#16a34a" onclick="markRequestUploaded('${escJs(q.id)}')">✓ Mark as uploaded</button>`:''}`;
       }else{
         actions=`<span class="hint" style="margin:0">${q.status==='Accepted'?('Added to your list as <b>'+esc(q.contentId)+'</b>'):'Declined'}${q.decidedAt?(' • '+esc(fmtWhen(q.decidedAt))):''}${q.decisionNote?(' • Note: '+esc(q.decisionNote)):''}</span>`;
       }
@@ -3122,9 +3168,10 @@ function renderRequests(){
         <button class="secondary" onclick="rejectRequestEdit('${escJs(q.id)}')">✕ Reject edit</button></div></div>`:'';
     const past=log.filter(e=>e.status!=='Pending');
     const hist=past.length?`<div class="reqHist"><b>Edit history:</b> ${past.slice().reverse().map(e=>esc(e.status)+' • '+esc(fmtWhen(e.decidedAt||e.at))+' ('+esc((e.changed||[]).map(k=>REQ_FIELD_LABELS[k]||k).join(', '))+')'+(e.note?' — '+esc(e.note):'')).join('<br>')}</div>`:'';
-    return `<div class="reqCard ${esc(q.status)} ${pend?'hasEdit':''}">
+    const shown=(item&&q.contentId)?(item.status==='Uploaded'?'Uploaded':(q.status==='Declined'?'Declined':'Accepted')):q.status;
+    return `<div class="reqCard ${esc(shown)} ${pend?'hasEdit':''}">
       <div class="reqTop"><div><div class="reqWho">${esc(q.requestedBy)}</div><div class="reqWhen">${esc(fmtWhen(q.submittedAt))} • ${esc(q.id)}</div></div>
-      <span class="reqStatus ${esc(q.status)}">${esc(statusLabel)}</span></div>
+      <span class="reqStatus ${esc(shown)}">${esc(statusLabel)}</span></div>
       <div class="reqTitle">${esc(q.content)}</div>
       <div class="reqProject">${esc(q.project)}</div>
       <div class="reqChips">${chips}</div>
@@ -3132,6 +3179,17 @@ function renderRequests(){
       ${editBlock}${hist}
       <div class="reqActions">${actions}</div></div>`;
   }).join('');
+}
+async function markRequestUploaded(id){
+  const q=requests.find(r=>r.id===id);if(!q||!q.contentId)return;
+  const item=data.find(x=>String(x.id)===String(q.contentId));
+  if(!item){alert('That content item is no longer in the list.');return;}
+  if(item.status==='Uploaded'){renderRequests&&renderRequests();return;}
+  if(!confirm('Confirm: "'+(item.content||q.content)+'" has already been uploaded?\n\nIt will be marked as Uploaded, and '+q.requestedBy+' will see this status in their request list.'))return;
+  saveToAppsScript({...item,status:'Uploaded'},function(ok,err){
+    if(!ok){alert('Could not mark as uploaded: '+(err&&err.message?err.message:err||'Unknown error'));return;}
+    if(typeof renderRequests==='function')renderRequests();
+  });
 }
 async function approveRequestEdit(id){
   if(requestBusy)return;
@@ -3322,6 +3380,31 @@ function resetRequestForm(){
 /* ---- "My requests": the requester's own requests, proven by a private token kept in this browser ---- */
 var myReqRows=[];
 function closeMyRequests(){$('myReqModal').classList.remove('open');}
+/** Where the finished content was uploaded + a read-only look at its title and description. */
+function myReqUploadHtml(q,idx){
+  const links=Array.isArray(q.uploadLinks)?q.uploadLinks:[];
+  if(!links.length&&q.contentStatus!=='Uploaded')return '';
+  const linkHtml=links.length?links.map(l=>/^https?:\/\//i.test(l.url)
+    ?`<a href="${esc(l.url)}" target="_blank" rel="noopener">🔗 ${esc(l.platform)}</a>`
+    :`<span class="hint" style="margin:0">${esc(l.platform)}: ${esc(l.url)}</span>`).join('')
+    :'<span class="hint" style="margin:0">The admin has not added the upload link yet.</span>';
+  const hasView=q.contentTitle||q.contentDescription;
+  return `<div class="myUpl"><div class="uplTitle">📤 Where it was uploaded</div>
+    <div class="uplLinks">${linkHtml}</div>
+    ${hasView?`<div style="margin-top:8px"><button class="secondary" style="padding:6px 10px;font-size:12px" onclick="toggleMyReqView(${idx})">👁 View content</button></div>
+    <div class="uplView" id="myReqView${idx}"><b>${esc(q.contentTitle||'')}</b>${q.contentDescription?'\n\n'+linkifyText(q.contentDescription):''}</div>`:''}</div>`;
+}
+function toggleMyReqView(i){const el=$('myReqView'+i);if(el)el.classList.toggle('open');}
+/** Friendly, colour-coded status for the requestor, based on the content item's real status. */
+function myReqStatusPill(q){
+  const st=q.contentStatus||'';
+  let cls='Pending',label='⏳ Received — waiting for the team';
+  if(q.status==='Declined'){cls='Declined';label='✕ Declined';}
+  else if(st==='Uploaded'){cls='Uploaded';label='✓ Uploaded';}
+  else if(st==='Revise'){cls='Revise';label='↺ Being revised';}
+  else if(st==='Editing'||st==='For Approval'||st==='Approved'||st==='For Upload'){cls='InProgress';label=st==='For Upload'?'📤 Ready for upload':(st==='Approved'?'👍 Approved — preparing upload':'🛠 In progress ('+st+')');}
+  return '<span class="myReqStatus '+cls+'">'+esc(label)+'</span>';
+}
 async function openMyRequests(){
   $('myReqModal').classList.add('open');
   const host=$('myReqList');
@@ -3331,7 +3414,7 @@ async function openMyRequests(){
     myReqRows=Array.isArray(myReqRows)?myReqRows:[];
   }catch(err){host.innerHTML='<p class="hint">Could not load your requests: '+esc(err&&err.message?err.message:err)+'</p>';return;}
   if(!myReqRows.length){host.innerHTML='<p class="hint">You have not sent any request yet.</p>';return;}
-  host.innerHTML=myReqRows.slice().reverse().map(q=>{
+  host.innerHTML=myReqRows.slice().reverse().map((q,qi)=>{
     const log=Array.isArray(q.editLog)?q.editLog:[];
     const last=log.length?log[log.length-1]:null;
     let editNote='';
@@ -3341,7 +3424,8 @@ async function openMyRequests(){
     const waiting=last&&last.status==='Pending';
     const canDel=!q.contentStatus||q.contentStatus==='Pending';
     return `<div class="myReqCard"><div class="reqTitle" style="margin-top:0">${esc(q.content)}</div>
-      <div class="reqProject">${esc(q.project)} • ${esc(q.id)} • Content status: <b>${esc(q.contentStatus||q.status)}</b></div>${editNote}
+      <div class="reqProject">${esc(q.project)} • ${esc(q.id)}</div>
+      <div style="margin-top:6px"><b style="font-size:12px">Status:</b>${myReqStatusPill(q)}</div>${myReqUploadHtml(q,qi)}${editNote}
       <div class="reqActions"><button class="secondary" onclick="startEditRequest('${escJs(q.id)}')">${waiting?'✏ Replace my pending change':'✏ Edit request'}</button>${canDel?`<button class="revDel" style="padding:8px 12px;border-radius:9px;font-weight:700" onclick="deleteMyRequest('${escJs(q.id)}')">🗑 Delete request</button>`:''}</div></div>`;
   }).join('');
 }

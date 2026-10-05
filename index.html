@@ -1381,6 +1381,7 @@ async function uploadThumbnail(fileName,imageData,onProgress,onRetry){
   setAppStatus('connected','Apps Script: Connected','Thumbnail uploaded to Google Drive.');
   return url;
 }
+function linkifyText(t){return esc(t).replace(/(https?:\/\/[^\s<]+)/g,function(u){return '<a href="'+u+'" target="_blank" rel="noopener noreferrer">'+u+'</a>';});}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 // For inserting a value inside a single-quoted onclick="...('...')" attribute
 // (rather than as HTML text, which is what esc() is for).
@@ -2194,7 +2195,7 @@ function deleteDriveFile_(url){
 function openDescModal(id){
   const x=data.find(a=>a.id===id); if(!x)return;
   $('descModalTitle').textContent=x.content||'Description';
-  $('descModalBody').textContent=x.description||'(No description)';
+  $('descModalBody').innerHTML=linkifyText(x.description||'(No description)');
   $('descModal').classList.add('open');
 }
 function closeDescModal(){$('descModal').classList.remove('open')}

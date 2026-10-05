@@ -697,12 +697,19 @@ body.role-request .requestOnly{display:inline-block}
 
 <div class="tabPane" id="paneRequests">
   <div class="toolbar">
-    <select id="reqFilter" onchange="renderRequests()">
-      <option value="">All requests (history)</option>
-      <option value="editpending">✏ Edits waiting for my approval</option>
+    <select id="reqFilter" onchange="renderRequests()" style="display:none">
+      <option value="">All requests</option>
+      <option value="editpending">Edits waiting</option>
+      <option value="Waiting">Waiting</option>
       <option value="Pending">Pending</option>
-      <option value="Accepted">Accepted</option>
+      <option value="Editing">Editing</option>
+      <option value="For Approval">For Approval</option>
+      <option value="Approved">Approved</option>
+      <option value="For Upload">For Upload</option>
+      <option value="Uploaded">Uploaded</option>
+      <option value="Revise">Revise</option>
       <option value="Declined">Declined</option>
+      <option value="Removed">Removed</option>
     </select>
     <select id="reqWho" onchange="renderRequests()"><option value="">All requesters</option><option>Rhia Vallejo</option><option>Ron Dotaro</option><option>Chris Ferareza</option><option>Richard Manilag</option><option>Jiyan Adriano</option></select>
     <button class="secondary" onclick="loadRequests(true)">🔄 Refresh</button>
@@ -713,6 +720,7 @@ body.role-request .requestOnly{display:inline-block}
     also kept here as a permanent record. If a requester wants to change their request, the change waits here until you
     <b>approve</b> it — nothing on your content list is changed before then.
   </p>
+  <div class="mTabsRow" id="reqTabs" style="margin-bottom:14px"></div>
   <div id="reqList"></div>
 </div><!-- /#paneRequests -->
 
@@ -3153,6 +3161,29 @@ function reqDiffHtml(e){
     return `<div class="rqField"><b>${esc(REQ_FIELD_LABELS[k]||k)}:</b> <span class="rqOld">${esc(o||'(empty)')}</span> → <span class="rqNew">${esc(n||'(empty)')}</span></div>`;
   }).join('');
 }
+/** Which category a request belongs to: follows the real status of its content item. */
+function reqGroup(q){
+  if(q.status==='Declined')return 'Declined';
+  if(isLegacyQueued(q))return 'Waiting';
+  const item=q.contentId?data.find(x=>String(x.id)===String(q.contentId)):null;
+  if(!item)return q.contentId?'Removed':'Pending';
+  return item.status||'Pending';
+}
+function setReqTab(v){$('reqFilter').value=v;renderRequests();}
+function renderReqTabs(f,who){
+  const host=$('reqTabs');if(!host)return;
+  const mine=requests.filter(q=>!who||q.requestedBy===who);
+  const cnt={};mine.forEach(q=>{const g=reqGroup(q);cnt[g]=(cnt[g]||0)+1;});
+  const edits=mine.filter(editPending).length;
+  const T=[['','📁 All',mine.length],['editpending','✏ Edits waiting',edits],['Waiting','⏳ Waiting for decision',cnt.Waiting||0],
+    ['Pending','🕘 Pending',cnt.Pending||0],['Editing','🛠 Editing',cnt.Editing||0],['For Approval','🕓 For Approval',cnt['For Approval']||0],
+    ['Approved','👍 Approved',cnt.Approved||0],['For Upload','📤 For Upload',cnt['For Upload']||0],['Uploaded','✓ Uploaded',cnt.Uploaded||0],
+    ['Revise','↺ Revise',cnt.Revise||0],['Declined','✕ Declined',cnt.Declined||0],['Removed','🗑 Removed from list',cnt.Removed||0]];
+  // always show the main ones; hide the rare tabs while empty (unless selected)
+  const always=['','editpending','Pending','For Upload','Uploaded'];
+  host.innerHTML=T.filter(t=>always.includes(t[0])||t[2]>0||f===t[0])
+    .map(t=>`<button type="button" class="mTab ${f===t[0]?'activeM':''}" onclick="setReqTab('${t[0]}')">${t[1]} <span class="mCount">${t[2]}</span></button>`).join('');
+}
 function renderRequests(){
   const host=$('reqList');
   if(!host)return;
@@ -3162,7 +3193,8 @@ function renderRequests(){
   }
   const f=$('reqFilter')?$('reqFilter').value:'';
   const who=$('reqWho')?$('reqWho').value:'';
-  const list=requests.filter(q=>(!f||(f==='editpending'?editPending(q):q.status===f))&&(!who||q.requestedBy===who));
+  renderReqTabs(f,who);
+  const list=requests.filter(q=>(!f||(f==='editpending'?editPending(q):reqGroup(q)===f))&&(!who||q.requestedBy===who));
   if(!list.length){
     host.innerHTML='<div class="revEmpty">'+(f==='editpending'?'No edits are waiting for your approval.':(!requests.length?'No requests yet.<br>Share the <b>Content Request Link</b> so people can suggest new content.':'Nothing to show here.'))+'</div>';
     return;

@@ -90,6 +90,7 @@ header .tag{margin:4px 0 0;opacity:.85;font-size:13px}
 .typeBadge.t-poster{background:#FEF3C7;color:#92400E}
 .typeBadge.t-article{background:#E7EDF5;color:#17458F}
 .typeBadge.t-none{background:#EEF1F5;color:#667085}
+.monthTag{margin-left:5px;background:#FEF3C7;color:#92400E}
 .catTag{display:inline-block;margin-top:3px;font-size:10px;font-weight:800;letter-spacing:.2px;color:var(--royal);background:var(--azure-bg);border-radius:999px;padding:2px 8px}
 
 .toolbar{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin:16px 0;display:flex;gap:9px;flex-wrap:wrap;align-items:center;box-shadow:var(--shadow)}
@@ -650,7 +651,7 @@ body.role-request .requestOnly{display:inline-block}
 <button type="button" class="catTab" id="catTabDistrictAffair" onclick="filterByCategory('District Affair')">🏛 District Affair <span class="catTabCount" id="catCountDistrictAffair">0</span></button>
 <button type="button" class="catTab" id="catTabOthers" onclick="filterByCategory('Others')">📌 Others <span class="catTabCount" id="catCountOthers">0</span></button>
 </div>
-<div class="categoryTabs shareHide" id="monthTabs" style="margin-top:-6px"></div>
+<div class="categoryTabs" id="monthTabs" style="margin-top:-6px"></div>
 <div class="shareHide" style="margin:16px 0">
 <button class="primary adminOnly" onclick="openModal()" style="font-size:17px;padding:16px 28px;border-radius:12px">+ Add Content</button>
 <button class="secondary adminOnly" onclick="copyRequestLink()" style="font-size:15px;padding:15px 20px;border-radius:12px;margin-left:10px" title="Get a link you can give to anyone who wants to suggest new content. Their request waits for your approval.">🔗 Content Request Link</button>
@@ -721,6 +722,7 @@ body.role-request .requestOnly{display:inline-block}
     <b>approve</b> it — nothing on your content list is changed before then.
   </p>
   <div class="mTabsRow" id="reqTabs" style="margin-bottom:14px"></div>
+  <div class="mTabsRow" id="reqMonthTabs" style="margin:0 0 12px"></div>
   <div id="reqList"></div>
 </div><!-- /#paneRequests -->
 
@@ -1078,6 +1080,12 @@ function applyRoleUI(){
   // (?approvals=1) since that list is already short and scoped by status.
   const catTabsEl=$('categoryTabs');
   if(catTabsEl)catTabsEl.style.display=(shareMode&&!shareAllMode)?'none':'';
+  // Month tabs: same rule as the category tabs, so every login that sees the
+  // full content list (Admin, Approver, the "All Content" link and the
+  // requestor link) can jump straight to a month. Hidden only on the
+  // single-item and "For Approval" share links, where the list is already short.
+  const monthTabsEl=$('monthTabs');
+  if(monthTabsEl)monthTabsEl.style.display=(shareMode&&!shareAllMode)?'none':'';
 }
 function buildContentShareLink(id){
   return location.origin+location.pathname+'?id='+encodeURIComponent(id);
@@ -2038,7 +2046,7 @@ function render(){
    let ds=dueState(x);
    let dueTag=ds.state==='overdue'?`<div class="dueTag overdue">Overdue ${ds.days}d</div>`:(ds.state==='today'?'<div class="dueTag today">Due today</div>':'');
    let uploadCell=x.uploadDate?(fmt(x.uploadDate)+dueTag+(x.uploadSetBy?`<div class="dueSetBy">Set by ${esc(x.uploadSetBy)}</div>`:'')):'<span style="color:#98a2b3">Not set</span>';
-   let mainRow=`<tr class="${row}"><td${thumbAttrs}>${thumb}</td><td${contentAttrs}><b>${esc(x.project||'')}</b>${x.category?`<div class="catTag">${esc(x.category)}</div>`:''}${x.requestedBy?`<div class="reqTag" title="This content was requested through the request link">Requested by ${esc(x.requestedBy)}</div>${requestorLinkChip(x)?`<div style="margin-top:5px">${requestorLinkChip(x)}</div>`:''}`:''}</td><td>${fmt(x.eventDate)}</td><td>${uploadCell}</td><td>${esc(x.platform)}</td><td>${typeBadgeHtml(x.ctype)}</td><td${contentAttrs}>${contentShareBtn}<b>${esc(x.content)}</b></td><td class="descCell" onclick="openDescModal('${x.id}')"><span class="clampText">${esc(x.description)}</span></td><td><span class="badge ${cls(x.status)}" onclick="quickStatus('${x.id}')" title="${esc(reviewedByTitle)}">${esc(x.status)}</span>${reviewedByHtml}</td><td><div class="links">${linkHtml}${insightToggleHtml}</div></td><td><div class="actions">${actionsHtml}</div></td></tr>`;
+   let mainRow=`<tr class="${row}"><td${thumbAttrs}>${thumb}</td><td${contentAttrs}><b>${esc(x.project||'')}</b>${x.category?`<div class="catTag">${esc(x.category)}</div>`:''}${x.eventDate?`<div class="catTag monthTag" title="Event month">🗓 ${esc(monthLabelOf(monthKeyOf(x.eventDate)))}</div>`:''}${x.requestedBy?`<div class="reqTag" title="This content was requested through the request link">Requested by ${esc(x.requestedBy)}</div>${requestorLinkChip(x)?`<div style="margin-top:5px">${requestorLinkChip(x)}</div>`:''}`:''}</td><td>${fmt(x.eventDate)}</td><td>${uploadCell}</td><td>${esc(x.platform)}</td><td>${typeBadgeHtml(x.ctype)}</td><td${contentAttrs}>${contentShareBtn}<b>${esc(x.content)}</b></td><td class="descCell" onclick="openDescModal('${x.id}')"><span class="clampText">${esc(x.description)}</span></td><td><span class="badge ${cls(x.status)}" onclick="quickStatus('${x.id}')" title="${esc(reviewedByTitle)}">${esc(x.status)}</span>${reviewedByHtml}</td><td><div class="links">${linkHtml}${insightToggleHtml}</div></td><td><div class="actions">${actionsHtml}</div></td></tr>`;
    let insightRow=postStats?renderInsightDetailRow_(x,postStats):'';
    return mainRow+insightRow;
  }).join(''):`<tr><td colspan="11" style="text-align:center;padding:35px;color:#667085">No content found. Click "+ Add Content" to start.</td></tr>`;
@@ -3169,7 +3177,18 @@ function reqGroup(q){
   if(!item)return q.contentId?'Removed':'Pending';
   return item.status||'Pending';
 }
+let reqMonth='';
 function setReqTab(v){$('reqFilter').value=v;renderRequests();}
+function setReqMonth(k){reqMonth=k;renderRequests();}
+function renderReqMonthTabs(f,who){
+  const host=$('reqMonthTabs');if(!host)return;
+  const base=requests.filter(q=>(!f||(f==='editpending'?editPending(q):reqGroup(q)===f))&&(!who||q.requestedBy===who));
+  const cnt={};base.forEach(q=>{const k=monthKeyOf(q.eventDate);cnt[k]=(cnt[k]||0)+1;});
+  if(reqMonth&&!cnt[reqMonth])reqMonth='';
+  const keys=Object.keys(cnt).filter(k=>k!=='none').sort().reverse();if(cnt.none)keys.push('none');
+  const tab=(k,label,n)=>`<button type="button" class="mTab ${reqMonth===k?'activeM':''}" onclick="setReqMonth('${k}')">${label} <span class="mCount">${n}</span></button>`;
+  host.innerHTML=tab('','🗓 All months',base.length)+keys.map(k=>tab(k,esc(monthLabelOf(k)),cnt[k])).join('');
+}
 function renderReqTabs(f,who){
   const host=$('reqTabs');if(!host)return;
   const mine=requests.filter(q=>!who||q.requestedBy===who);
@@ -3194,7 +3213,8 @@ function renderRequests(){
   const f=$('reqFilter')?$('reqFilter').value:'';
   const who=$('reqWho')?$('reqWho').value:'';
   renderReqTabs(f,who);
-  const list=requests.filter(q=>(!f||(f==='editpending'?editPending(q):reqGroup(q)===f))&&(!who||q.requestedBy===who));
+  renderReqMonthTabs(f,who);
+  const list=requests.filter(q=>(!f||(f==='editpending'?editPending(q):reqGroup(q)===f))&&(!who||q.requestedBy===who)&&(!reqMonth||monthKeyOf(q.eventDate)===reqMonth));
   if(!list.length){
     host.innerHTML='<div class="revEmpty">'+(f==='editpending'?'No edits are waiting for your approval.':(!requests.length?'No requests yet.<br>Share the <b>Content Request Link</b> so people can suggest new content.':'Nothing to show here.'))+'</div>';
     return;

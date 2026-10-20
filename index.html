@@ -746,6 +746,7 @@ body.role-request .requestOnly{display:inline-block}
         <div class="field"><label>Date of Event</label><input type="date" id="rqEventDate"></div>
         <div class="field"><label>Main Platform</label><select id="rqPlatform"><option>Facebook</option><option>TikTok</option><option>YouTube</option><option>Instagram</option><option>LinkedIn</option><option>X / Twitter</option><option>Other</option></select></div>
         <div class="field"><label>Content Type</label><select id="rqCtype"><option>Photo</option><option>Video</option><option>Reel / Short</option><option>Poster / Graphic</option><option>Article / Caption</option></select></div>
+        <div class="field full"><label>People of Action <span class="reqNeed">*</span></label><select id="rqPeopleOfAction"><option value="">— Select one —</option><option>Connect</option><option>Empower</option><option>End Polio</option><option>Fight Hunger</option><option>Inspire</option><option>Learn</option><option>Mentor</option><option>Promote Peace</option><option>Save Lives</option><option>Transform</option><option>Others</option></select></div>
         <div class="field full"><label>Category</label><select id="rqCategory"><option>Fellowship</option><option>Service Project</option><option>Meeting</option><option>Training</option><option>Special Events</option><option>Sports</option><option>MoA Signing</option><option>Recap</option><option>RC Makati Video News</option><option>RCM Hymn</option><option>Welcome Song</option><option>District Affair</option><option>Others</option></select></div>
         <div class="field full"><label>Content / Title <span class="reqNeed">*</span></label><input id="rqContent" maxlength="200" placeholder="Example: RC Makati Hope Mission"></div>
         <div class="field full"><label>Details / Caption</label><textarea id="rqDescription" maxlength="5000" placeholder="What should the content show or say? Any wording, names or instructions."></textarea></div>
@@ -3165,7 +3166,7 @@ async function loadRequests(manual){
   updateBell();
   if(manual&&!requestsError)showToast('Requests refreshed');
 }
-const REQ_FIELD_LABELS={project:'Project',eventDate:'Event date',platform:'Platform',ctype:'Content type',category:'Category',content:'Title',description:'Description',refLink:'Reference link'};
+const REQ_FIELD_LABELS={project:'Project',eventDate:'Event date',platform:'Platform',ctype:'Content type',category:'Category',content:'Title',description:'Description',refLink:'Reference link',peopleOfAction:'People of Action'};
 function reqDiffHtml(e){
   return (e.changed||[]).map(k=>{
     const o=k==='eventDate'?fmt(e.before[k]):e.before[k],n=k==='eventDate'?fmt(e.after[k]):e.after[k];
@@ -3401,6 +3402,7 @@ async function submitRequestForm(){
   if(!name){alert('Please log in first by choosing your name.');location.reload();return;}
   if(!g('rqProject')){alert('Please enter the Project.');$('rqProject').focus();return;}
   if(!g('rqContent')){alert('Please enter the Content / Title.');$('rqContent').focus();return;}
+  if(!$('rqPeopleOfAction').value){alert('Please select a People of Action.');$('rqPeopleOfAction').focus();return;}
   if(navigator.onLine===false){alert('You appear to be offline. Please reconnect and try again.');return;}
   const editing=!!reqEditId;
   const idleLabel=editing?'Send change for approval':'Send request';
@@ -3411,14 +3413,14 @@ async function submitRequestForm(){
     if(editing){
       await apiRequest('submitRequestEdit',{id:reqEditId,requester:name,reason:g('rqReason'),fields:{
         project:g('rqProject'),eventDate:$('rqEventDate').value,platform:$('rqPlatform').value,ctype:$('rqCtype').value,
-        category:$('rqCategory').value,content:g('rqContent'),description:g('rqDescription'),refLink:g('rqRefLink')}});
+        category:$('rqCategory').value,peopleOfAction:$('rqPeopleOfAction').value,content:g('rqContent'),description:g('rqDescription'),refLink:g('rqRefLink')}});
       $('rqDoneName').textContent=name;
       $('rqDoneMsg').innerHTML='Thank you, <b>'+esc(name)+'</b>. Your change was sent to the admin. <b>Nothing changes until it is approved.</b> You can follow it under <b>My requests</b>.';
       sent=true;
     }else{
       const res=await apiRequest('submitRequest',{
         requestedBy:name,project:g('rqProject'),eventDate:$('rqEventDate').value,platform:$('rqPlatform').value,
-        ctype:$('rqCtype').value,category:$('rqCategory').value,content:g('rqContent'),description:g('rqDescription'),
+        ctype:$('rqCtype').value,category:$('rqCategory').value,peopleOfAction:$('rqPeopleOfAction').value,content:g('rqContent'),description:g('rqDescription'),
         refLink:g('rqRefLink'),website:g('rqWebsite'),clientKey:reqSubmitKey
       });
       $('rqDoneName').textContent=name;
@@ -3443,7 +3445,7 @@ async function submitRequestForm(){
   }
   if(sent){
     // clear the form so the same request cannot be re-sent by accident, then show the confirmation and auto-close
-    ['rqProject','rqEventDate','rqContent','rqDescription','rqRefLink','rqWebsite','rqReason'].forEach(id=>{$(id).value='';});
+    ['rqProject','rqEventDate','rqPeopleOfAction','rqContent','rqDescription','rqRefLink','rqWebsite','rqReason'].forEach(id=>{$(id).value='';});
     reqSubmitKey=null;
     $('reqFormBox').style.display='none';$('reqDoneBox').style.display='block';
     window.scrollTo(0,0);
@@ -3456,7 +3458,7 @@ async function submitRequestForm(){
 }
 function resetRequestForm(){
   clearReqAutoClose();
-  ['rqProject','rqEventDate','rqContent','rqDescription','rqRefLink','rqWebsite','rqReason'].forEach(id=>{$(id).value='';});
+  ['rqProject','rqEventDate','rqPeopleOfAction','rqContent','rqDescription','rqRefLink','rqWebsite','rqReason'].forEach(id=>{$(id).value='';});
   reqEditId=null;reqSubmitKey=null;setRequestFormMode(false);
   $('reqDoneBox').style.display='none';$('reqFormBox').style.display='block';
   $('rqProject').focus();
@@ -3559,7 +3561,7 @@ function startEditRequest(id){
   clearReqAutoClose();reqEditId=id;setRequestFormMode(true);
   $('rqName').value=q.requestedBy||'';
   $('rqProject').value=q.project||'';$('rqEventDate').value=q.eventDate||'';
-  $('rqPlatform').value=q.platform||'Facebook';$('rqCtype').value=q.ctype||'Photo';$('rqCategory').value=q.category||'Fellowship';
+  $('rqPlatform').value=q.platform||'Facebook';$('rqCtype').value=q.ctype||'Photo';$('rqCategory').value=q.category||'Fellowship';$('rqPeopleOfAction').value=q.peopleOfAction||'';
   $('rqContent').value=q.content||'';$('rqDescription').value=q.description||'';$('rqRefLink').value=q.refLink||'';$('rqReason').value='';
   closeMyRequests();
   $('reqDoneBox').style.display='none';$('reqFormBox').style.display='block';

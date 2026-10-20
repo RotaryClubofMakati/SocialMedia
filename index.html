@@ -786,6 +786,7 @@ body.role-request .requestOnly{display:inline-block}
 <div class="field"><label>Main Platform</label><select id="platform"><option>Facebook</option><option>TikTok</option><option>YouTube</option><option>Instagram</option><option>LinkedIn</option><option>X / Twitter</option><option>Other</option></select></div>
 <div class="field"><label>Content Type</label><select id="ctype"><option>Photo</option><option>Video</option><option>Reel / Short</option><option>Poster / Graphic</option><option>Article / Caption</option></select></div>
 <div class="field"><label>Category</label><select id="category"><option>Fellowship</option><option>Service Project</option><option>Meeting</option><option>Training</option><option>Special Events</option><option>Sports</option><option>MoA Signing</option><option>Recap</option><option>RC Makati Video News</option><option>RCM Hymn</option><option>Welcome Song</option><option>District Affair</option><option>Others</option></select></div>
+<div class="field full"><label>People of Action <span class="reqNeed">*</span></label><select id="peopleOfAction"><option value="">— Select one —</option><option>Connect</option><option>Empower</option><option>End Polio</option><option>Fight Hunger</option><option>Inspire</option><option>Learn</option><option>Mentor</option><option>Promote Peace</option><option>Save Lives</option><option>Transform</option><option>Others</option></select></div>
 <div class="field full"><label>Content / Title</label><input id="content" placeholder="Example: RC Makati Hope Mission"></div>
 <div class="field full"><label>Description / Caption</label><textarea id="description"></textarea></div>
 <div class="field full"><label>Status — click it anytime to update</label><select id="status"><option>Pending</option><option>Editing</option><option>For Approval</option><option>Approved</option><option>For Upload</option><option>Uploaded</option><option>Revise</option></select></div>
@@ -2001,7 +2002,7 @@ function render(){
  $(CATEGORY_TAB_ID[cat]||'catTabAll')?.classList.add('activeCat');
  renderMonthTabs();
  let arr=data.filter(x=>{
-   return (!q||[x.project,x.content,x.description,x.eventDate,x.uploadDate,x.platform,x.ctype,x.category,x.status,x.notes].join(' ').toLowerCase().includes(q))
+   return (!q||[x.project,x.content,x.description,x.eventDate,x.uploadDate,x.platform,x.ctype,x.category,x.peopleOfAction,x.status,x.notes].join(' ').toLowerCase().includes(q))
    &&(!proj||String(x.project||'').toLowerCase().includes(proj))
    &&(!p||x.platform===p)&&(!s||x.status===s)&&(!cat||x.category===cat)&&(!tf||x.ctype===tf)&&(!monthFilter||monthKeyOf(x.eventDate)===monthFilter)
    &&(!shareMode||shareAllMode||(shareApprovalsMode?x.status==='For Approval':String(x.id)===shareContentId));
@@ -2046,7 +2047,7 @@ function render(){
    let ds=dueState(x);
    let dueTag=ds.state==='overdue'?`<div class="dueTag overdue">Overdue ${ds.days}d</div>`:(ds.state==='today'?'<div class="dueTag today">Due today</div>':'');
    let uploadCell=x.uploadDate?(fmt(x.uploadDate)+dueTag+(x.uploadSetBy?`<div class="dueSetBy">Set by ${esc(x.uploadSetBy)}</div>`:'')):'<span style="color:#98a2b3">Not set</span>';
-   let mainRow=`<tr class="${row}"><td${thumbAttrs}>${thumb}</td><td${contentAttrs}><b>${esc(x.project||'')}</b>${x.category?`<div class="catTag">${esc(x.category)}</div>`:''}${x.eventDate?`<div class="catTag monthTag" title="Event month">🗓 ${esc(monthLabelOf(monthKeyOf(x.eventDate)))}</div>`:''}${x.requestedBy?`<div class="reqTag" title="This content was requested through the request link">Requested by ${esc(x.requestedBy)}</div>${requestorLinkChip(x)?`<div style="margin-top:5px">${requestorLinkChip(x)}</div>`:''}`:''}</td><td>${fmt(x.eventDate)}</td><td>${uploadCell}</td><td>${esc(x.platform)}</td><td>${typeBadgeHtml(x.ctype)}</td><td${contentAttrs}>${contentShareBtn}<b>${esc(x.content)}</b></td><td class="descCell" onclick="openDescModal('${x.id}')"><span class="clampText">${esc(x.description)}</span></td><td><span class="badge ${cls(x.status)}" onclick="quickStatus('${x.id}')" title="${esc(reviewedByTitle)}">${esc(x.status)}</span>${reviewedByHtml}</td><td><div class="links">${linkHtml}${insightToggleHtml}</div></td><td><div class="actions">${actionsHtml}</div></td></tr>`;
+   let mainRow=`<tr class="${row}"><td${thumbAttrs}>${thumb}</td><td${contentAttrs}><b>${esc(x.project||'')}</b>${x.category?`<div class="catTag">${esc(x.category)}</div>`:''}${x.peopleOfAction?`<div class="catTag" style="background:#FEF0D6;color:#8A5A05" title="People of Action">🌍 ${esc(x.peopleOfAction)}</div>`:''}${x.eventDate?`<div class="catTag monthTag" title="Event month">🗓 ${esc(monthLabelOf(monthKeyOf(x.eventDate)))}</div>`:''}${x.requestedBy?`<div class="reqTag" title="This content was requested through the request link">Requested by ${esc(x.requestedBy)}</div>${requestorLinkChip(x)?`<div style="margin-top:5px">${requestorLinkChip(x)}</div>`:''}`:''}</td><td>${fmt(x.eventDate)}</td><td>${uploadCell}</td><td>${esc(x.platform)}</td><td>${typeBadgeHtml(x.ctype)}</td><td${contentAttrs}>${contentShareBtn}<b>${esc(x.content)}</b></td><td class="descCell" onclick="openDescModal('${x.id}')"><span class="clampText">${esc(x.description)}</span></td><td><span class="badge ${cls(x.status)}" onclick="quickStatus('${x.id}')" title="${esc(reviewedByTitle)}">${esc(x.status)}</span>${reviewedByHtml}</td><td><div class="links">${linkHtml}${insightToggleHtml}</div></td><td><div class="actions">${actionsHtml}</div></td></tr>`;
    let insightRow=postStats?renderInsightDetailRow_(x,postStats):'';
    return mainRow+insightRow;
  }).join(''):`<tr><td colspan="11" style="text-align:center;padding:35px;color:#667085">No content found. Click "+ Add Content" to start.</td></tr>`;
@@ -2292,8 +2293,8 @@ function closeDescModal(){$('descModal').classList.remove('open')}
 function openModal(id=null){
  modalToken++;
  editId=id;$('mtitle').textContent=id?'Edit Content':'Add Content';$('linkRows').innerHTML='';
- let x=id?data.find(a=>a.id===id):{project:'',eventDate:'',uploadDate:'',platform:'Facebook',ctype:'Photo',category:'Fellowship',content:'',description:'',status:'Pending',thumbnail:'',photos:[],links:[]};
- $('project').value=x.project||'';$('eventDate').value=x.eventDate||'';$('uploadDate').value=x.uploadDate||'';$('platform').value=x.platform||'Facebook';$('ctype').value=x.ctype||'Photo';$('category').value=x.category||'Fellowship';$('content').value=x.content||'';$('description').value=x.description||'';$('status').value=x.status||'For Upload';$('thumb').value=x.thumbnail||'';
+ let x=id?data.find(a=>a.id===id):{project:'',eventDate:'',uploadDate:'',platform:'Facebook',ctype:'Photo',category:'Fellowship',peopleOfAction:'',content:'',description:'',status:'Pending',thumbnail:'',photos:[],links:[]};
+ $('project').value=x.project||'';$('eventDate').value=x.eventDate||'';$('uploadDate').value=x.uploadDate||'';$('platform').value=x.platform||'Facebook';$('ctype').value=x.ctype||'Photo';$('category').value=x.category||'Fellowship';$('peopleOfAction').value=x.peopleOfAction||'';$('content').value=x.content||'';$('description').value=x.description||'';$('status').value=x.status||'For Upload';$('thumb').value=x.thumbnail||'';
  $('requestedByNote').style.display=x.requestedBy?'block':'none';
  $('requestedByNote').innerHTML=x.requestedBy?('📥 Requested by '+esc(x.requestedBy)+(requestorLink(x)?'<div style="margin-top:6px;font-weight:600;word-break:break-all">'+requestorLinkBox(x)+'</div>':'')):'';
  $('uploadDateSetBy').textContent=(x.uploadDate&&x.uploadSetBy)?('Set by '+x.uploadSetBy):'';
@@ -2816,6 +2817,7 @@ function saveContent(){
    platform:$('platform').value,
    ctype:$('ctype').value,
    category:$('category').value,
+   peopleOfAction:$('peopleOfAction').value,
    content:$('content').value.trim(),
    description:$('description').value.trim(),
    status:$('status').value,
@@ -2829,6 +2831,7 @@ function saveContent(){
      .map(r=>({platform:r.querySelector('.linkPlatform').value,url:r.querySelector('.linkUrl').value.trim()}))
      .filter(l=>l.url)
  };
+ if(!x.peopleOfAction){alert('Please select a People of Action.');$('peopleOfAction').focus();return}
  if(!x.content){alert('Please enter Content / Title.');return}
  // Date of Upload is optional now: an approver or staff can set it later.
  {

@@ -490,6 +490,86 @@ body.role-request .requestOnly{display:inline-block}
 #loginScreen.requesterOnly .adminLoginPart{display:none}
 #loginScreen.requesterOnly .loginDivider{display:none}
 #loginScreen.requesterOnly .reqOnlyTitle{display:block}
+
+/* ===== v3 polish: lively + advanced ===== */
+:root{--glass:rgba(255,255,255,.72)}
+body{background:radial-gradient(1100px 500px at 8% -5%,rgba(0,103,200,.10),transparent 60%),radial-gradient(900px 480px at 100% 0,rgba(247,168,27,.10),transparent 55%),var(--bg);background-attachment:fixed}
+header{background:linear-gradient(120deg,var(--navy),var(--royal),var(--azure),var(--royal),var(--navy));background-size:300% 100%;animation:hdrFlow 18s ease-in-out infinite;position:relative;overflow:hidden;box-shadow:0 8px 26px rgba(15,59,115,.28)}
+header::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.14) 50%,transparent 65%);transform:translateX(-120%);animation:hdrShine 7s ease-in-out infinite;pointer-events:none}
+@keyframes hdrFlow{0%,100%{background-position:0 0}50%{background-position:100% 0}}
+@keyframes hdrShine{0%,55%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+@keyframes riseIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.cards .card{animation:riseIn .55s cubic-bezier(.2,.8,.2,1) both;background:linear-gradient(160deg,#fff,#F6FAFF);position:relative;overflow:hidden}
+.cards .card:nth-child(1){animation-delay:.03s}.cards .card:nth-child(2){animation-delay:.08s}.cards .card:nth-child(3){animation-delay:.13s}.cards .card:nth-child(4){animation-delay:.18s}.cards .card:nth-child(5){animation-delay:.23s}.cards .card:nth-child(6){animation-delay:.28s}.cards .card:nth-child(7){animation-delay:.33s}.cards .card:nth-child(8){animation-delay:.38s}
+.cards .card::after{content:"";position:absolute;right:-24px;top:-24px;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,rgba(0,103,200,.14),transparent 70%);transition:transform .35s}
+.cards .card:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 14px 28px rgba(15,59,115,.18)}
+.cards .card:hover::after{transform:scale(2.2)}
+.cards .card .num{font-family:'Manrope',Arial,sans-serif;font-variant-numeric:tabular-nums}
+button{transition:transform .12s,box-shadow .18s,filter .18s,background .18s}
+button.primary:hover,button.secondary:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(15,59,115,.2)}
+button:active{transform:translateY(0) scale(.97)}
+button.primary{background-image:linear-gradient(135deg,var(--royal),var(--azure))}
+tbody tr{animation:rowIn .45s ease both}
+@keyframes rowIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+tbody tr:hover{background:#EEF5FD}
+.modal>div,.modalBox,.modalCard{animation:riseIn .3s cubic-bezier(.2,.8,.2,1) both}
+.albumTile{transition:transform .15s,box-shadow .15s,border-color .15s}
+.albumTile:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(15,59,115,.16)}
+.myReqCard{transition:transform .15s,box-shadow .15s;animation:riseIn .4s ease both}
+.myReqCard:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(15,59,115,.14)}
+.mrChips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.mrChip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;background:#EAF2FC;color:var(--azure-tx);border:1px solid #CFE0F5}
+.mrChip.cat{background:linear-gradient(135deg,var(--royal),var(--azure));color:#fff;border-color:transparent}
+.mrChip.poa{background:var(--gold-bg);color:var(--gold-tx);border-color:#F6D99A}
+.mrChip .typeBadge,.mrChip [class*=badge]{margin:0}
+/* admin photo picking */
+.albumSelBar{display:none;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding:10px 12px;border-radius:10px;background:linear-gradient(135deg,#EEF5FD,#F8FBFF);border:1px dashed var(--azure)}
+.albumSelBar.show{display:flex}
+body.role-approver .albumSelBar{display:none!important}
+.albumSelBar .asbText{font-size:12px;font-weight:700;color:var(--azure-tx);flex:1;min-width:180px}
+.albumSelBar button{padding:6px 10px;font-size:11px;font-weight:700;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--navy);cursor:pointer}
+.albumSelBar .asbDl{background:linear-gradient(135deg,var(--royal),var(--azure));color:#fff;border:0}
+.albumSelBar button:disabled{opacity:.45;cursor:not-allowed}
+.tilePick{position:absolute;top:-6px;left:-6px;z-index:2;width:24px;height:24px;cursor:pointer}
+.tilePick input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+.tilePick span{display:block;width:24px;height:24px;border-radius:7px;background:#fff;border:2px solid var(--azure);box-shadow:0 2px 6px rgba(0,0,0,.2);transition:all .15s}
+.tilePick input:checked+span{background:var(--azure);}
+.tilePick input:checked+span::after{content:"✓";color:#fff;font-size:15px;font-weight:800;display:block;text-align:center;line-height:20px}
+.tilePick input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}
+.albumTile.picked{box-shadow:0 0 0 2px var(--azure)}
+
+.lockedBtn{background:#E5EAF1!important;color:#6B7A90!important;border:1px solid #D3DBE6!important;cursor:not-allowed!important;box-shadow:none!important;transform:none!important;padding:8px 12px;border-radius:9px;font-weight:700}
+/* ===== v3.1 extra polish ===== */
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:linear-gradient(var(--azure),var(--royal));border-radius:10px;border:2px solid var(--bg)}::-webkit-scrollbar-track{background:transparent}
+::selection{background:var(--gold);color:#3b2600}
+header h1{background:linear-gradient(90deg,#fff,#FFE3A6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;position:relative}
+header .tag::before{content:"";display:inline-block;width:26px;height:3px;border-radius:3px;background:var(--gold);vertical-align:middle;margin-right:8px}
+body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;filter:blur(70px);opacity:.35;pointer-events:none;animation:orbFloat 22s ease-in-out infinite}
+body::before{width:380px;height:380px;background:#8EC5FF;left:-120px;top:30%}
+body::after{width:340px;height:340px;background:#FFD98A;right:-110px;bottom:5%;animation-delay:-9s}
+@keyframes orbFloat{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,-60px)}}
+.toolbar{background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-color:rgba(255,255,255,.7)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--azure);box-shadow:0 0 0 3px rgba(0,103,200,.18)}
+input,select,textarea{transition:border-color .15s,box-shadow .15s}
+th{background:linear-gradient(180deg,var(--royal),var(--navy));letter-spacing:.4px;text-transform:uppercase;font-size:10.5px}
+td{transition:background .15s}
+.badge{box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 2px 6px rgba(15,59,115,.10)}
+.badge:hover{box-shadow:0 4px 12px rgba(15,59,115,.22)}
+.tabBtn{transition:background .15s,color .15s,border-color .15s,transform .15s}
+.tabBtn:hover{transform:translateY(-1px)}
+.tabBtn.active{background:linear-gradient(180deg,transparent,rgba(0,103,200,.08))}
+.tabPane.active{animation:riseIn .35s ease both}
+.box{box-shadow:0 30px 70px rgba(10,25,50,.35);border-top:4px solid var(--gold)}
+.modal{backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.box h2{background:linear-gradient(90deg,var(--navy),var(--azure));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.thumb{transition:transform .25s,box-shadow .25s}
+.thumb:hover{transform:scale(1.12);box-shadow:0 8px 20px rgba(15,59,115,.3);position:relative;z-index:3}
+.reviewBtn:not(:disabled){animation:ringPulse 2.6s ease-in-out infinite}
+@keyframes ringPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,103,200,.35)}50%{box-shadow:0 0 0 7px rgba(0,103,200,0)}}
+.dueTag.overdue{animation:pulse 1.4s ease-in-out infinite}
+.cards .card .label{text-transform:uppercase;letter-spacing:.6px;font-size:10.5px;font-weight:700}
+.cards .card.activeCard{background:linear-gradient(160deg,#EAF3FF,#fff)}
+@media(max-width:700px){body::before,body::after{display:none}}
 </style>
 </head>
 <body>
@@ -822,6 +902,12 @@ body.role-request .requestOnly{display:inline-block}
 <span class="arbText" id="arbText"></span>
 <button type="button" class="arbDownload" id="arbDownloadBtn" onclick="downloadApprovedPhotos()">⬇ Download approved</button>
 <button type="button" class="arbRemove" id="arbRemoveBtn" onclick="removeRejectedPhotos()">🗑 Remove rejected</button>
+</div>
+<div id="albumSelBar" class="albumSelBar adminOnly">
+<span class="asbText" id="asbText"></span>
+<button type="button" class="asbBtn" onclick="selectAllAlbum(true)">Select all</button>
+<button type="button" class="asbBtn" onclick="selectAllAlbum(false)">Clear</button>
+<button type="button" class="asbDl" id="asbDownloadBtn" onclick="downloadSelectedPhotos()">⬇ Download selected (0)</button>
 </div>
 <div id="albumGrid" class="albumGrid"></div>
 <div class="hint">This is separate from the cover Thumbnail above. Add photos and/or videos — the Approver checks (✓ approve) or marks (✕ do not upload) each one individually before it goes out. Once reviewed, use the bar above to download the approved files (as one zip) and remove the ones marked do not upload — you'll be asked to confirm before anything is deleted.</div>
@@ -2034,12 +2120,13 @@ function render(){
    let linkHtml=renderLinksHtml(x.links);
    let postStats=(insightsData&&insightsData.perPost)?insightsData.perPost[x.id]:null;
    let insightToggleHtml=postStats?`<button type="button" class="insightToggleBtn" onclick="event.stopPropagation();toggleInsightRow('${x.id}')">${expandedInsightRows.has(x.id)?'▲':'▼'} Insights</button>`:'';
+   const revLocked=isApproverLike()&&x.status==='Uploaded';
    let actionsHtml=isApproverLike()
-     ?`<button class="primary reviewBtn" onclick="openApproveModal('${x.id}')">Review</button>`
+     ?(revLocked?`<button class="reviewBtn lockedBtn" disabled title="Already uploaded — review is closed">🔒 Uploaded</button>`:`<button class="primary reviewBtn" onclick="openApproveModal('${x.id}')">Review</button>`)
      :`<button class="secondary" onclick="openModal('${x.id}')">Edit</button><button class="danger" onclick="del('${x.id}')">Delete</button>`;
-   let thumbAttrs=isApproverLike()?` onclick="openApproveModal('${x.id}')" style="cursor:pointer"`:'';
+   let thumbAttrs=(isApproverLike()&&!revLocked)?` onclick="openApproveModal('${x.id}')" style="cursor:pointer"`:'';
    let contentShareBtn=isApproverLike()?'':`<button type="button" class="shareRowBtn adminOnly" onclick="event.stopPropagation();copyContentShareLink('${x.id}','${escJs(x.content||'')}')" title="Get a shareable link for just this content item">📎</button>`;
-   let contentAttrs=` onclick="${isApproverLike()?`openApproveModal('${x.id}')`:`openModal('${x.id}')`}" style="cursor:pointer" title="${isApproverLike()?'Click to review':'Click to edit'}"`;
+   let contentAttrs=revLocked?` title="Already uploaded — review is closed"`:` onclick="${isApproverLike()?`openApproveModal('${x.id}')`:`openModal('${x.id}')`}" style="cursor:pointer" title="${isApproverLike()?'Click to review':'Click to edit'}"`;
    let revList=getReviewsFor(x);
    let extra=revList.length>1?(' • '+revList.length+' reviews on record: '+revList.map(r=>r.by).join(', ')):'';
    let reviewedByTitle=x.reviewedBy?('Reviewed by '+x.reviewedBy+(x.reviewedAt?(' on '+fmt(x.reviewedAt.slice(0,10))):'')+extra):(isApproverLike()?'Click to review':'Click to change status');
@@ -2134,6 +2221,7 @@ function updateApEditedTags(){
 function openApproveModal(id){
   apModalToken++;
   const x=data.find(a=>a.id===id); if(!x)return;
+  if(x.status==='Uploaded'){alert('This content is already uploaded, so review is locked.');return;}
   apEditId=id;
   $('apProject').textContent=x.project||'';
   $('apContent').textContent=x.content||'';
@@ -2216,6 +2304,7 @@ function setApPhotoStatus(cid,status){
 }
 function submitApprove(newStatus){
   const x=data.find(a=>a.id===apEditId); if(!x)return;
+  if(x.status==='Uploaded'){alert('This content is already uploaded, so review is locked.');closeApproveModal();return;}
   const reviewerName=$('apReviewerName').value.trim();
   if(!reviewerName){alert('Please enter your name — it is recorded as who reviewed this content.');$('apReviewerName').focus();return;}
   const notes=$('apNotes').value.trim();
@@ -2458,7 +2547,8 @@ function renderAlbumGrid(){
     const label=p.uploading?(p.retrying||('Uploading… '+(p.progress||0)+'%')):(p.url?(p.status==='approved'?'✓ Approved':p.status==='revise'?'✕ Do Not Upload':'Pending review'):'Uploading…');
     const progressBar=p.uploading?`<div class="tileUploadBar"><div class="fill" style="width:${p.progress||0}%"></div></div>`:'';
     const mediaHtml=p.url?`<div class="tileMedia" onclick="openAlbumLightbox('${p.cid}')" title="Click to enlarge">${media}<span class="zoomBadge">${badge}</span>${progressBar}</div>`:media;
-    return `<div class="albumTile ${p.status||''}"><button type="button" class="tileRemove" onclick="removeAlbumPhoto('${p.cid}')" title="Remove">✕</button>${mediaHtml}<div class="tileStatus">${label}</div></div>`;
+    const pick=p.url&&!p.uploading?`<label class="tilePick adminOnly" title="Select to download"><input type="checkbox" ${p.sel?'checked':''} onchange="toggleAlbumSel('${p.cid}',this.checked)"><span></span></label>`:'';
+    return `<div class="albumTile ${p.status||''} ${p.sel?'picked':''}">${pick}<button type="button" class="tileRemove" onclick="removeAlbumPhoto('${p.cid}')" title="Remove">✕</button>${mediaHtml}<div class="tileStatus">${label}</div></div>`;
   }).join(''):'<p class="hint">No album photos added yet.</p>';
   renderAlbumReviewBar();
 }
@@ -2583,7 +2673,27 @@ function closeLightbox(){
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&$('lightboxModal').classList.contains('open'))closeLightbox();
 });
+function toggleAlbumSel(cid,on){
+  const p=modalPhotos.find(x=>x.cid===cid);if(!p)return;
+  p.sel=!!on;renderAlbumGrid();
+}
+function selectAllAlbum(on){
+  modalPhotos.forEach(p=>{if(p.url&&!p.uploading)p.sel=!!on;});
+  renderAlbumGrid();
+}
+function renderAlbumSelBar(){
+  const bar=$('albumSelBar');if(!bar)return;
+  const ready=modalPhotos.filter(p=>p.url&&!p.uploading);
+  const sel=ready.filter(p=>p.sel);
+  bar.classList.toggle('show',ready.length>0);
+  $('asbText').textContent='Pick any files to download — no review needed ('+sel.length+' of '+ready.length+' selected)';
+  if(!zipBusy_){
+    $('asbDownloadBtn').disabled=sel.length===0;
+    $('asbDownloadBtn').textContent='⬇ Download selected ('+sel.length+')';
+  }
+}
 function renderAlbumReviewBar(){
+  renderAlbumSelBar();
   const bar=$('albumReviewBar');
   if(!bar)return;
   const approved=modalPhotos.filter(p=>p.status==='approved'&&p.url);
@@ -2633,44 +2743,47 @@ function triggerDownload_(url){
  * because Apps Script can't build a single blob over ~50MB.
  */
 let zipBusy_=false;
-async function downloadApprovedPhotos(){
-  if(zipBusy_)return;
+function downloadApprovedPhotos(){
   const approved=modalPhotos.filter(p=>p.status==='approved'&&p.url);
-  if(!approved.length){alert('No photos have been approved by the Approver yet.');return;}
+  return zipDownload_(approved,$('arbDownloadBtn'),'No photos have been approved by the Approver yet.');
+}
+function downloadSelectedPhotos(){
+  const picked=modalPhotos.filter(p=>p.sel&&p.url&&!p.uploading);
+  return zipDownload_(picked,$('asbDownloadBtn'),'Tick the photos/videos you want first.');
+}
+async function zipDownload_(approved,btn,emptyMsg){
+  if(zipBusy_)return;
+  if(!approved.length){alert(emptyMsg);return;}
   if(approved.length===1){ // nothing to zip
     triggerDownload_(driveDownloadUrl_(approved[0].url));
     return;
   }
-  if(!isOnline()){alert('Internet is required to download the approved files as a zip.');return;}
-  // Only Drive-hosted files can be zipped. Anything else (a still-uploading
-  // local copy, or a pasted non-Drive link) is reported instead of silently lost.
+  if(!isOnline()){alert('Internet is required to download the files as a zip.');return;}
   const driveUrls=approved.map(p=>p.url).filter(u=>/drive\.google\.com/.test(u));
   let notZipped=approved.length-driveUrls.length;
-  if(!driveUrls.length){alert('None of the approved files are stored in Google Drive, so they can\'t be zipped.');return;}
+  if(!driveUrls.length){alert('None of the chosen files are stored in Google Drive, so they can\'t be zipped.');return;}
   zipBusy_=true;
-  const btn=$('arbDownloadBtn');
   btn.disabled=true;
   btn.textContent='⏳ Preparing zip…';
   const builtIds=[];
   try{
     const plan=await apiRequest('zipPlan',{urls:driveUrls,zipName:($('content').value||'').trim()});
     notZipped+=plan.skipped||0;
-    if(!plan.parts.length)throw new Error('None of the approved files could be read from Drive.');
+    if(!plan.parts.length)throw new Error('None of the files could be read from Drive.');
     if(plan.parts.length>1)showToast('These files are large, so they\'re split into '+plan.parts.length+' zip files. If your browser asks, allow multiple downloads.');
     for(let i=0;i<plan.parts.length;i++){
       btn.textContent='⏳ Zipping '+(plan.parts.length>1?((i+1)+'/'+plan.parts.length):plan.total+' file(s)')+'…';
       const part=await apiRequest('zipBuild',{ids:plan.parts[i].ids,name:plan.parts[i].name});
       builtIds.push(part.id);
       triggerDownload_(part.downloadUrl);
-      if(i<plan.parts.length-1)await new Promise(r=>setTimeout(r,1500)); // don't fire back-to-back
+      if(i<plan.parts.length-1)await new Promise(r=>setTimeout(r,1500));
     }
     showToast('✓ Downloading '+plan.total+' file(s) as '+(plan.parts.length>1?plan.parts.length+' zips':'a zip')+(notZipped?' — '+notZipped+' couldn\'t be included (not in Drive / no access).':'.'));
-    // The temp zip in Drive is only needed for the download itself.
     setTimeout(()=>{apiRequest('zipCleanup',{ids:builtIds}).catch(()=>{});},10*60*1000);
   }catch(err){
     const msg=String(err&&err.message||err);
     alert(/Unknown action/i.test(msg)
-      ?'The Apps Script backend doesn\'t have the zip feature yet.\n\nPaste the updated script (v1_9.gs) into Apps Script and redeploy: Deploy > Manage deployments > pencil icon > Version: "New version" > Deploy.'
+      ?'The Apps Script backend doesn\'t have the zip feature yet.\n\nPaste the updated script into Apps Script and redeploy: Deploy > Manage deployments > pencil icon > Version: "New version" > Deploy.'
       :'Could not build the zip: '+msg+'\n\nPlease try again.');
     if(builtIds.length)apiRequest('zipCleanup',{ids:builtIds}).catch(()=>{});
   }finally{
@@ -3537,8 +3650,16 @@ function renderMyReqs(){
     else if(last&&last.status==='Rejected')editNote='<div class="hint" style="color:#8C1D23;font-weight:700;margin-top:6px">✕ Your last change was not approved'+(last.note?(': '+esc(last.note)):'.')+'</div>';
     const waiting=last&&last.status==='Pending';
     const canDel=!q.contentStatus||q.contentStatus==='Pending';
+    const metaChips=[
+      q.category?`<span class="mrChip cat">📁 ${esc(q.category)}</span>`:'',
+      q.ctype?`<span class="mrChip">${typeBadgeHtml(q.ctype)}</span>`:'',
+      q.platform?`<span class="mrChip">📤 ${esc(q.platform)}</span>`:'',
+      q.peopleOfAction?`<span class="mrChip poa">🌍 ${esc(q.peopleOfAction)}</span>`:'',
+      q.eventDate?`<span class="mrChip">🗓 ${esc(fmt(q.eventDate))}</span>`:''
+    ].filter(Boolean).join('');
     return `<div class="myReqCard"><div class="reqTitle" style="margin-top:0">${esc(q.content)}</div>
       <div class="reqProject">${esc(q.project)} • ${esc(q.id)}</div>
+      ${metaChips?`<div class="mrChips">${metaChips}</div>`:''}
       <div style="margin-top:6px"><b style="font-size:12px">Status:</b>${myReqStatusPill(q)}</div>${myReqUploadHtml(q,qi)}${editNote}
       <div class="reqActions"><button class="secondary" onclick="startEditRequest('${escJs(q.id)}')">${waiting?'✏ Replace my pending change':'✏ Edit request'}</button>${canDel?`<button class="revDel" style="padding:8px 12px;border-radius:9px;font-weight:700" onclick="deleteMyRequest('${escJs(q.id)}')">🗑 Delete request</button>`:''}</div></div>`;
   }).join('');
@@ -3620,5 +3741,32 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)silentRefr
   });
 </script>
 
+
+<script>
+/* stat-card count-up: tween whenever a number changes */
+(function(){
+  try{
+    if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    const run=el=>{
+      if(el._busy)return;
+      const to=parseInt(String(el.textContent).replace(/[^0-9-]/g,''),10);
+      if(isNaN(to))return;
+      const from=el._last==null?0:el._last;
+      el._last=to;
+      if(from===to)return;
+      el._busy=true;const t0=performance.now(),d=650;
+      const step=t=>{
+        const k=Math.min(1,(t-t0)/d),e=1-Math.pow(1-k,3);
+        el.textContent=Math.round(from+(to-from)*e);
+        if(k<1)requestAnimationFrame(step);else{el._busy=false;el.textContent=to;}
+      };requestAnimationFrame(step);
+    };
+    const els=document.querySelectorAll('.cards .card .num');
+    els.forEach(el=>{
+      new MutationObserver(()=>{if(!el._busy)run(el);}).observe(el,{childList:true,characterData:true,subtree:true});
+    });
+  }catch(e){}
+})();
+</script>
 </body>
 </html>

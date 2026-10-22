@@ -609,6 +609,18 @@ body.role-approver:not(.role-request) .feedTab{display:none!important}
 .feedSkel{height:260px;border-radius:14px;background:linear-gradient(90deg,#E6EDF7 25%,#F4F8FD 50%,#E6EDF7 75%);background-size:200% 100%;animation:skel 1.3s linear infinite}
 @keyframes skel{to{background-position:-200% 0}}
 @media(max-width:900px){.feedPlayerWrap{grid-template-columns:1fr}.feedList{max-height:none}}
+
+.feedAlbums{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 12px;margin-bottom:6px;scroll-snap-type:x proximity}
+.feedAlbum{flex:none;display:flex;align-items:center;gap:10px;width:230px;text-align:left;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;cursor:pointer;font:inherit;color:var(--text);scroll-snap-align:start;transition:transform .15s,box-shadow .15s,border-color .15s}
+.feedAlbum:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(15,59,115,.16);border-color:var(--azure)}
+.feedAlbum.on{border-color:var(--azure);background:linear-gradient(135deg,#EAF3FF,#fff);box-shadow:0 0 0 2px rgba(0,103,200,.25)}
+.feedAlbumCover{flex:none;width:54px;height:54px;border-radius:10px;overflow:hidden;background:#E3ECF7;display:flex;align-items:center;justify-content:center;font-size:22px}
+.feedAlbumCover img{width:100%;height:100%;object-fit:cover;display:block}
+.feedAlbumTxt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.feedAlbumTxt b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feedAlbumTxt small{font-size:11px;color:var(--muted)}
+.feedAlbumHead{margin:4px 0 12px;font-size:14px;color:var(--navy)}
+.feedAlbumHead a{margin-left:10px;color:var(--azure);font-weight:700;font-size:12px;text-decoration:none}
 </style>
 </head>
 <body>
@@ -1735,7 +1747,7 @@ function toggleDateSort(){
  render();
 }
 /* ---- News Feed ----------------------------------------------------- */
-let feedData=null,feedLoading=false,feedPlayId='';
+let feedData=null,feedLoading=false,feedPlayId='',feedAlbum='';
 function feedAgo_(iso){
   const t=Date.parse(iso);if(!t)return '';
   const m=Math.max(0,Math.floor((Date.now()-t)/60000));
@@ -1779,8 +1791,14 @@ function playFeedVideo(id,auto){
   document.querySelectorAll('#feedList .feedItem').forEach(el=>el.classList.toggle('playing',el.dataset.id===id));
   if(auto&&fp&&fp.scrollIntoView&&window.innerWidth<900)fp.scrollIntoView({behavior:'smooth',block:'center'});
 }
+function feedPhotoList_(){
+  const fb=(feedData&&feedData.facebook)||{};
+  if(feedAlbum){const a=(fb.albums||[]).find(x=>x.id===feedAlbum);if(a)return a.photos||[];}
+  return fb.photos||[];
+}
+function setFeedAlbum(id){feedAlbum=id||'';renderFeed();}
 function openFeedPhoto(i){
-  const ph=(feedData&&feedData.facebook.photos||[])[i];if(!ph)return;
+  const ph=feedPhotoList_()[i];if(!ph)return;
   openLightbox(ph.full||ph.thumb,false,(ph.caption?ph.caption+' — ':'')+feedAgo_(ph.created));
 }
 function renderFeed(){
@@ -1805,11 +1823,22 @@ function renderFeed(){
       }).join('')+'</div></div>';
   }
   // ---- Facebook ----
-  html+='<div class="feedSecTitle" style="margin-top:26px"><span class="feedDot fb">f</span> Latest Facebook photos</div>';
+  html+='<div class="feedSecTitle" style="margin-top:26px"><span class="feedDot fb">f</span> Facebook photos — by album</div>';
   if(fb.notConnected)html+='<p class="hint">Facebook is not connected yet. An admin can add FB_PAGE_ID and FB_PAGE_ACCESS_TOKEN as Script Properties in the Apps Script project.</p>';
   else if(fb.error)html+='<div class="insightErr">Facebook: '+esc(fb.error)+'</div>';
-  else if(!(fb.photos||[]).length)html+='<p class="hint">No photos found on the Facebook page yet.</p>';
-  else html+='<div class="feedPhotos">'+fb.photos.map((p,i)=>'<button type="button" class="feedPhoto" onclick="openFeedPhoto('+i+')" title="'+esc(p.caption||'Click to enlarge')+'"><img src="'+esc(p.thumb)+'" loading="lazy" referrerpolicy="no-referrer" alt="'+esc(p.caption||'Facebook photo')+'"><span class="feedPhotoTag">'+esc(feedAgo_(p.created))+'</span></button>').join('')+'</div>';
+  else if(!(fb.photos||[]).length&&!(fb.albums||[]).length)html+='<p class="hint">No photos found on Facebook yet.</p>';
+  else{
+    const albums=fb.albums||[];
+    if(feedAlbum&&!albums.some(a=>a.id===feedAlbum))feedAlbum='';
+    if(albums.length){
+      html+='<div class="feedAlbums"><button type="button" class="feedAlbum'+(feedAlbum===''?' on':'')+'" onclick="setFeedAlbum(\'\')"><span class="feedAlbumCover all">🕒</span><span class="feedAlbumTxt"><b>Latest photos</b><small>All recent uploads</small></span></button>'
+        +albums.map(a=>'<button type="button" class="feedAlbum'+(feedAlbum===a.id?' on':'')+'" onclick="setFeedAlbum(\''+escJs(a.id)+'\')" title="'+esc(a.name)+'"><span class="feedAlbumCover">'+(a.cover?'<img src="'+esc(a.cover)+'" loading="lazy" referrerpolicy="no-referrer" alt="">':'📁')+'</span><span class="feedAlbumTxt"><b>'+esc(a.name)+'</b><small>'+Number(a.count||0).toLocaleString()+' photo'+(a.count==1?'':'s')+' • '+esc(feedAgo_(a.updated))+'</small></span></button>').join('')+'</div>';
+    }
+    const cur=feedAlbum?albums.find(a=>a.id===feedAlbum):null;
+    if(cur)html+='<div class="feedAlbumHead"><b>📁 '+esc(cur.name)+'</b>'+(cur.link?' <a href="'+esc(cur.link)+'" target="_blank" rel="noopener">Open album on Facebook ↗</a>':'')+'</div>';
+    const list=feedPhotoList_();
+    html+=list.length?'<div class="feedPhotos">'+list.map((p,i)=>'<button type="button" class="feedPhoto" onclick="openFeedPhoto('+i+')" title="'+esc(p.caption||'Click to enlarge')+'"><img src="'+esc(p.thumb)+'" loading="lazy" referrerpolicy="no-referrer" alt="'+esc(p.caption||'Facebook photo')+'"><span class="feedPhotoTag">'+esc(feedAgo_(p.created))+'</span></button>').join('')+'</div>':'<p class="hint">No photos in this album.</p>';
+  }
   html+='<div class="hint" style="margin-top:12px">Updated '+esc(feedAgo_(feedData.fetchedAt))+' • refreshes automatically every 10 minutes.</div>';
   host.innerHTML=html;
   if(vids.length)playFeedVideo(feedPlayId||vids[0].id,false);

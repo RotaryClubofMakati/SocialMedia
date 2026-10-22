@@ -570,6 +570,45 @@ td{transition:background .15s}
 .cards .card .label{text-transform:uppercase;letter-spacing:.6px;font-size:10.5px;font-weight:700}
 .cards .card.activeCard{background:linear-gradient(160deg,#EAF3FF,#fff)}
 @media(max-width:700px){body::before,body::after{display:none}}
+
+/* ===== News Feed ===== */
+body.role-request .tabBar.shareHide{display:flex!important}
+body.role-approver:not(.role-request) .feedTab{display:none!important}
+.feedHead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin:14px 0}
+.feedTitle{font-size:22px;font-weight:800;color:var(--navy)}
+.feedSecTitle{display:flex;align-items:center;gap:8px;font-family:'Manrope',Arial,sans-serif;font-weight:800;font-size:17px;color:var(--navy);margin:6px 0 10px}
+.feedDot{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;color:#fff;font-size:12px;font-weight:800}
+.feedDot.yt{background:#E11D2A}.feedDot.fb{background:#1877F2;font-size:15px}
+.feedPlayerWrap{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:16px;align-items:start}
+.feedMain{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.feedFrame{aspect-ratio:16/9;background:#000}
+.feedFrame iframe{width:100%;height:100%;border:0;display:block}
+.feedNow{padding:14px 16px}
+.feedNowTitle{font-weight:800;font-size:16px;margin-top:6px;color:var(--text)}
+.feedNowMeta{font-size:12px;color:var(--muted);margin-top:4px}
+.feedNowMeta a{color:var(--azure);font-weight:700;text-decoration:none}
+.feedNew{display:inline-block;background:linear-gradient(135deg,var(--gold),#ffcf6b);color:#4a2f00;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:800;letter-spacing:.5px}
+.feedNew.sm{padding:1px 6px;font-size:9px}
+.feedList{display:flex;flex-direction:column;gap:8px;max-height:560px;overflow:auto;padding-right:4px}
+.feedItem{display:flex;gap:10px;text-align:left;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;cursor:pointer;color:var(--text);font:inherit;transition:transform .15s,box-shadow .15s,border-color .15s}
+.feedItem:hover{transform:translateX(3px);box-shadow:0 6px 16px rgba(15,59,115,.14);border-color:var(--azure)}
+.feedItem.playing{border-color:var(--azure);background:linear-gradient(135deg,#EAF3FF,#fff);box-shadow:0 0 0 2px rgba(0,103,200,.25)}
+.feedThumb{position:relative;flex:none;width:128px;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#0b1730}
+.feedThumb img{width:100%;height:100%;object-fit:cover;display:block}
+.feedThumb em{position:absolute;right:4px;bottom:4px;background:rgba(0,0,0,.78);color:#fff;font-style:normal;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px}
+.feedPlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-style:normal;font-size:22px;background:rgba(0,0,0,.28);opacity:0;transition:opacity .15s}
+.feedItem:hover .feedPlay,.feedItem.playing .feedPlay{opacity:1}
+.feedTxt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.feedTxt b{font-size:13px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.feedTxt small{font-size:11px;color:var(--muted)}
+.feedPhotos{columns:4 190px;column-gap:12px}
+.feedPhoto{position:relative;display:block;width:100%;margin:0 0 12px;padding:0;border:0;border-radius:12px;overflow:hidden;cursor:zoom-in;break-inside:avoid;background:#e8eef6;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s}
+.feedPhoto:hover{transform:translateY(-3px) scale(1.015);box-shadow:0 12px 26px rgba(15,59,115,.25)}
+.feedPhoto img{width:100%;display:block}
+.feedPhotoTag{position:absolute;left:8px;bottom:8px;background:rgba(15,25,45,.72);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;backdrop-filter:blur(4px)}
+.feedSkel{height:260px;border-radius:14px;background:linear-gradient(90deg,#E6EDF7 25%,#F4F8FD 50%,#E6EDF7 75%);background-size:200% 100%;animation:skel 1.3s linear infinite}
+@keyframes skel{to{background-position:-200% 0}}
+@media(max-width:900px){.feedPlayerWrap{grid-template-columns:1fr}.feedList{max-height:none}}
 </style>
 </head>
 <body>
@@ -701,6 +740,7 @@ td{transition:background .15s}
   <button type="button" class="tabBtn adminOnly" id="tabBtnReviews" onclick="switchTab('reviews')">🧾 Reviews / Approvals <span class="tabCount" id="tabReviewCount" style="display:none">0</span></button>
   <button type="button" class="tabBtn adminOnly" id="tabBtnRequests" onclick="switchTab('requests')">📥 Requests <span class="tabCount" id="tabRequestCount" style="display:none">0</span></button>
   <button type="button" class="tabBtn adminOnly" id="tabBtnInsights" onclick="switchTab('insights')">📈 Insights</button>
+  <button type="button" class="tabBtn feedTab" id="tabBtnFeed" onclick="switchTab('feed')">📰 News Feed</button>
 </div>
 
 <div class="tabPane active" id="paneContent">
@@ -813,6 +853,15 @@ td{transition:background .15s}
   </div>
   <div id="insightsBody"><p class="hint">Loading insights…</p></div>
 </div><!-- /#paneInsights -->
+
+<div class="tabPane" id="paneFeed">
+  <div class="feedHead">
+    <div><div class="brandFont feedTitle">📰 News Feed</div>
+    <div class="hint">Latest videos from our YouTube channel and latest photos from our Facebook page — play and view them right here.</div></div>
+    <button class="secondary" id="refreshFeedBtn" onclick="loadFeed(true)">🔄 Refresh</button>
+  </div>
+  <div id="feedBody"><p class="hint">Loading the latest posts…</p></div>
+</div><!-- /#paneFeed -->
 </div><!-- /.container -->
 
 <div class="modal" id="requestModal" onclick="if(event.target===this&&!requestSending)closeRequestModal()">
@@ -1685,12 +1734,99 @@ function toggleDateSort(){
  if(arrow)arrow.textContent=dateSortDir==='asc'?'▲':'▼';
  render();
 }
+/* ---- News Feed ----------------------------------------------------- */
+let feedData=null,feedLoading=false,feedPlayId='';
+function feedAgo_(iso){
+  const t=Date.parse(iso);if(!t)return '';
+  const m=Math.max(0,Math.floor((Date.now()-t)/60000));
+  if(m<60)return (m<=1?'just now':m+' min ago');
+  const h=Math.floor(m/60);if(h<24)return h+' hr ago';
+  const d=Math.floor(h/24);if(d<30)return d+' day'+(d>1?'s':'')+' ago';
+  return new Date(t).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});
+}
+function feedDur_(iso){
+  const m=String(iso||'').match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/);
+  if(!m)return '';
+  const h=+m[1]||0,mi=+m[2]||0,se=+m[3]||0,p=n=>String(n).padStart(2,'0');
+  return h?h+':'+p(mi)+':'+p(se):mi+':'+p(se);
+}
+async function loadFeed(manual){
+  if(feedLoading)return;
+  if(!isOnline()){$('feedBody').innerHTML='<div class="insightErr">The News Feed needs an internet connection — you appear to be offline.</div>';return;}
+  feedLoading=true;
+  const btn=$('refreshFeedBtn');
+  if(btn){btn.disabled=true;btn.textContent='⏳ Loading…';}
+  if(!feedData)$('feedBody').innerHTML='<div class="feedSkel"></div><p class="hint">Loading the latest posts…</p>';
+  try{
+    feedData=await apiRequest('getFeed',{force:!!manual});
+    if(!feedPlayId||!(feedData.youtube.videos||[]).some(v=>v.id===feedPlayId))feedPlayId=((feedData.youtube.videos||[])[0]||{}).id||'';
+    if(activeTab==='feed')renderFeed();
+  }catch(err){
+    const msg=String(err&&err.message||err);
+    $('feedBody').innerHTML='<div class="insightErr">Could not load the News Feed: '+esc(/Unknown action/i.test(msg)?'the Apps Script backend needs the updated script (with getFeed) pasted in and redeployed.':msg)+'</div>';
+  }finally{
+    feedLoading=false;
+    if(btn){btn.disabled=false;btn.textContent='🔄 Refresh';}
+  }
+}
+function playFeedVideo(id,auto){
+  feedPlayId=id;
+  const v=((feedData&&feedData.youtube.videos)||[]).find(x=>x.id===id);if(!v)return;
+  const fp=$('feedPlayer');
+  if(fp)fp.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?rel=0&modestbranding=1'+(auto?'&autoplay=1':'');
+  if($('feedNowTitle'))$('feedNowTitle').textContent=v.title;
+  if($('feedNowMeta'))$('feedNowMeta').innerHTML=esc(feedAgo_(v.published))+' • '+Number(v.views||0).toLocaleString()+' views • <a href="https://www.youtube.com/watch?v='+encodeURIComponent(id)+'" target="_blank" rel="noopener">Open on YouTube ↗</a>';
+  document.querySelectorAll('#feedList .feedItem').forEach(el=>el.classList.toggle('playing',el.dataset.id===id));
+  if(auto&&fp&&fp.scrollIntoView&&window.innerWidth<900)fp.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function openFeedPhoto(i){
+  const ph=(feedData&&feedData.facebook.photos||[])[i];if(!ph)return;
+  openLightbox(ph.full||ph.thumb,false,(ph.caption?ph.caption+' — ':'')+feedAgo_(ph.created));
+}
+function renderFeed(){
+  const host=$('feedBody');if(!host)return;
+  if(!feedData){return;}
+  const yt=feedData.youtube||{},fb=feedData.facebook||{};
+  const vids=yt.videos||[];
+  let html='';
+  // ---- YouTube ----
+  html+='<div class="feedSecTitle"><span class="feedDot yt">▶</span> Latest YouTube videos</div>';
+  if(yt.error)html+='<div class="insightErr">YouTube: '+esc(yt.error)+'</div>';
+  else if(!vids.length)html+='<p class="hint">No videos found on the channel yet.</p>';
+  else{
+    const cur=vids.find(v=>v.id===feedPlayId)||vids[0];
+    html+='<div class="feedPlayerWrap"><div class="feedMain"><div class="feedFrame"><iframe id="feedPlayer" src="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(cur.id)+'?rel=0&modestbranding=1" allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>'
+      +'<div class="feedNow"><span class="feedNew">LATEST</span><div class="feedNowTitle" id="feedNowTitle">'+esc(cur.title)+'</div><div class="feedNowMeta" id="feedNowMeta"></div></div></div>'
+      +'<div class="feedList" id="feedList">'+vids.map((v,i)=>{
+        const d=feedDur_(v.duration);
+        return '<button type="button" class="feedItem'+(v.id===cur.id?' playing':'')+'" data-id="'+esc(v.id)+'" onclick="playFeedVideo(\''+escJs(v.id)+'\',true)">'
+          +'<span class="feedThumb"><img src="'+esc(v.thumb)+'" loading="lazy" referrerpolicy="no-referrer" alt="">'+(d?'<em>'+d+'</em>':'')+'<i class="feedPlay">▶</i></span>'
+          +'<span class="feedTxt"><b>'+esc(v.title)+'</b><small>'+(i===0?'<span class="feedNew sm">NEW</span> ':'')+esc(feedAgo_(v.published))+' • '+Number(v.views||0).toLocaleString()+' views</small></span></button>';
+      }).join('')+'</div></div>';
+  }
+  // ---- Facebook ----
+  html+='<div class="feedSecTitle" style="margin-top:26px"><span class="feedDot fb">f</span> Latest Facebook photos</div>';
+  if(fb.notConnected)html+='<p class="hint">Facebook is not connected yet. An admin can add FB_PAGE_ID and FB_PAGE_ACCESS_TOKEN as Script Properties in the Apps Script project.</p>';
+  else if(fb.error)html+='<div class="insightErr">Facebook: '+esc(fb.error)+'</div>';
+  else if(!(fb.photos||[]).length)html+='<p class="hint">No photos found on the Facebook page yet.</p>';
+  else html+='<div class="feedPhotos">'+fb.photos.map((p,i)=>'<button type="button" class="feedPhoto" onclick="openFeedPhoto('+i+')" title="'+esc(p.caption||'Click to enlarge')+'"><img src="'+esc(p.thumb)+'" loading="lazy" referrerpolicy="no-referrer" alt="'+esc(p.caption||'Facebook photo')+'"><span class="feedPhotoTag">'+esc(feedAgo_(p.created))+'</span></button>').join('')+'</div>';
+  html+='<div class="hint" style="margin-top:12px">Updated '+esc(feedAgo_(feedData.fetchedAt))+' • refreshes automatically every 10 minutes.</div>';
+  host.innerHTML=html;
+  if(vids.length)playFeedVideo(feedPlayId||vids[0].id,false);
+}
 /* ---- Tabs ---------------------------------------------------------- */
 var activeTab='content'; // var: applyRoleUI may run before this line is reached
 function switchTab(name){
   // Approver / share-link users only ever get the Content list.
   if((name==='reviews'||name==='insights'||name==='requests')&&isApproverLike())name='content';
+  // The News Feed is for Admin and Requesters only (not approvers / review links).
+  if(name==='feed'&&isApproverLike()&&!requestMode)name='content';
+  const leavingFeed=activeTab==='feed'&&name!=='feed';
   activeTab=name;
+  if($('paneFeed'))$('paneFeed').classList.toggle('active',name==='feed');
+  $('tabBtnFeed')?.classList.toggle('active',name==='feed');
+  if(leavingFeed){const fp=$('feedPlayer');if(fp)fp.src='about:blank';} // stop playback when leaving
+  if(name==='feed')renderFeed(),(!feedData&&!feedLoading)&&loadFeed();
   $('paneContent').classList.toggle('active',name==='content');
   $('paneReviews').classList.toggle('active',name==='reviews');
   $('paneInsights').classList.toggle('active',name==='insights');

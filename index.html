@@ -638,6 +638,7 @@ body.role-approver:not(.role-request) .feedTab{display:none!important}
 .feedPostText.clamp{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .feedMore{align-self:flex-start;background:none;border:0;padding:0;color:var(--azure);font-weight:700;font-size:12px;cursor:pointer}
 .lbCaption{white-space:pre-line}
+.feedPostTitle{font-weight:800;font-size:14px;color:var(--navy);line-height:1.35}
 </style>
 </head>
 <body>
@@ -1859,7 +1860,7 @@ function renderFeed(){
     const cur=feedAlbum?albums.find(a=>a.id===feedAlbum):null;
     if(cur)html+='<div class="feedAlbumHead"><b>📁 '+esc(cur.name)+'</b>'+(cur.link?' <a href="'+esc(cur.link)+'" target="_blank" rel="noopener">Open album on Facebook ↗</a>':'')+'</div>';
     const list=feedPhotoList_();
-    html+=list.length?'<div class="feedPhotos">'+list.map((p,i)=>'<button type="button" class="feedPhoto" onclick="openFeedPhoto('+i+')" title="'+esc(p.caption||'Click to enlarge')+'"><img src="'+esc(p.thumb)+'" loading="lazy" referrerpolicy="no-referrer" alt="'+esc(p.caption||'Facebook photo')+'"><span class="feedPhotoTag">'+esc(feedAgo_(p.created))+'</span>'+(p.caption?'<span class="feedPhotoCap">'+esc(p.caption)+'</span>':'')+'</button>').join('')+'</div>':'<p class="hint">No photos in this album.</p>';
+    html+=list.length?'<div class="feedPhotos">'+list.map((p,i)=>'<button type="button" class="feedPhoto" onclick="openFeedPhoto('+i+')" title="'+esc(p.caption||'Click to enlarge')+'"><img src="'+esc(p.thumb)+'" loading="lazy" referrerpolicy="no-referrer" alt="'+esc(p.caption||'Facebook photo')+'"><span class="feedPhotoTag">'+esc(feedAgo_(p.created))+'</span>'+((p.caption||p.album)?'<span class="feedPhotoCap">'+esc(p.caption||('📁 '+p.album))+'</span>':'')+'</button>').join('')+'</div>':'<p class="hint">No photos in this album.</p>';
   }
   // ---- Latest Facebook posts (below the albums) ----
   if(!fb.notConnected&&!fb.error){
@@ -1872,7 +1873,7 @@ function renderFeed(){
       const long=txt.length>220||txt.split('\n').length>4;
       return '<article class="feedPost">'
         +(p.picture?'<a class="feedPostPic" href="'+esc(p.link||p.picture)+'" target="_blank" rel="noopener"><img src="'+esc(p.picture)+'" loading="lazy" referrerpolicy="no-referrer" alt=""></a>':'')
-        +'<div class="feedPostBody"><div class="feedPostTime">'+esc(feedAgo_(p.created))+'</div>'
+        +'<div class="feedPostBody"><div class="feedPostTime">'+esc(feedAgo_(p.created))+(p.count?' • '+Number(p.count).toLocaleString()+' photos':'')+'</div>'+(p.title?'<div class="feedPostTitle">'+esc(p.title)+'</div>':'')
         +(txt?'<div class="feedPostText'+(long?' clamp':'')+'">'+esc(txt)+'</div>'+(long?'<button type="button" class="feedMore" onclick="toggleFeedText(this)">Read more ▾</button>':''):'')
         +(p.link?'<a class="feedPostLink" href="'+esc(p.link)+'" target="_blank" rel="noopener">View on Facebook ↗</a>':'')
         +'</div></article>';

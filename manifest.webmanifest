@@ -1,20 +1,17 @@
 {
   "name": "Rotary Club of Makati Content Tracker",
   "short_name": "RC Makati",
-  "description": "Request, review and track Rotary Club of Makati social media content.",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#0F3B73",
+  "background_color": "#000000",
   "theme_color": "#0F3B73",
   "icons": [
-    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
-    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
-  ],
-  "shortcuts": [
-    {"name": "Request content", "url": "./?request=1"},
-    {"name": "News Feed", "url": "./"}
+    {
+      "src": "logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }

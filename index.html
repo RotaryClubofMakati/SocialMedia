@@ -2,17 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0F3B73">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="RC Makati">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" id="pwaManifest" href="manifest.webmanifest">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Rotary Club of Makati Content Tracker</title>
 <link rel="icon" type="image/png" sizes="any" href="logo.png?v=2">
 <link rel="shortcut icon" type="image/png" href="logo.png?v=2">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" href="logo.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -645,68 +639,6 @@ body.role-approver:not(.role-request) .feedTab{display:none!important}
 .feedMore{align-self:flex-start;background:none;border:0;padding:0;color:var(--azure);font-weight:700;font-size:12px;cursor:pointer}
 .lbCaption{white-space:pre-line}
 .feedPostTitle{font-weight:800;font-size:14px;color:var(--navy);line-height:1.35}
-
-/* ===== Mobile app (PWA) ===== */
-html{-webkit-text-size-adjust:100%}
-body{padding-bottom:env(safe-area-inset-bottom)}
-header{padding-top:max(20px,env(safe-area-inset-top))}
-button,.tabBtn,.catTab,.mTab{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-#installBtn{display:none;align-items:center;gap:6px;background:var(--gold);color:#3b2600;border:0;border-radius:999px;padding:8px 14px;font-weight:800;font-size:12px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25)}
-#installBtn.show{display:inline-flex}
-.iosTip{display:none;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:60;background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 14px;box-shadow:0 12px 30px rgba(10,25,50,.3);font-size:13px}
-.iosTip.show{display:block}
-.iosTip button{float:right;border:0;background:none;font-size:18px;cursor:pointer;color:var(--muted)}
-@media(max-width:700px){
-  header{padding:max(14px,env(safe-area-inset-top)) 14px 14px;gap:10px}
-  header h1{font-size:18px}
-  .container{padding:0 10px;margin-top:12px}
-  .toolbar{padding:10px;gap:7px}.toolbar input{min-width:100%}
-  .tabBar{flex-wrap:nowrap;overflow-x:auto;gap:2px;scrollbar-width:none}.tabBar::-webkit-scrollbar{display:none}
-  .tabBtn{white-space:nowrap;padding:10px 12px;font-size:13px}
-  button,.secondary,.primary{min-height:40px}
-  input,select,textarea{font-size:16px} /* stops iOS zooming into fields */
-  .box{padding:16px;max-height:94vh;border-radius:14px}
-  .modalActions{position:sticky;bottom:-16px;background:#fff;padding:10px 0 2px}
-  .feedFrame{border-radius:0}
-  .feedAlbum{width:200px}
-  .feedPhotos{columns:2 140px}
-  /* content table becomes stacked cards */
-  .wrap{overflow:visible;background:none;border:0;box-shadow:none}
-  table,thead,tbody,tr,td{display:block;min-width:0!important;width:100%}
-  #tbody{display:block}
-  thead{display:none}
-  #tbody tr{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);margin-bottom:12px;padding:10px 12px;position:relative}
-  #tbody tr.insightDetailRow{padding:0;border:0;box-shadow:none;background:none}
-  #tbody td{border:0!important;padding:6px 0!important;display:flex;gap:10px;align-items:flex-start;font-size:13px;min-height:0}
-  #tbody td::before{flex:none;width:84px;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);padding-top:3px}
-  #tbody td:nth-child(1)::before{content:"Photo"}
-  #tbody td:nth-child(2)::before{content:"Project"}
-  #tbody td:nth-child(3)::before{content:"Event"}
-  #tbody td:nth-child(4)::before{content:"Upload"}
-  #tbody td:nth-child(5)::before{content:"Platform"}
-  #tbody td:nth-child(6)::before{content:"Type"}
-  #tbody td:nth-child(7)::before{content:"Content"}
-  #tbody td:nth-child(8)::before{content:"Details"}
-  #tbody td:nth-child(9)::before{content:"Status"}
-  #tbody td:nth-child(10)::before{content:"Links"}
-  #tbody td:nth-child(11)::before{content:"Actions"}
-  #tbody td[colspan]{display:block;text-align:center}
-  #tbody td[colspan]::before{content:none}
-  .actions{flex-wrap:wrap}
-}
-
-@media(max-width:700px){
-  header .tag:not(#x){font-size:11.5px;margin:2px 0 0}
-  header .brandRow{align-items:flex-start;gap:10px}
-  #gearIcon{width:44px;height:44px}
-  header h1{font-size:17px;line-height:1.2}
-  header .brandRow .tag:last-child,header .brandRow .tag[style]{display:none}
-  .headerRight{width:100%;justify-content:flex-start}
-  .categoryTabs,#monthTabs{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;padding-bottom:6px;-webkit-overflow-scrolling:touch}
-  .categoryTabs::-webkit-scrollbar,#monthTabs::-webkit-scrollbar{display:none}
-  .catTab{flex:none;padding:8px 13px;font-size:12px;white-space:nowrap}
-}
-@media(max-width:700px){#tbody td.descCell{background:transparent!important}#tbody td{background:transparent}}
 </style>
 </head>
 <body>
@@ -813,8 +745,8 @@ button,.tabBtn,.catTab,.mTab{touch-action:manipulation;-webkit-tap-highlight-col
     <div class="notifList" id="notifList"></div>
   </div>
 </div>
-<button type="button" id="installBtn" onclick="installApp()">📲 Install app</button>
- <span class="roleBadge" id="roleBadge">Admin</span>
+<span class="roleBadge" id="roleBadge">Admin</span>
+<button type="button" class="requestOnly" onclick="requesterLogout()" title="Log out of the requester portal" style="background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer">🚪 Log out</button>
 <div class="liveSwitchWrap shareHide">
   <span id="liveToggleLabel">Live mode</span>
   <button id="liveToggle" class="liveToggle on" onclick="toggleLive()" aria-pressed="true" title="Click to work offline"><span class="knob"></span></button>
@@ -878,7 +810,7 @@ button,.tabBtn,.catTab,.mTab{touch-action:manipulation;-webkit-tap-highlight-col
 <div class="requestOnly" style="margin:16px 0">
 <button class="primary" onclick="openRequestModal()" style="font-size:17px;padding:16px 28px;border-radius:12px">📩 For Posting</button>
 <button class="secondary" onclick="openMyRequests()" style="font-size:15px;padding:15px 22px;border-radius:12px;margin-left:10px">✏ My requests</button>
-<button class="secondary" onclick="requesterLogout()" style="font-size:15px;padding:15px 22px;border-radius:12px;margin-left:10px" title="Log out and choose a different name">🚪 Switch name</button>
+<input id="reqSearch" type="search" placeholder="🔍 Search project, content, description, platform..." oninput="document.getElementById('search').value=this.value;render()" style="display:block;width:100%;max-width:520px;margin-top:12px;padding:12px 14px;border:1px solid var(--border);border-radius:10px;font-size:14px">
 </div>
 <div class="toolbar shareHide">
 <input id="search" placeholder="Search project, content, description, event, platform..." oninput="render()">
@@ -1068,6 +1000,12 @@ button,.tabBtn,.catTab,.mTab{touch-action:manipulation;-webkit-tap-highlight-col
 <div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveContent()">Save Content</button></div>
 </div></div>
 
+<div class="modal" id="infoModal" onclick="if(event.target===this)closeInfoModal()"><div class="box" style="width:min(640px,100%)">
+<h2 id="infoModalTitle">Details</h2>
+<div id="infoModalBody"></div>
+<div class="modalActions"><button class="secondary" onclick="closeInfoModal()">Close</button></div>
+</div></div>
+
 <div class="modal" id="descModal" onclick="if(event.target===this)closeDescModal()"><div class="box" style="width:min(600px,100%)">
 <h2 id="descModalTitle">Description</h2>
 <div id="descModalBody"></div>
@@ -1135,7 +1073,6 @@ button,.tabBtn,.catTab,.mTab{touch-action:manipulation;-webkit-tap-highlight-col
 </div>
 </div></div>
 
-<div class="iosTip" id="iosTip"><button onclick="this.parentNode.classList.remove('show')" aria-label="Close">✕</button><b>Install on iPhone/iPad</b><br>Tap the <b>Share</b> button, then <b>Add to Home Screen</b>.</div>
 <div class="modal" id="lightboxModal" onclick="if(event.target===this)closeLightbox()">
 <div class="box">
 <button type="button" class="lbClose" onclick="closeLightbox()" title="Close">✕</button>
@@ -2391,7 +2328,7 @@ function render(){
    // the review grid, so a thumbnail an approver marked "Do Not Upload" is
    // visibly flagged here too, instead of looking identical to a cleared one.
    let thumbBorder=x.thumbnailStatus==='approved'?'border:2px solid #16a34a':x.thumbnailStatus==='revise'?'border:2px solid var(--cardinal)':'';
-   let thumb=coverUrl?`<img class="thumb" src="${esc(coverUrl)}" data-src="${esc(coverUrl)}" alt="Thumbnail" referrerpolicy="no-referrer" loading="lazy"${thumbBorder?` style="${thumbBorder}"`:''}>`:`<div class="thumbEmpty">No image</div>`;
+   let thumb=coverUrl?`<img class="thumb" src="${esc(coverUrl)}" data-src="${esc(coverUrl)}" alt="Thumbnail" referrerpolicy="no-referrer" loading="lazy" title="Click to view" onclick="event.stopPropagation();openLightbox('${escJs(coverUrl)}',isVideoUrl('${escJs(coverUrl)}'))" style="cursor:zoom-in;${thumbBorder}">`:`<div class="thumbEmpty">No image</div>`;
    let linkHtml=renderLinksHtml(x.links);
    let postStats=(insightsData&&insightsData.perPost)?insightsData.perPost[x.id]:null;
    let insightToggleHtml=postStats?`<button type="button" class="insightToggleBtn" onclick="event.stopPropagation();toggleInsightRow('${x.id}')">${expandedInsightRows.has(x.id)?'▲':'▼'} Insights</button>`:'';
@@ -2401,7 +2338,7 @@ function render(){
      :`<button class="secondary" onclick="openModal('${x.id}')">Edit</button><button class="danger" onclick="del('${x.id}')">Delete</button>`;
    let thumbAttrs=(isApproverLike()&&!revLocked)?` onclick="openApproveModal('${x.id}')" style="cursor:pointer"`:'';
    let contentShareBtn=isApproverLike()?'':`<button type="button" class="shareRowBtn adminOnly" onclick="event.stopPropagation();copyContentShareLink('${x.id}','${escJs(x.content||'')}')" title="Get a shareable link for just this content item">📎</button>`;
-   let contentAttrs=revLocked?` title="Already uploaded — review is closed"`:` onclick="${isApproverLike()?`openApproveModal('${x.id}')`:`openModal('${x.id}')`}" style="cursor:pointer" title="${isApproverLike()?'Click to review':'Click to edit'}"`;
+   let contentAttrs=revLocked?` title="Already uploaded — review is closed"`:(isApproverLike()?` onclick="openApproveModal('${x.id}')" style="cursor:pointer" title="Click to review"`:` onclick="openInfoModal('${x.id}')" style="cursor:pointer" title="Click for details"`);
    let revList=getReviewsFor(x);
    let extra=revList.length>1?(' • '+revList.length+' reviews on record: '+revList.map(r=>r.by).join(', ')):'';
    let reviewedByTitle=x.reviewedBy?('Reviewed by '+x.reviewedBy+(x.reviewedAt?(' on '+fmt(x.reviewedAt.slice(0,10))):'')+extra):(isApproverLike()?'Click to review':'Click to change status');
@@ -2655,6 +2592,25 @@ function openDescModal(id){
   $('descModal').classList.add('open');
 }
 function closeDescModal(){$('descModal').classList.remove('open')}
+function openInfoModal(id){
+  const x=data.find(a=>a.id===id); if(!x)return;
+  const row=(label,html)=>`<div style="margin:0 0 12px"><div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:3px">${label}</div><div>${html}</div></div>`;
+  const dash='<span style="color:#98a2b3">—</span>';
+  const links=(x.links&&String(x.links).trim())?renderLinksHtml(x.links):'';
+  let h='';
+  h+=row('Category',x.category?esc(x.category):dash);
+  h+=row('People of Action',x.peopleOfAction?esc(x.peopleOfAction):dash);
+  h+=row('Description',x.description?linkifyText(x.description):'<span style="color:#98a2b3">(No description)</span>');
+  h+=row('Where it will be posted',x.platform?esc(x.platform):dash);
+  if(x.status==='Uploaded'||links){
+    h+=row('Uploaded links',links?`<div class="links">${links}</div>`:'<span style="color:#98a2b3">No links added yet</span>');
+  }
+  $('infoModalTitle').textContent=x.content||x.project||'Details';
+  $('infoModalBody').innerHTML=(x.project?`<div style="font-size:12px;color:var(--muted);margin:-6px 0 12px">Project: <b>${esc(x.project)}</b></div>`:'')+h;
+  $('infoModal').classList.add('open');
+}
+function closeInfoModal(){$('infoModal').classList.remove('open')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('infoModal')&&$('infoModal').classList.contains('open'))closeInfoModal()});
 function openModal(id=null){
  modalToken++;
  editId=id;$('mtitle').textContent=id?'Edit Content':'Add Content';$('linkRows').innerHTML='';
@@ -4040,51 +3996,6 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)silentRefr
     els.forEach(el=>{
       new MutationObserver(()=>{if(!el._busy)run(el);}).observe(el,{childList:true,characterData:true,subtree:true});
     });
-  }catch(e){}
-})();
-</script>
-
-<script>
-/* ---- Installable app (PWA) ---------------------------------------- */
-(function(){
-  try{
-    var isHttp=/^https?:$/.test(location.protocol);
-    // One manifest per link: a requester who installs from ?request=1 gets an app that opens
-    // straight to the request page, while the plain link installs the admin/approver app.
-    if(isHttp){
-      var base=location.origin+location.pathname;
-      var q=location.search&&/[?&](request|all|approvals)=1/.test(location.search)?'?'+location.search.slice(1).split('&').filter(function(x){return /^(request|all|approvals)=/.test(x)}).join('&'):'';
-      var start=base+q;
-      var isReq=/request=1/.test(q);
-      var dir=base.replace(/[^\/]*$/,'');
-      var m={name:isReq?'RC Makati Content Request':'Rotary Club of Makati Content Tracker',short_name:isReq?'RC Request':'RC Makati',
-        description:'Request, review and track Rotary Club of Makati social media content.',
-        id:start,start_url:start,scope:dir,display:'standalone',orientation:'portrait',background_color:'#0F3B73',theme_color:'#0F3B73',
-        icons:[{src:dir+'icon-192.png',sizes:'192x192',type:'image/png',purpose:'any'},{src:dir+'icon-512.png',sizes:'512x512',type:'image/png',purpose:'any'},{src:dir+'icon-maskable-512.png',sizes:'512x512',type:'image/png',purpose:'maskable'}]};
-      var blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
-      var link=document.getElementById('pwaManifest');
-      if(link)link.href=URL.createObjectURL(blob);
-      if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
-    }
-  }catch(e){}
-  var deferred=null;
-  var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone;
-  window.addEventListener('beforeinstallprompt',function(e){
-    e.preventDefault();deferred=e;
-    var b=document.getElementById('installBtn');if(b&&!standalone)b.classList.add('show');
-  });
-  window.addEventListener('appinstalled',function(){
-    deferred=null;var b=document.getElementById('installBtn');if(b)b.classList.remove('show');
-  });
-  window.installApp=function(){
-    if(deferred){deferred.prompt();deferred.userChoice.finally(function(){deferred=null;var b=document.getElementById('installBtn');if(b)b.classList.remove('show');});}
-  };
-  // iPhone/iPad Safari has no install prompt — show the manual hint once.
-  try{
-    var ios=/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.MSStream;
-    if(ios&&!standalone&&!localStorage.getItem('rcmIosTip')){
-      setTimeout(function(){var t=document.getElementById('iosTip');if(t){t.classList.add('show');localStorage.setItem('rcmIosTip','1');}},2500);
-    }
   }catch(e){}
 })();
 </script>

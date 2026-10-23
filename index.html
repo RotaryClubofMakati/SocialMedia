@@ -571,6 +571,24 @@ td{transition:background .15s}
 .cards .card.activeCard{background:linear-gradient(160deg,#EAF3FF,#fff)}
 @media(max-width:700px){body::before,body::after{display:none}}
 
+
+/* ===== Details popup ===== */
+#infoModal .box h2{font-size:24px;line-height:1.25;margin:0 0 6px}
+.infoProject{font-size:13px;color:var(--muted);margin:0 0 16px;padding-bottom:12px;border-bottom:2px solid var(--gold)}
+.infoProject b{color:var(--navy)}
+.infoChips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.infoChip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700;border:1.5px solid}
+.infoChip.cat{background:#EAF3FF;color:#17458F;border-color:#9CC3F2}
+.infoChip.poa{background:#FEF0D6;color:#8A5A05;border-color:#F0C676}
+.infoChip.plat{background:#EAF7EE;color:#166534;border-color:#9AD7AE}
+.infoSec{border:1.5px solid #D5DEEA;border-radius:12px;margin:0 0 14px;overflow:hidden;background:#fff}
+.infoSecHead{background:linear-gradient(90deg,#F1F6FD,#fff);border-bottom:1.5px solid #D5DEEA;padding:8px 14px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--navy)}
+.infoSecBody{padding:12px 14px;font-size:15px;line-height:1.65;color:#1f2937;word-break:break-word}
+.infoSec.desc{border-left:5px solid var(--azure)}
+.infoSec.desc .infoSecBody{background:#FAFCFF;white-space:pre-wrap}
+.infoSec.links{border-left:5px solid #16a34a}
+.infoSec.links .infoSecHead{color:#166534}
+.infoMuted{color:#98a2b3}
 /* ===== News Feed ===== */
 body.role-request .tabBar.shareHide{display:flex!important}
 body.role-approver:not(.role-request) .feedTab{display:none!important}
@@ -2347,7 +2365,7 @@ function render(){
    let ds=dueState(x);
    let dueTag=ds.state==='overdue'?`<div class="dueTag overdue">Overdue ${ds.days}d</div>`:(ds.state==='today'?'<div class="dueTag today">Due today</div>':'');
    let uploadCell=x.uploadDate?(fmt(x.uploadDate)+dueTag+(x.uploadSetBy?`<div class="dueSetBy">Set by ${esc(x.uploadSetBy)}</div>`:'')):'<span style="color:#98a2b3">Not set</span>';
-   let mainRow=`<tr class="${row}"><td${thumbAttrs}>${thumb}</td><td${contentAttrs}><b>${esc(x.project||'')}</b>${x.category?`<div class="catTag">${esc(x.category)}</div>`:''}${x.peopleOfAction?`<div class="catTag" style="background:#FEF0D6;color:#8A5A05" title="People of Action">🌍 ${esc(x.peopleOfAction)}</div>`:''}${x.eventDate?`<div class="catTag monthTag" title="Event month">🗓 ${esc(monthLabelOf(monthKeyOf(x.eventDate)))}</div>`:''}${x.requestedBy?`<div class="reqTag" title="This content was requested through the request link">Requested by ${esc(x.requestedBy)}</div>${requestorLinkChip(x)?`<div style="margin-top:5px">${requestorLinkChip(x)}</div>`:''}`:''}</td><td>${fmt(x.eventDate)}</td><td>${uploadCell}</td><td>${esc(x.platform)}</td><td>${typeBadgeHtml(x.ctype)}</td><td${contentAttrs}>${contentShareBtn}<b>${esc(x.content)}</b></td><td class="descCell" onclick="openDescModal('${x.id}')"><span class="clampText">${esc(x.description)}</span></td><td><span class="badge ${cls(x.status)}" onclick="quickStatus('${x.id}')" title="${esc(reviewedByTitle)}">${esc(x.status)}</span>${reviewedByHtml}</td><td><div class="links">${linkHtml}${insightToggleHtml}</div></td><td><div class="actions">${actionsHtml}</div></td></tr>`;
+   let mainRow=`<tr class="${row}"><td${thumbAttrs}>${thumb}</td><td${contentAttrs}><b>${esc(x.project||'')}</b>${x.category?`<div class="catTag">${esc(x.category)}</div>`:''}${x.peopleOfAction?`<div class="catTag" style="background:#FEF0D6;color:#8A5A05" title="People of Action">🌍 ${esc(x.peopleOfAction)}</div>`:''}${x.eventDate?`<div class="catTag monthTag" title="Event month">🗓 ${esc(monthLabelOf(monthKeyOf(x.eventDate)))}</div>`:''}${x.requestedBy?`<div class="reqTag" title="This content was requested through the request link">Requested by ${esc(x.requestedBy)}</div>${requestorLinkChip(x)?`<div style="margin-top:5px">${requestorLinkChip(x)}</div>`:''}`:''}</td><td>${fmt(x.eventDate)}</td><td>${uploadCell}</td><td>${esc(x.platform)}</td><td>${typeBadgeHtml(x.ctype)}</td><td${contentAttrs}>${contentShareBtn}<b>${esc(x.content)}</b></td><td class="descCell" onclick="openInfoModal('${x.id}')" title="Click for details"><span class="clampText">${esc(x.description)}</span></td><td><span class="badge ${cls(x.status)}" onclick="quickStatus('${x.id}')" title="${esc(reviewedByTitle)}">${esc(x.status)}</span>${reviewedByHtml}</td><td><div class="links">${linkHtml}${insightToggleHtml}</div></td><td><div class="actions">${actionsHtml}</div></td></tr>`;
    let insightRow=postStats?renderInsightDetailRow_(x,postStats):'';
    return mainRow+insightRow;
  }).join(''):`<tr><td colspan="11" style="text-align:center;padding:35px;color:#667085">No content found. Click "+ Add Content" to start.</td></tr>`;
@@ -2594,19 +2612,22 @@ function openDescModal(id){
 function closeDescModal(){$('descModal').classList.remove('open')}
 function openInfoModal(id){
   const x=data.find(a=>a.id===id); if(!x)return;
-  const row=(label,html)=>`<div style="margin:0 0 12px"><div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:3px">${label}</div><div>${html}</div></div>`;
-  const dash='<span style="color:#98a2b3">—</span>';
+  const sec=(cls,icon,label,html)=>`<div class="infoSec ${cls}"><div class="infoSecHead">${icon} ${label}</div><div class="infoSecBody">${html}</div></div>`;
   const links=(x.links&&String(x.links).trim())?renderLinksHtml(x.links):'';
+  let chips='';
+  if(x.category)chips+=`<span class="infoChip cat">📁 ${esc(x.category)}</span>`;
+  if(x.peopleOfAction)chips+=`<span class="infoChip poa">🌍 ${esc(x.peopleOfAction)}</span>`;
+  if(x.platform)chips+=`<span class="infoChip plat">📢 ${esc(x.platform)}</span>`;
   let h='';
-  h+=row('Category',x.category?esc(x.category):dash);
-  h+=row('People of Action',x.peopleOfAction?esc(x.peopleOfAction):dash);
-  h+=row('Description',x.description?linkifyText(x.description):'<span style="color:#98a2b3">(No description)</span>');
-  h+=row('Where it will be posted',x.platform?esc(x.platform):dash);
+  if(x.project)h+=`<div class="infoProject">Project: <b>${esc(x.project)}</b></div>`;
+  h+=chips?`<div class="infoChips">${chips}</div>`:'';
+  h+=sec('desc','📝','Description',x.description?linkifyText(x.description):'<span class="infoMuted">(No description)</span>');
+  h+=sec('','📍','Where it will be posted',x.platform?esc(x.platform):'<span class="infoMuted">Not set</span>');
   if(x.status==='Uploaded'||links){
-    h+=row('Uploaded links',links?`<div class="links">${links}</div>`:'<span style="color:#98a2b3">No links added yet</span>');
+    h+=sec('links','🔗','Uploaded links',links?`<div class="links">${links}</div>`:'<span class="infoMuted">No links added yet</span>');
   }
   $('infoModalTitle').textContent=x.content||x.project||'Details';
-  $('infoModalBody').innerHTML=(x.project?`<div style="font-size:12px;color:var(--muted);margin:-6px 0 12px">Project: <b>${esc(x.project)}</b></div>`:'')+h;
+  $('infoModalBody').innerHTML=h;
   $('infoModal').classList.add('open');
 }
 function closeInfoModal(){$('infoModal').classList.remove('open')}

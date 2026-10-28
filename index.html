@@ -288,6 +288,7 @@ video.preview{width:200px;height:120px;border-radius:9px;background:#111;display
 #lightboxModal img,#lightboxModal video{width:100%;max-height:90vh;object-fit:contain;border-radius:10px;display:block;background:#000}
 #lightboxModal .lbClose{position:absolute;top:-14px;right:-14px;background:#fff;color:var(--text);border:0;border-radius:50%;width:34px;height:34px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 #lightboxModal .lbClose{z-index:5}
+.lbShapeBtn{display:none}
 #lightboxModal video{max-height:85vh;max-height:85dvh}
 #lightboxModal .lbCaption{text-align:center;color:#fff;font-size:12px;font-weight:700;margin-top:10px}
 #lightboxYoutubeCard{position:relative;width:100%;border-radius:10px;overflow:hidden;background:#000;cursor:pointer;display:block}
@@ -890,6 +891,10 @@ html[data-theme="neon"] a{text-shadow:0 0 4px rgba(0,229,255,.4)}
   #lightboxModal img,#lightboxModal video{border-radius:0;max-height:88vh;max-height:88dvh}
   #lightboxModal #lightboxDriveVideoWrap,#lightboxModal #lightboxYoutubePlayerWrap{aspect-ratio:auto!important;height:82vh;height:82dvh;border-radius:0!important}
   #lightboxModal .lbClose{top:calc(8px + env(safe-area-inset-top));left:8px;right:auto;width:44px;height:44px;font-size:18px;background:rgba(255,255,255,.95)}
+  /* Wide / Tall switch for embedded videos: Wide = 16:9 (controls sit right on
+     a landscape video), Tall = fills the screen (vertical reels). */
+  #lightboxModal.lbWide #lightboxDriveVideoWrap,#lightboxModal.lbWide #lightboxYoutubePlayerWrap{aspect-ratio:16/9!important;height:auto!important}
+  .lbShapeBtn.show{display:block;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));z-index:6;background:rgba(255,255,255,.95);color:#12305c;border:0;border-radius:999px;padding:11px 20px;font-size:14px;font-weight:800;box-shadow:0 2px 10px rgba(0,0,0,.4)}
   #lightboxModal .lbCaption{padding:8px 14px calc(8px + env(safe-area-inset-bottom));font-size:13px}
   .apBox{padding:16px}
   .reqBox{padding:16px}
@@ -1363,6 +1368,7 @@ html[data-theme="dark"] .modal{background:rgba(3,6,12,.8)}
 <span class="ytHint">Watch on YouTube ↗</span>
 </a>
 <div class="lbCaption" id="lightboxCaption"></div>
+<button type="button" class="lbShapeBtn" id="lbShapeBtn" onclick="toggleLbShape()"></button>
 </div>
 </div>
 
@@ -3099,6 +3105,7 @@ function openLightbox(url,isVideo,caption){
   }
   $('lightboxCaption').textContent=caption||'';
   $('lightboxModal').classList.add('open');
+  lbRefreshShape();
 }
 /**
  * Real inline playback needs the YouTube IFrame Player API (not a bare
@@ -3173,10 +3180,26 @@ function playYoutubeLink(e,url){
   $('lightboxModal').classList.add('open');
   if(window.YT&&YT.Player){ mountYtPlayer(id,url); }
   else { pendingYtVideoId=id; pendingYtUrl=url; ensureYtApi(); }
+  $('lightboxYoutubePlayerWrap').style.display='block';
+  lbRefreshShape();
   return false;
 }
 /* Tapping the dark area closes photos, but never a video — one stray tap
    used to kill playback. Videos close with the ✕ button (or Esc). */
+const LB_SHAPE_KEY='rcLbShape';
+function lbRefreshShape(){
+  const m=$('lightboxModal'),b=$('lbShapeBtn');
+  let wide=false;try{wide=localStorage.getItem(LB_SHAPE_KEY)==='wide';}catch(e){}
+  m.classList.toggle('lbWide',wide);
+  const embedded=['lightboxDriveVideoWrap','lightboxYoutubePlayerWrap'].some(id=>$(id).style.display==='block');
+  b.classList.toggle('show',embedded);
+  b.textContent=wide?'↕ Tall (reels)':'↔ Wide (landscape)';
+}
+function toggleLbShape(){
+  const wide=!$('lightboxModal').classList.contains('lbWide');
+  try{localStorage.setItem(LB_SHAPE_KEY,wide?'wide':'tall');}catch(e){}
+  lbRefreshShape();
+}
 function lbBackdropClick(e){
   if(e.target!==$('lightboxModal'))return;
   const playing=['lightboxVideo','lightboxDriveVideoWrap','lightboxYoutubePlayerWrap','lightboxYoutubeCard']
@@ -3186,6 +3209,7 @@ function lbBackdropClick(e){
 }
 function closeLightbox(){
   $('lightboxModal').classList.remove('open');
+  $('lbShapeBtn').classList.remove('show');
   const vid=$('lightboxVideo');
   vid.pause();vid.removeAttribute('src');
   const card=$('lightboxYoutubeCard');

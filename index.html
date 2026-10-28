@@ -287,6 +287,8 @@ video.preview{width:200px;height:120px;border-radius:9px;background:#111;display
 #lightboxModal .box{background:transparent;box-shadow:none;padding:0;width:min(94vw,920px);max-height:94vh;position:relative}
 #lightboxModal img,#lightboxModal video{width:100%;max-height:90vh;object-fit:contain;border-radius:10px;display:block;background:#000}
 #lightboxModal .lbClose{position:absolute;top:-14px;right:-14px;background:#fff;color:var(--text);border:0;border-radius:50%;width:34px;height:34px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#lightboxModal .lbClose{z-index:5}
+#lightboxModal video{max-height:85vh;max-height:85dvh}
 #lightboxModal .lbCaption{text-align:center;color:#fff;font-size:12px;font-weight:700;margin-top:10px}
 #lightboxYoutubeCard{position:relative;width:100%;border-radius:10px;overflow:hidden;background:#000;cursor:pointer;display:block}
 #lightboxYoutubeCard img{width:100%;max-height:90vh;object-fit:contain;display:block;border-radius:10px;background:#000}
@@ -345,8 +347,16 @@ textarea{min-height:90px}
 #apTitleBox{font-size:16px;font-weight:700;line-height:1.5;color:var(--navy);white-space:pre-wrap;word-break:break-word;border:1px solid var(--border);border-radius:9px;padding:12px 14px;background:#F9FBFD}
 #apTitleBox.empty{font-weight:500;font-style:italic;color:var(--muted)}
 /* Editable title/description in the review modal (reviewer may leave them as-is) */
-#apTitleInput{width:100%;font-size:16px;font-weight:700;color:var(--navy);padding:12px 14px;border:1px solid var(--border);border-radius:9px;background:#F9FBFD}
-#apDescInput{width:100%;min-height:150px;font-size:15px;line-height:1.6;color:#344054;padding:14px;border:1px solid var(--border);border-radius:9px;background:#F9FBFD;resize:vertical}
+#apTitleInput{display:block;width:100%;min-height:0;height:auto;font-size:16px;font-weight:700;line-height:1.4;color:var(--navy);padding:12px 14px;border:1px solid var(--border);border-radius:9px;background:#F9FBFD;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+/* Description card — same look as the Details view: blue left bar, heading
+   strip, and the text box grows to its full height so the whole caption is
+   visible with no inner scrollbar (the modal itself scrolls, never the box). */
+.apDescCard{border:1.5px solid #D5DEEA;border-left:5px solid var(--azure);border-radius:12px;overflow:hidden;background:#fff}
+.apDescHead{background:linear-gradient(90deg,#F1F6FD,#fff);border-bottom:1.5px solid #D5DEEA;padding:8px 14px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--navy)}
+#apDescInput{display:block;width:100%;min-height:0;height:auto;font-size:15px;line-height:1.65;color:#1f2937;padding:12px 14px;border:0;border-radius:0;background:#FAFCFF;box-shadow:none;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+#apDescInput:focus{box-shadow:inset 0 0 0 2px rgba(0,103,200,.25)}
+html[data-theme="dark"] :is(.apDescCard,.apDescHead),html[data-theme="neon"] :is(.apDescCard,.apDescHead){background:var(--card);border-color:var(--border);color:var(--navy)}
+html[data-theme="dark"] #apDescInput,html[data-theme="neon"] #apDescInput{background:var(--s2);color:var(--text)}
 .apEditedTag{display:none;margin-left:8px;font-size:10px;font-weight:800;color:#8A5A05;background:#FEF0D6;border-radius:999px;padding:2px 8px}
 .apEditedTag.show{display:inline-block}
 .revSuggest{margin-top:8px;font-size:12px;line-height:1.5;background:#FEF9E7;border:1px solid #F3DFA2;border-radius:9px;padding:8px 10px;white-space:pre-wrap;word-break:break-word}
@@ -365,7 +375,7 @@ textarea{min-height:90px}
 .apBox .albumTile .tileChecks button{padding:7px 0;font-size:14px}
 .apDecideBar{margin-top:22px;padding:16px;border-radius:12px;background:#F5F8FC;border:1px solid var(--border)}
 .apDecideBar button:disabled{opacity:.45;cursor:not-allowed}
-@media(max-width:700px){.apBox{padding:18px}.apBox .albumTile{width:138px}.apBox .albumTile img,.apBox .albumTile video{width:126px;height:94px}}
+@media(max-width:700px){.apBox{padding:14px}.apBox h2{font-size:19px}#apDescInput,#apTitleInput{font-size:16px}#apDescInput{padding:12px}.apDecideBar button{min-width:100%!important;flex:1 1 100%!important}.apBox #apUploadDate{max-width:100%!important}.apBox .albumTile{width:138px}.apBox .albumTile img,.apBox .albumTile video{width:126px;height:94px}}
 .hint{font-size:11px;color:var(--muted);margin-top:4px}
 .btnSpin{display:inline-block;width:14px;height:14px;margin-right:8px;vertical-align:-2px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:btnSpin .7s linear infinite}
 @keyframes btnSpin{to{transform:rotate(360deg)}}
@@ -873,7 +883,14 @@ html[data-theme="neon"] a{text-shadow:0 0 4px rgba(0,229,255,.4)}
   .modal#loginScreen,.modal#lightboxModal{align-items:center;padding:12px}
   .box{width:100%!important;max-height:94vh;border-radius:18px 18px 0 0;padding:16px}
   .modal#loginScreen .box{border-radius:18px;width:min(380px,100%)!important}
-  #lightboxModal .box{border-radius:0}
+  /* Video / photo viewer: full-width, tall enough for vertical reels, with a
+     ✕ that stays on-screen (top-left, clear of Drive's own pop-out icon). */
+  .modal#lightboxModal{padding:0;background:rgba(0,0,0,.92);align-items:center}
+  #lightboxModal .box{border-radius:0;border-top:0;width:100%!important;max-width:100vw;max-height:100vh;max-height:100dvh;overflow:hidden;padding:0}
+  #lightboxModal img,#lightboxModal video{border-radius:0;max-height:88vh;max-height:88dvh}
+  #lightboxModal #lightboxDriveVideoWrap,#lightboxModal #lightboxYoutubePlayerWrap{aspect-ratio:auto!important;height:82vh;height:82dvh;border-radius:0!important}
+  #lightboxModal .lbClose{top:calc(8px + env(safe-area-inset-top));left:8px;right:auto;width:44px;height:44px;font-size:18px;background:rgba(255,255,255,.95)}
+  #lightboxModal .lbCaption{padding:8px 14px calc(8px + env(safe-area-inset-bottom));font-size:13px}
   .apBox{padding:16px}
   .reqBox{padding:16px}
   .linkRow{grid-template-columns:1fr}
@@ -1288,12 +1305,12 @@ html[data-theme="dark"] .modal{background:rgba(3,6,12,.8)}
 <label>Title — the exact title used for the post (e.g. the YouTube title). You can edit it.
   <span class="apEditedTag" id="apTitleEdited">✏ edited</span>
   <button type="button" class="apCopyBtn" onclick="copyApTitle()" title="Copy this title">⧉ Copy</button></label>
-<input id="apTitleInput" maxlength="200" placeholder="(No title entered yet)" oninput="updateApEditedTags()">
+<textarea id="apTitleInput" rows="1" maxlength="200" placeholder="(No title entered yet)" oninput="updateApEditedTags()" onkeydown="if(event.key==='Enter')event.preventDefault()"></textarea>
 </div>
 <div class="field full" style="margin-top:14px">
 <label>Description / Caption — read the whole thing before deciding. You can edit it.
   <span class="apEditedTag" id="apDescEdited">✏ edited</span></label>
-<textarea id="apDescInput" placeholder="(No description)" oninput="updateApEditedTags()"></textarea>
+<div class="apDescCard"><div class="apDescHead">📝 Description</div><textarea id="apDescInput" rows="1" placeholder="(No description)" oninput="updateApEditedTags()"></textarea></div>
 <div class="hint">Only change these if you want to suggest new wording — if you leave them alone, the title and description stay exactly as they are. Your notes below are kept either way.</div>
 </div>
 <div class="reqLinkBox" id="apReqLink" style="display:none"></div>
@@ -1329,13 +1346,13 @@ html[data-theme="dark"] .modal{background:rgba(3,6,12,.8)}
 </div>
 </div></div>
 
-<div class="modal" id="lightboxModal" onclick="if(event.target===this)closeLightbox()">
+<div class="modal" id="lightboxModal" onclick="lbBackdropClick(event)">
 <div class="box">
 <button type="button" class="lbClose" onclick="closeLightbox()" title="Close">✕</button>
 <img id="lightboxImg" referrerpolicy="no-referrer" style="display:none">
-<video id="lightboxVideo" controls style="display:none"></video>
+<video id="lightboxVideo" controls playsinline webkit-playsinline preload="metadata" style="display:none"></video>
 <div id="lightboxDriveVideoWrap" style="display:none;width:100%;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000">
-<iframe id="lightboxDriveVideo" style="width:100%;height:100%;border:0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+<iframe id="lightboxDriveVideo" style="width:100%;height:100%;border:0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
 </div>
 <div id="lightboxYoutubePlayerWrap" style="display:none;width:100%;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000">
 <div id="lightboxYoutubePlayer" style="width:100%;height:100%"></div>
@@ -2682,7 +2699,15 @@ let apPhotosState=[];
 let apOrigTitle='',apOrigDesc='';
 function apTitleChanged(){return ($('apTitleInput').value||'').trim()!==apOrigTitle.trim();}
 function apDescChanged(){return ($('apDescInput').value||'').trim()!==apOrigDesc.trim();}
+function apAutoGrow(el){
+  if(!el)return;
+  el.style.height='auto';
+  el.style.height=(el.scrollHeight+(el.offsetHeight-el.clientHeight))+'px';
+}
+function apGrowAll(){apAutoGrow($('apTitleInput'));apAutoGrow($('apDescInput'));}
+window.addEventListener('resize',()=>{if($('approveModal')&&$('approveModal').classList.contains('open'))apGrowAll();});
 function updateApEditedTags(){
+  apGrowAll();
   $('apTitleEdited').classList.toggle('show',apTitleChanged());
   $('apDescEdited').classList.toggle('show',apDescChanged());
 }
@@ -2728,6 +2753,8 @@ function openApproveModal(id){
   renderApGrid();
   updateApDecisionState();
   $('approveModal').classList.add('open');
+  apGrowAll();requestAnimationFrame(apGrowAll);setTimeout(apGrowAll,150);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(apGrowAll);
 }
 /** Copies the title verbatim so it can be pasted straight into YouTube etc. */
 async function copyApTitle(){
@@ -3147,6 +3174,15 @@ function playYoutubeLink(e,url){
   if(window.YT&&YT.Player){ mountYtPlayer(id,url); }
   else { pendingYtVideoId=id; pendingYtUrl=url; ensureYtApi(); }
   return false;
+}
+/* Tapping the dark area closes photos, but never a video — one stray tap
+   used to kill playback. Videos close with the ✕ button (or Esc). */
+function lbBackdropClick(e){
+  if(e.target!==$('lightboxModal'))return;
+  const playing=['lightboxVideo','lightboxDriveVideoWrap','lightboxYoutubePlayerWrap','lightboxYoutubeCard']
+    .some(id=>$(id)&&$(id).style.display!=='none'&&getComputedStyle($(id)).display!=='none');
+  if(playing)return;
+  closeLightbox();
 }
 function closeLightbox(){
   $('lightboxModal').classList.remove('open');

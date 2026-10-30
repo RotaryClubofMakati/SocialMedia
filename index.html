@@ -916,6 +916,106 @@ html[data-theme="dark"] #lightboxModal .box,html[data-theme="neon"] #lightboxMod
 html[data-theme="neon"] .modal{background:rgba(0,0,0,.92)}
 html[data-theme="dark"] .modal{background:rgba(3,6,12,.8)}
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style id="rcRedesign">
+/* ===== RC Makati — "Gold & Ink" redesign layer (visual only) ===== */
+html[data-theme="light"]{
+  --navy:#0B2A55;--royal:#123F86;--azure:#1366D6;--gold:#F2A516;--cardinal:#C2343A;
+  --bg:#F6F2EA;--card:#FFFDF9;--border:#E8E0D2;--text:#16203A;--muted:#6B7280;
+  --radius:18px;--shadow:0 1px 2px rgba(11,42,85,.04),0 8px 24px -12px rgba(11,42,85,.18);
+}
+body{font-family:'Plus Jakarta Sans','Inter',Arial,sans-serif;letter-spacing:-.005em;
+  background:radial-gradient(1200px 500px at 100% -10%,rgba(242,165,22,.10),transparent 60%),
+             radial-gradient(900px 500px at -10% 0%,rgba(19,102,214,.08),transparent 60%),var(--bg);background-attachment:fixed}
+h1,h2,h3,.brandFont,.card .num{font-family:'Fraunces','Manrope',Georgia,serif;letter-spacing:-.02em}
+
+/* Header: deep ink with gold hairline */
+header{background:linear-gradient(135deg,#071C3D 0%,#0B2A55 45%,#123F86 100%);padding:18px 32px;position:sticky;top:0;z-index:20;
+  box-shadow:0 10px 30px -15px rgba(7,28,61,.6);border-bottom:2px solid var(--gold)}
+header::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(400px 120px at 85% 0%,rgba(242,165,22,.25),transparent 70%)}
+header h1{font-size:26px;font-weight:800}
+header .tag{opacity:.75;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase}
+.iconBtn{border-radius:12px;backdrop-filter:blur(6px)}
+#appscriptStatus{border-radius:999px;backdrop-filter:blur(6px)}
+
+.container{margin:28px auto;padding:0 24px}
+
+/* Tabs: segmented pill bar */
+.tabBar{border-bottom:0;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:5px;gap:4px;
+  width:max-content;max-width:100%;box-shadow:var(--shadow);margin:6px 0 22px}
+.tabBtn{border-radius:999px!important;border-bottom:0!important;margin:0!important;padding:10px 20px}
+.tabBtn:hover{background:#F3ECDF}
+.tabBtn.active,.tabBtn.activeTab,.tabBtn[aria-selected="true"]{background:var(--navy)!important;color:#fff!important;box-shadow:0 6px 16px -6px rgba(11,42,85,.6)}
+
+/* Stat cards: soft tiles with color glow */
+.cards{gap:14px}
+.card{border:1px solid var(--border);border-left:0;border-radius:var(--radius);padding:16px 18px 14px;position:relative;overflow:hidden;
+  box-shadow:var(--shadow);transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s}
+.card::before{content:"";position:absolute;left:16px;right:16px;top:0;height:3px;border-radius:0 0 4px 4px;background:var(--accentC,var(--royal))}
+.card::after{content:"";position:absolute;right:-30px;bottom:-30px;width:90px;height:90px;border-radius:50%;background:var(--accentC,var(--royal));opacity:.08}
+.card:hover{transform:translateY(-3px);box-shadow:0 16px 30px -14px rgba(11,42,85,.35)}
+.card.activeCard{box-shadow:0 0 0 2px var(--accentC,var(--azure)),0 16px 30px -14px rgba(11,42,85,.35)}
+.card.stPending{--accentC:#64748B}.card.stUploaded{--accentC:#1E9155}.card.stEditing{--accentC:#D99308}
+.card.stApproval{--accentC:#1366D6}.card.stApproved{--accentC:#16A34A}.card.stUpload{--accentC:#4F46C9}
+.card.stRevise{--accentC:#C2343A}
+.card .label{text-transform:uppercase;letter-spacing:.07em;font-size:10.5px;font-weight:700}
+.card .num{font-size:32px;font-weight:800;color:var(--accentC,var(--navy));line-height:1.1;margin-top:6px}
+
+/* Chips */
+.catTab,.monthTab,.mTab{border-radius:999px;padding:8px 15px;font-weight:700;box-shadow:0 1px 0 rgba(11,42,85,.04)}
+.catTab.activeCat,.monthTab.activeMonth,.mTab.activeM{background:var(--navy);border-color:var(--navy);box-shadow:0 8px 18px -8px rgba(11,42,85,.6)}
+.catTab .catTabCount,.monthTab .mCount,.mTab .mCount{background:rgba(242,165,22,.18);color:#8A5A05}
+.catTab.activeCat .catTabCount,.monthTab.activeMonth .mCount,.mTab.activeM .mCount{background:var(--gold);color:#16203A}
+
+/* Toolbar & inputs */
+.toolbar{border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+input,select,textarea{border:1px solid var(--border);border-radius:12px;padding:10px 13px;background:#fff;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--azure);box-shadow:0 0 0 4px rgba(19,102,214,.14)}
+
+/* Buttons */
+button{border-radius:12px;transition:transform .15s,box-shadow .15s,filter .15s}
+.primary{background:linear-gradient(135deg,#1366D6,#123F86);box-shadow:0 8px 18px -8px rgba(19,102,214,.7)}
+.primary:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.secondary{background:#F1EADC;color:var(--navy)}
+.danger{background:linear-gradient(135deg,#D9454B,#A5262C)}
+
+/* Tables & panels */
+.wrap{border-radius:var(--radius)!important;border:1px solid var(--border);box-shadow:var(--shadow);overflow:auto}
+th{background:#FBF7EF!important;color:var(--muted)!important;text-transform:uppercase;font-size:11px!important;letter-spacing:.06em}
+tbody tr{transition:background .12s}
+tbody tr:hover td{background:#FBF5E8}
+.box{border-radius:24px;border-top:0;box-shadow:0 40px 80px -20px rgba(7,28,61,.45)}
+.box::before{content:"";display:block;height:4px;margin:-24px -24px 20px;border-radius:24px 24px 0 0;background:linear-gradient(90deg,var(--gold),#F7C85A,var(--azure))}
+.modal{backdrop-filter:blur(6px)}
+.typeBadge,.catTag{border-radius:999px}
+.dueCard,.chartCard,.insightCard,.insightMiniCard,.reqCard,.myReqCard,.feedPost,.revGroup{border-radius:var(--radius)!important;box-shadow:var(--shadow)}
+
+/* Login */
+#loginScreen{background:radial-gradient(800px 400px at 80% 10%,rgba(242,165,22,.25),transparent 60%),linear-gradient(160deg,#071C3D,#123F86)!important}
+#loginScreen .box,#loginScreen > div{border-radius:28px}
+
+/* Entrance motion */
+@keyframes rcRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.cards .card{animation:rcRise .5s cubic-bezier(.2,.8,.2,1) both}
+.cards .card:nth-child(2){animation-delay:.04s}.cards .card:nth-child(3){animation-delay:.08s}.cards .card:nth-child(4){animation-delay:.12s}
+.cards .card:nth-child(5){animation-delay:.16s}.cards .card:nth-child(6){animation-delay:.2s}.cards .card:nth-child(7){animation-delay:.24s}.cards .card:nth-child(8){animation-delay:.28s}
+
+/* Dark themes: keep their palettes, just inherit shapes */
+html[data-theme="dark"] .tabBtn:hover,html[data-theme="neon"] .tabBtn:hover{background:var(--s3)}
+html[data-theme="dark"] .secondary,html[data-theme="neon"] .secondary{background:var(--s3)}
+html[data-theme="dark"] th,html[data-theme="neon"] th{background:var(--s2)!important}
+html[data-theme="dark"] input,html[data-theme="neon"] input{background:var(--s2)}
+html[data-theme="dark"] tbody tr:hover td,html[data-theme="neon"] tbody tr:hover td{background:var(--s2)}
+html[data-theme="dark"] .catTab .catTabCount,html[data-theme="neon"] .catTab .catTabCount{color:var(--gold-tx)}
+
+@media (max-width:760px){
+  header{padding:14px 16px;position:relative}
+  .container{padding:0 12px}
+  .tabBar{width:auto;border-radius:20px 20px 0 0}
+  .card .num{font-size:26px}
+}
+</style>
 </head>
 <body>
 <div class="modal open" id="loginScreen" style="z-index:9999;background:#0F1929">

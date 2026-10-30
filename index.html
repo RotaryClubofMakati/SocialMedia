@@ -930,7 +930,7 @@ body{font-family:'Plus Jakarta Sans','Inter',Arial,sans-serif;letter-spacing:-.0
 h1,h2,h3,.brandFont,.card .num{font-family:'Fraunces','Manrope',Georgia,serif;letter-spacing:-.02em}
 
 /* Header: deep ink with gold hairline */
-header{background:linear-gradient(135deg,#071C3D 0%,#0B2A55 45%,#123F86 100%);padding:18px 32px;position:sticky;top:0;z-index:20;
+header{background:linear-gradient(135deg,#071C3D 0%,#0B2A55 45%,#123F86 100%);padding:18px 32px;position:relative;z-index:20;
   box-shadow:0 10px 30px -15px rgba(7,28,61,.6);border-bottom:2px solid var(--gold)}
 header::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(400px 120px at 85% 0%,rgba(242,165,22,.25),transparent 70%)}
@@ -1009,11 +1009,84 @@ html[data-theme="dark"] input,html[data-theme="neon"] input{background:var(--s2)
 html[data-theme="dark"] tbody tr:hover td,html[data-theme="neon"] tbody tr:hover td{background:var(--s2)}
 html[data-theme="dark"] .catTab .catTabCount,html[data-theme="neon"] .catTab .catTabCount{color:var(--gold-tx)}
 
+
+/* ---------- Populated content list (desktop) ---------- */
+tbody td{padding:14px 12px;vertical-align:middle}
+tbody tr + tr td{border-top:1px solid var(--border)}
+.thumb,.thumbEmpty{border-radius:12px!important;box-shadow:0 4px 12px -6px rgba(11,42,85,.4);object-fit:cover}
+td.descCell{color:var(--muted);line-height:1.5;font-size:13px}
+.links a{border-radius:999px!important;font-weight:700}
+.actions button{border-radius:10px}
+
+/* ---------- Post captions (News Feed) ---------- */
+.feedPosts{gap:18px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.feedPost{border-radius:20px!important;border:1px solid var(--border)}
+.feedPostPic{aspect-ratio:4/3;position:relative}
+.feedPostPic::after{content:"";position:absolute;inset:auto 0 0 0;height:40%;background:linear-gradient(transparent,rgba(7,28,61,.35));pointer-events:none}
+.feedPostBody{padding:16px 18px 18px;gap:8px}
+.feedPostTime{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.feedPostTime::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.feedPostTitle{font-family:'Fraunces',Georgia,serif;font-size:17px;font-weight:700;line-height:1.3;letter-spacing:-.01em}
+.feedPostText{font-size:14px;line-height:1.65;color:var(--text);opacity:.88;padding-left:12px;border-left:3px solid rgba(242,165,22,.55)}
+.feedPostText.clamp{-webkit-line-clamp:4;mask-image:linear-gradient(#000 65%,transparent);-webkit-mask-image:linear-gradient(#000 65%,transparent)}
+.feedMore{margin-left:12px;padding:4px 12px!important;border-radius:999px!important;background:rgba(19,102,214,.08)!important;font-size:12px}
+.feedPostLink{align-self:flex-start;margin-top:auto;padding:8px 14px;border-radius:999px;background:var(--navy);color:#fff!important;font-size:12px}
+.feedPostLink:hover{filter:brightness(1.15)}
+.feedNowTitle{font-family:'Fraunces',Georgia,serif;font-size:20px;line-height:1.3}
+.feedItem{border-radius:14px!important}
+.feedTxt b{font-size:13.5px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.feedTxt small{color:var(--muted);font-size:11.5px}
+.feedPhoto{border-radius:16px!important}
+.feedAlbum{border-radius:16px!important}
+.feedAlbum.on{border-color:var(--navy);box-shadow:0 0 0 2px var(--navy)}
+#lightboxModal .lbCaption{font-size:14px;line-height:1.6}
+html[data-theme="dark"] .feedPostLink,html[data-theme="neon"] .feedPostLink{background:var(--azure-bg);color:var(--azure)!important}
+
+/* ---------- Mobile ---------- */
 @media (max-width:760px){
-  header{padding:14px 16px;position:relative}
-  .container{padding:0 12px}
-  .tabBar{width:auto;border-radius:20px 20px 0 0}
+  header{position:relative;padding:14px 16px}
+  header h1{font-size:18px}
+  .container{padding:0 12px;margin:14px auto 96px}
+  /* bottom nav: floating glass dock */
+  .tabBar{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));width:auto;border-radius:22px;padding:6px;
+    background:rgba(255,253,249,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--border);
+    box-shadow:0 18px 40px -12px rgba(7,28,61,.45);margin:0;flex-wrap:nowrap;overflow-x:auto}
+  .tabBtn{flex:1 0 auto;padding:10px 12px;font-size:12px;border-top:0!important}
+  html[data-theme="dark"] .tabBar,html[data-theme="neon"] .tabBar{background:var(--glass)}
+  #toast{bottom:calc(92px + env(safe-area-inset-bottom))}
+  .cards .card{flex:0 0 128px;padding:14px}
   .card .num{font-size:26px}
+  .card::after{width:60px;height:60px}
+  /* content rows as cards */
+  tbody tr{border-radius:18px!important;padding:14px;gap:8px 14px;border-left-width:0!important;position:relative;overflow:hidden}
+  tbody tr.rowUploaded::before,tbody tr.rowNotUploaded::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;border-radius:0 4px 4px 0;background:#16A34A}
+  tbody tr.rowNotUploaded::before{background:var(--cardinal)}
+  tbody tr + tr td{border-top:0}
+  tbody td{padding:0}
+  td:nth-child(2){font-weight:800;color:var(--navy);font-size:14px}
+  td:nth-child(3)::before,td:nth-child(4)::before,td:nth-child(5)::before,td:nth-child(6)::before,td:nth-child(9)::before,td:nth-child(10)::before{color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:10px}
+  td.descCell{font-size:13px;padding-top:4px!important;border-top:1px dashed var(--border)!important}
+  .thumb,.thumbEmpty{width:84px;height:84px}
+  /* sheets */
+  .box{border-radius:24px 24px 0 0;padding:18px}
+  .box::before{margin:-18px -18px 16px;border-radius:24px 24px 0 0}
+  #lightboxModal .box::before{display:none}
+  .modal#loginScreen .box{border-radius:24px}
+  /* feed */
+  .feedPosts{grid-template-columns:1fr;gap:14px}
+  .feedPostBody{padding:14px 16px 16px}
+  .feedPostText{font-size:14.5px}
+  .feedNowTitle{font-size:17px}
+  .feedAlbum{width:200px}
+  .tabBar{max-width:calc(100vw - 20px)}
+}
+#lightboxModal .box::before{display:none}
+
+@media (max-width:760px){
+  .headerRight{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:6px;padding-bottom:2px}
+  .headerRight::-webkit-scrollbar{display:none}
+  .headerRight > *{flex:none}
+  .liveSwitchWrap{padding:4px 8px}
 }
 </style>
 </head>

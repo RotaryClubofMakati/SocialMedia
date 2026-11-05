@@ -674,6 +674,7 @@ body.role-approver:not(.role-request) .feedTab{display:none!important}
 .feedMore{align-self:flex-start;background:none;border:0;padding:0;color:var(--azure);font-weight:700;font-size:12px;cursor:pointer}
 .lbCaption{white-space:pre-line}
 .feedPostTitle{font-weight:800;font-size:14px;color:var(--navy);line-height:1.35}
+body.portal .iconBtn[onclick="logout()"],body.portal button[onclick="requesterLogout()"]{display:none!important}
 </style>
 <script>(function(){var t='';try{t=localStorage.getItem('rcMakatiTheme')||''}catch(e){}if(['light','dark','neon'].indexOf(t)<0)t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';document.documentElement.setAttribute('data-theme',t);})();</script>
 <style id="themeAndMobile">
@@ -1159,19 +1160,95 @@ html[data-theme="dark"] .feedPostLink,html[data-theme="neon"] .feedPostLink{back
   var shareContentId=(shareIdParam&&shareIdParam.trim())?shareIdParam.trim():'';
   var shareMode=!!shareContentId||shareAllMode||shareApprovalsMode;
   if(requestMode)document.body.classList.add('role-request');
-  if(shareMode){
-    if(requestMode&&!getRequester()){
-      document.getElementById('loginScreen').classList.add('requesterOnly');
-    }else{
+
+  /* ================= RCM ADMIN PORTAL SIGN-IN =================
+     No username/password here any more. This page runs inside the RCM Admin
+     Systems portal; the portal hands over the signed-in Google token, the
+     portal API confirms who it is, and the role is set from the email below.
+     Public share links (?id= / ?all= / ?approvals=) still work with no login. */
+  var PORTAL_API='https://script.google.com/macros/s/AKfycby5bu-lCbf4qgxyEtTsZc7CDRHWbcax3vtCuZWf_97JJZblYvdPwDbWv-DuQKPOrki6UQ/exec';
+  var PORTAL_APP_ID='content';   // the id of this system in the portal's APPS list
+  var ADMIN_EMAILS=['aaron.glo@rotaryclubmakati.org'];
+  // Names must match the existing request records exactly, so each person keeps their current requests.
+  var PEOPLE={
+    'rhia.vallejo@rotaryclubmakati.org':{name:'Rhia Vallejo',kind:'requester'},
+    'cos@rotaryclubmakati.org':{name:'Ron Dotaro',kind:'requester'},
+    'richard.manilag@rotaryclubmakati.org':{name:'Richard Manilag',kind:'requester'},
+    'jiyan.adriano@rotaryclubmakati.org':{name:'Jiyan Adriano',kind:'requester'},
+    'chris.ferareza@rotaryclubmakati.org':{name:'Chris Ferareza',kind:'requester'},
+    'al.marcial@rotaryclubmakati.org':{name:'Al Marcial',kind:'approver'},
+    'angie.falceso@rotaryclubmakati.org':{name:'Angie Falceso',kind:'approver'}
+  };
+  var PID_KEY='rcmPortalId';
+  function portalMsg(t,bad){var m=document.getElementById('rcmPortalMsg');if(m){m.textContent=t;m.style.color=bad?'#B0272D':'';}}
+  function applyPortalId(id){
+    try{
+      if(id.kind==='admin'){sessionStorage.setItem('rcMakatiAdminAuth','1');sessionStorage.setItem('rcMakatiRole','admin');}
+      else if(id.kind==='approver'){sessionStorage.setItem('rcMakatiAdminAuth','1');sessionStorage.setItem('rcMakatiRole','approver');localStorage.setItem('rcMakatiReviewerName',id.name);}
+      else if(id.kind==='requester'){localStorage.setItem(REQUESTER_KEY,id.name);}
+    }catch(e){}
+  }
+  function portalIdentify(cb){
+    var done=false,tries=0,timer;
+    function fail(t){if(done)return;done=true;clearInterval(timer);portalMsg(t,true);}
+    window.addEventListener('message',function(e){
+      if(done||e.source!==window.parent||!e.data||e.data.type!=='rcm-token'||!e.data.token)return;
+      done=true;clearInterval(timer);
+      var portalName=(e.data.user&&e.data.user.name)||'';
+      fetch(PORTAL_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'access',token:e.data.token})})
+        .then(function(r){return r.json();})
+        .then(function(j){
+          if(!j.ok||!j.user)return portalMsg('This Google account is not authorized. Please ask the portal admin.',true);
+          var u=j.user,email=String(u.email||'').toLowerCase(),apps=u.apps||[];
+          var hasApp=u.role==='admin'||apps.some(function(a){return a===PORTAL_APP_ID||a.indexOf(PORTAL_APP_ID+':')===0;});
+          if(!hasApp)return portalMsg('Your account has no access to the Content Tracker.',true);
+          // Role is set in the portal (Admin tab > Content dropdown): content:admin / content:approver / content:requester.
+          var pr=''; apps.forEach(function(x){if(x.indexOf(PORTAL_APP_ID+':')===0)pr=x.split(':')[1];});
+          var old=PEOPLE[email];   // existing records keep the exact name they were saved under
+          var kind=(u.role==='admin'||ADMIN_EMAILS.indexOf(email)>=0||pr==='admin')?'admin':(pr==='approver'||pr==='requester')?pr:(old?old.kind:'requester');
+          var nm=old?old.name:(portalName||email);
+          if(kind==='requester'&&REQUESTERS.indexOf(nm)<0)REQUESTERS.push(nm);
+          var id={email:email,name:kind==='admin'?'Admin':nm,kind:kind};
+          cb(id);
+        }).catch(function(){portalMsg('Cannot reach the portal server. Please reload.',true);});
+    });
+    function ask(){if(done)return;if(++tries>12)return fail('Please open this tracker from the RCM Admin Systems portal.');try{window.parent.postMessage({type:'rcm-need-token'},'*');}catch(e){}}
+    ask();timer=setInterval(ask,700);
+  }
+
+  var portalFlow=!shareMode||requestMode;
+  if(portalFlow){
+    document.body.classList.add('portal');
+    var box=document.querySelector('#loginScreen .box');
+    if(box)box.innerHTML='<h2 style="margin:0">Rotary Club of Makati</h2><p id="rcmPortalMsg" style="color:var(--muted);font-size:13px;margin:12px 0 0">Signing you in through RCM Admin…</p>';
+    var cached=null;try{cached=JSON.parse(sessionStorage.getItem(PID_KEY)||'null');}catch(e){}
+    var inFrame=(window.parent!==window);
+    function enter(id){
+      if(id.kind==='requester'&&REQUESTERS.indexOf(id.name)<0)REQUESTERS.push(id.name);
+      applyPortalId(id);
+      if(id.kind==='requester'&&!requestMode){location.replace(location.pathname+'?request=1');return;}
+      if(id.kind!=='requester'&&requestMode){location.replace(location.pathname);return;}
       document.getElementById('loginScreen').classList.remove('open');
+      if(id.kind==='approver')document.body.classList.add('role-approver');
+    }
+    if(cached){
+      enter(cached);   // instant render; re-verified below in case the portal user changed
+      if(inFrame)portalIdentify(function(id){
+        if(id.email!==cached.email){try{sessionStorage.clear();sessionStorage.setItem(PID_KEY,JSON.stringify(id));}catch(e){}location.reload();}
+      });
+    }else{
+      window.__rcmHold=true;   // don't load any data until we know who this is
+      if(!inFrame)portalMsg('Please open this tracker from the RCM Admin Systems portal.',true);
+      else portalIdentify(function(id){
+        try{sessionStorage.setItem(PID_KEY,JSON.stringify(id));}catch(e){}
+        applyPortalId(id);
+        if(id.kind==='requester'&&!requestMode)location.replace(location.pathname+'?request=1');
+        else if(id.kind!=='requester'&&requestMode)location.replace(location.pathname);
+        else location.reload();
+      });
     }
   }else{
-    if(sessionStorage.getItem('rcMakatiAdminAuth')==='1'){
-      document.getElementById('loginScreen').classList.remove('open');
-    }
-    if(sessionStorage.getItem('rcMakatiRole')==='approver'){
-      document.body.classList.add('role-approver');
-    }
+    document.getElementById('loginScreen').classList.remove('open');   // public share link
   }
 </script>
 <header>
@@ -4441,6 +4518,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)silentRefr
     if(!forceOffline) setAppStatus('disconnected','Apps Script: Offline','Internet is unavailable. Local data remains available.');
   });
   window.addEventListener('load', async function(){
+    if(window.__rcmHold)return;
     if(requestMode)initRequestPage();
     applyRoleUI();
     const arrow=$('eventDateSortArrow');
